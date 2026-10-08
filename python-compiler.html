@@ -1,0 +1,1556 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Python Playground — Онлайн-компилятор</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+
+<!-- CodeMirror -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/material-darker.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/dialog/dialog.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/fold/foldgutter.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/hint/show-hint.min.css">
+
+<!-- Единый стиль всех шпаргалок -->
+<link rel="stylesheet" href="styles.css">
+
+<style>
+/* ================================================================
+   Только специфика Playground: toolbar, рабочая область, редактор,
+   вывод, сниппеты, hint-попап, модалка.
+   ================================================================ */
+
+/* ---- сдвиг под фиксированную шапку ---- */
+body.has-site-header .container{
+  padding-top:0;
+}
+body.has-site-header .toolbar{margin-top:22px}
+
+/* ---- toolbar ---- */
+.toolbar{
+  background:var(--card);
+  border:1px solid var(--line);border-radius:14px;
+  padding:10px 12px;margin:16px 0 14px;
+  display:flex;flex-wrap:wrap;gap:8px;align-items:center;
+  box-shadow:var(--shadow);
+}
+.toolbar .spacer{flex:1}
+.toolbar button,.toolbar select{
+  font:600 13.5px var(--font-ui);
+  border:1px solid var(--line);border-radius:9px;
+  padding:8px 12px;background:var(--card);color:var(--text);
+  cursor:pointer;transition:.15s ease;white-space:nowrap;
+  display:inline-flex;align-items:center;gap:6px;
+}
+.toolbar button:hover,.toolbar select:hover{
+  border-color:var(--a1);color:var(--a1);
+}
+.toolbar button:active{transform:translateY(1px)}
+.toolbar button.primary{
+  background:var(--a1);color:#fff;border-color:var(--a1);
+  box-shadow:0 6px 16px rgba(12,124,134,.28);
+}
+.toolbar button.primary:hover{background:#0A6A73;border-color:#0A6A73;color:#fff}
+.toolbar button:disabled{opacity:.5;cursor:not-allowed;transform:none}
+
+/* ---- status-индикатор ---- */
+.status{
+  display:inline-flex;align-items:center;gap:7px;
+  font-size:12.5px;font-weight:600;color:var(--muted);
+  padding:5px 11px;background:var(--bg);
+  border-radius:999px;border:1px solid var(--line);
+}
+.status .dot{
+  width:7px;height:7px;border-radius:50%;
+  background:#B0BDD0;transition:.2s;
+}
+.status.loading .dot{background:var(--a2);animation:pulse 1.2s infinite}
+.status.ready .dot{background:var(--a5)}
+.status.running .dot{background:var(--a6);animation:pulse .8s infinite}
+.status.error .dot{background:var(--red)}
+@keyframes pulse{
+  0%,100%{opacity:1;transform:scale(1)}
+  50%{opacity:.4;transform:scale(.85)}
+}
+
+/* ---- рабочая область ---- */
+.workspace{
+  display:grid;
+  grid-template-columns:230px 1fr 1fr;
+  gap:14px;margin-bottom:22px;
+  height:calc(100vh - 400px);
+  min-height:460px;
+}
+.workspace.no-sidebar{grid-template-columns:1fr 1fr}
+.workspace.no-sidebar .sidebar{display:none}
+@media(max-width:1100px){
+  .workspace{grid-template-columns:200px 1fr;height:auto}
+  .workspace > .panel:nth-child(3){grid-column:1 / -1}
+  .workspace .panel{min-height:400px}
+}
+@media(max-width:760px){
+  .workspace{grid-template-columns:1fr}
+  .workspace .sidebar{order:-1}
+}
+
+/* ---- sidebar (сниппеты) ---- */
+.sidebar{
+  background:var(--bg);
+  border:1px solid var(--line);border-radius:14px;
+  overflow:hidden;display:flex;flex-direction:column;
+  box-shadow:var(--shadow);
+}
+.sidebar-head{
+  padding:10px 12px;background:var(--card);
+  border-bottom:1px solid var(--line);
+  display:flex;align-items:center;gap:8px;
+  font-size:12px;font-weight:700;color:var(--muted);
+  letter-spacing:.05em;text-transform:uppercase;
+}
+.sidebar-head button{
+  padding:4px 9px;font-size:12px;border-radius:7px;
+  margin-left:auto;border:1px solid var(--line);
+  background:var(--card);color:var(--text);cursor:pointer;
+}
+.sidebar-head button:hover{border-color:var(--a1);color:var(--a1)}
+.snip-list{
+  flex:1;overflow-y:auto;padding:6px;
+  display:flex;flex-direction:column;gap:3px;
+}
+.snip{
+  padding:8px 10px;border-radius:8px;cursor:pointer;
+  display:flex;align-items:center;gap:8px;
+  font-size:13.5px;transition:.12s ease;
+  position:relative;color:var(--text);
+}
+.snip:hover{background:var(--card)}
+.snip.active{
+  background:var(--card);font-weight:700;
+  box-shadow:0 2px 8px rgba(23,32,51,.07);
+}
+.snip.active::before{
+  content:"";position:absolute;left:0;top:8px;bottom:8px;
+  width:3px;border-radius:2px;background:var(--a1);
+}
+.snip .name{
+  flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  font-family:var(--font-code);font-size:12.5px;
+}
+.snip .menu-btn{
+  opacity:0;transition:.15s;border:none;background:transparent;
+  padding:2px 5px;color:var(--muted);border-radius:4px;
+  font-size:16px;line-height:1;cursor:pointer;
+}
+.snip:hover .menu-btn,.snip.active .menu-btn{opacity:1}
+.snip .menu-btn:hover{background:var(--bg);color:var(--text)}
+.snip-menu{
+  position:absolute;right:6px;top:100%;z-index:20;
+  background:var(--card);border:1px solid var(--line);
+  border-radius:9px;box-shadow:var(--shadow-lg);
+  padding:4px;display:none;flex-direction:column;min-width:150px;
+}
+.snip-menu.show{display:flex}
+.snip-menu button{
+  border:none;background:transparent;border-radius:6px;
+  padding:7px 11px;text-align:left;font-size:13px;
+  color:var(--text);cursor:pointer;justify-content:flex-start;
+}
+.snip-menu button:hover{background:var(--bg);color:var(--text)}
+
+/* ---- панели ---- */
+.panel{
+  background:var(--card);border:1px solid var(--line);
+  border-radius:14px;overflow:hidden;box-shadow:var(--shadow);
+  display:flex;flex-direction:column;min-height:0;
+}
+.panel-head{
+  padding:9px 12px;background:var(--bg);
+  border-bottom:1px solid var(--line);
+  display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+  font-size:12px;font-weight:700;color:var(--muted);
+  letter-spacing:.05em;text-transform:uppercase;
+}
+.panel-head .file{
+  font:600 12px var(--font-code);color:var(--a1);
+  background:rgba(12,124,134,.1);padding:3px 8px;border-radius:6px;
+  text-transform:none;letter-spacing:0;
+  max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.panel-head .actions{margin-left:auto;display:flex;gap:5px}
+.panel-head button{
+  padding:4px 9px;font-size:11.5px;border-radius:7px;
+  border:1px solid var(--line);background:var(--card);
+  color:var(--text);cursor:pointer;
+}
+.panel-head button:hover{border-color:var(--a1);color:var(--a1)}
+
+/* ---- CodeMirror ---- */
+.editor-host{flex:1;overflow:hidden;position:relative;background:#212121}
+.CodeMirror{
+  height:100% !important;font:13px/1.55 var(--font-code);
+  font-family:var(--font-code) !important;
+  background:#212121 !important;
+}
+.CodeMirror-gutters{background:#1a1a1a !important;border-right:1px solid #2b2b2b !important}
+.CodeMirror-linenumber{color:#5C7099 !important}
+.CodeMirror-cursor{border-left:2px solid #FFB454 !important}
+.CodeMirror-selected{background:rgba(12,124,134,.35) !important}
+.CodeMirror-activeline-background{background:rgba(255,255,255,.03) !important}
+
+/* ---- hint popup ---- */
+.CodeMirror-hints{
+  background:#1a2338 !important;border:1px solid #2b3a55 !important;
+  border-radius:9px !important;
+  box-shadow:0 12px 32px rgba(0,0,0,.5) !important;
+  font:13px var(--font-code) !important;
+  padding:4px !important;z-index:9999 !important;
+  max-height:280px !important;overflow-y:auto !important;
+}
+.CodeMirror-hint{
+  color:#DDE6F5 !important;padding:5px 10px !important;
+  border-radius:6px !important;white-space:nowrap !important;
+  line-height:20px !important;
+}
+li.CodeMirror-hint-active{background:var(--a1) !important;color:#fff !important}
+.CodeMirror-hint::before{
+  display:inline-block;font-size:10px;font-weight:700;
+  line-height:1;padding:3px 6px;border-radius:4px;
+  margin-right:8px;vertical-align:middle;letter-spacing:.02em;
+  font-family:var(--font-ui);
+  background:rgba(255,255,255,.1);color:#B8C6DD;
+}
+.CodeMirror-hint.hint-kw::before{content:'ключ';background:rgba(255,180,84,.22);color:#FFB454}
+.CodeMirror-hint.hint-bi::before{content:'builtin';background:rgba(142,214,144,.2);color:#8EE6A0}
+.CodeMirror-hint.hint-mod::before{content:'модуль';background:rgba(169,155,255,.22);color:#A99BFF}
+.CodeMirror-hint.hint-met::before{content:'метод';background:rgba(127,196,255,.22);color:#7FC4FF}
+.CodeMirror-hint.hint-wrd::before{content:'из кода';background:rgba(255,255,255,.08);color:#B8C6DD}
+li.CodeMirror-hint-active::before{
+  background:rgba(255,255,255,.2) !important;color:#fff !important;
+}
+
+/* ---- вывод ---- */
+.output{
+  flex:1;padding:12px 14px;overflow:auto;
+  font:13px/1.55 var(--font-code);
+  color:var(--text);background:var(--card);
+  white-space:pre-wrap;word-break:break-word;min-height:0;
+}
+.output .line-err{color:var(--red);font-weight:500}
+.output .line-ok{color:var(--a5)}
+.output .line-info{color:var(--muted);font-style:italic}
+.output:empty::before{
+  content:"Здесь появится результат выполнения…";
+  color:var(--muted);font-style:italic;opacity:.7;
+}
+
+/* ---- toast ---- */
+.toast{
+  position:fixed;left:50%;bottom:26px;
+  transform:translate(-50%,80px);
+  background:var(--text);color:var(--card);
+  padding:11px 18px;border-radius:10px;
+  font-size:14px;font-weight:600;z-index:100;
+  box-shadow:0 10px 30px rgba(0,0,0,.3);
+  transition:.25s cubic-bezier(.2,.9,.3,1.2);opacity:0;
+  pointer-events:none;max-width:90vw;
+}
+.toast.show{transform:translate(-50%,0);opacity:1}
+.toast.error{background:var(--red);color:#fff}
+.toast.success{background:var(--a5);color:#fff}
+
+/* ---- модалка ---- */
+.modal-bg{
+  position:fixed;inset:0;background:rgba(15,26,48,.5);z-index:90;
+  display:none;align-items:center;justify-content:center;padding:20px;
+}
+.modal-bg.show{display:flex}
+.modal{
+  background:var(--card);border-radius:16px;padding:24px;
+  max-width:520px;width:100%;box-shadow:var(--shadow-lg);
+  border:1px solid var(--line);
+}
+.modal h3{margin:0 0 10px;font-size:19px;color:var(--text)}
+.modal p{margin:0 0 14px;color:var(--muted);font-size:14px}
+.modal input[type="text"]{
+  width:100%;padding:11px 13px;font:14px var(--font-ui);
+  border:1px solid var(--line);border-radius:9px;outline:none;
+  transition:.15s;background:var(--card);color:var(--text);
+}
+.modal input:focus{
+  border-color:var(--a1);
+  box-shadow:0 0 0 3px rgba(12,124,134,.15);
+}
+.modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:16px}
+.modal-actions button{
+  font:600 13.5px var(--font-ui);
+  border:1px solid var(--line);border-radius:9px;
+  padding:8px 14px;background:var(--card);color:var(--text);
+  cursor:pointer;transition:.15s ease;
+}
+.modal-actions button:hover{border-color:var(--a1);color:var(--a1)}
+.modal-actions button.primary{
+  background:var(--a1);color:#fff;border-color:var(--a1);
+}
+.modal-actions button.primary:hover{
+  background:#0A6A73;border-color:#0A6A73;color:#fff;
+}
+
+/* ---- адаптив для компилятора ---- */
+@media(max-width:520px){
+  .workspace{height:auto}
+  .toolbar{padding:8px}
+  .toolbar button,.toolbar select{padding:7px 10px;font-size:13px}
+}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <h1>Python Playground</h1>
+  <p class="subtitle">
+    Настоящий Python 3.12 в браузере через <b>Pyodide</b>. Редактор с подсветкой
+    синтаксиса, <b>автодополнение кода</b>, менеджер сниппетов, экспорт <code>.py</code>
+    и обмен ссылкой.
+  </p>
+  <div class="badges">
+    <span class="badge">Python 3.12</span>
+    <span class="badge">CodeMirror</span>
+    <span class="badge">Автодополнение</span>
+    <span class="badge">Pyodide · WASM</span>
+    <span class="badge">Автосохранение</span>
+  </div>
+</header>
+
+<main class="container">
+
+  <div class="toolbar">
+    <button id="runBtn" class="primary" disabled>
+      <svg viewBox="0 0 24 24" fill="currentColor" width="12" height="12"><path d="M8 5v14l11-7z"/></svg>
+      Запустить
+    </button>
+    <button id="clearBtn" title="Очистить вывод">Очистить</button>
+
+    <select id="examples" title="Загрузить пример">
+      <option value="">— Примеры —</option>
+      <option value="vars">1. Переменные</option>
+      <option value="types">2. Типы данных</option>
+      <option value="ifelse">3. Условный оператор</option>
+      <option value="whileloop">4. Цикл while</option>
+      <option value="forloop">5. Цикл for</option>
+      <option value="functions">6. Функции</option>
+      <option value="random_time">7. Модули random и time</option>
+      <option value="classes">8. Классы и объекты</option>
+      <option value="oop">9. ООП</option>
+      <option value="lists">10. Списки</option>
+      <option value="dicts">11. Словари</option>
+      <option value="turtle_demo">12. Модуль turtle</option>
+    </select>
+
+    <button id="downloadBtn" title="Скачать как .py">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Скачать
+    </button>
+    <button id="shareBtn" title="Скопировать ссылку на код">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.6" y1="10.7" x2="15.4" y2="6.3"/><line x1="8.6" y1="13.3" x2="15.4" y2="17.7"/></svg>
+      Поделиться
+    </button>
+
+    <div class="spacer"></div>
+    <span id="status" class="status loading">
+      <span class="dot"></span>
+      <span id="statusText">Загрузка Python…</span>
+    </span>
+  </div>
+
+  <div class="workspace" id="workspace">
+
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-head">
+        Сниппеты
+        <button id="newSnipBtn" title="Новый сниппет (Ctrl+N)">+</button>
+      </div>
+      <div class="snip-list" id="snipList"></div>
+    </aside>
+
+    <div class="panel">
+      <div class="panel-head">
+        Редактор <span class="file" id="fileName">main.py</span>
+        <div class="actions">
+          <button id="hintBtn" title="Подсказка (Ctrl+Space)">💡</button>
+          <button id="copyBtn" title="Скопировать код">Копировать</button>
+          <button id="sidebarToggle" title="Скрыть/показать список">☰</button>
+        </div>
+      </div>
+      <div class="editor-host">
+        <textarea id="editor"></textarea>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head">
+        Вывод <span class="file" id="outStatus">console</span>
+        <div class="actions">
+          <button id="scrollBtn" title="Прокрутить вниз">↓</button>
+        </div>
+      </div>
+      <div class="output" id="output"></div>
+    </div>
+
+  </div>
+
+</main>
+
+<footer class="site">
+  Python Playground · работает на <a href="https://pyodide.org/" target="_blank" rel="noopener">Pyodide</a>
+  · автодополнение: <kbd>Ctrl</kbd>+<kbd>Space</kbd> · запуск: <kbd>Ctrl</kbd>+<kbd>Enter</kbd>
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<div class="modal-bg" id="modalBg">
+  <div class="modal">
+    <h3 id="modalTitle">Название сниппета</h3>
+    <p id="modalSub">Введите имя файла с расширением <code>.py</code>.</p>
+    <input type="text" id="modalInput" placeholder="main.py" autocomplete="off">
+    <div class="modal-actions">
+      <button id="modalCancel">Отмена</button>
+      <button id="modalOk" class="primary">Сохранить</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/closebrackets.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/matchbrackets.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/selection/active-line.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/comment/comment.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/fold/foldcode.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/fold/foldgutter.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/fold/indent-fold.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/dialog/dialog.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/search/searchcursor.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/search/search.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/hint/show-hint.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/pyodide/v0.26.2/full/pyodide.js"></script>
+
+<!-- Единые скрипты всех шпаргалок: header, тема, «наверх», прогресс -->
+<script src="app.js"></script>
+
+<script>
+(function(){
+  'use strict';
+
+  var $ = function(id){ return document.getElementById(id); };
+  var output = $('output');
+  var runBtn = $('runBtn');
+  var clearBtn = $('clearBtn');
+  var copyBtn = $('copyBtn');
+  var downloadBtn = $('downloadBtn');
+  var shareBtn = $('shareBtn');
+  var scrollBtn = $('scrollBtn');
+  var examples = $('examples');
+  var statusEl = $('status');
+  var statusText = $('statusText');
+  var outStatus = $('outStatus');
+  var fileName = $('fileName');
+  var snipList = $('snipList');
+  var newSnipBtn = $('newSnipBtn');
+  var sidebarToggle = $('sidebarToggle');
+  var hintBtn = $('hintBtn');
+  var workspace = $('workspace');
+  var toast = $('toast');
+
+  /* ============================================================
+     ПРИМЕРЫ
+  ============================================================ */
+  var EXAMPLES = {
+    vars: `# Переменные
+# Переменная — это имя, под которым хранится значение.
+
+name = "Аня"          # строка
+age = 12              # целое число
+height = 1.55         # дробное число
+is_student = True     # логическое значение
+
+print(name)
+print(age)
+print(height)
+print(is_student)
+
+print()
+
+# Значение переменной можно менять
+age = 13
+print("Теперь возраст:", age)
+
+# Несколько переменных сразу
+x, y = 10, 20
+print("x =", x, "y =", y)
+
+# Обмен значений
+x, y = y, x
+print("После обмена: x =", x, "y =", y)
+`,
+    types: `# Типы данных
+# У каждого значения в Python есть тип.
+
+number = 42
+pi = 3.14
+text = "Привет"
+flag = True
+
+print(type(number))
+print(type(pi))
+print(type(text))
+print(type(flag))
+
+print()
+
+# Преобразование типов
+a = "25"
+b = int(a)             # строка -> целое
+print("25 + 5 =", b + 5)
+
+c = 3.99
+d = int(c)             # отбрасывает дробную часть
+print("int(3.99) =", d)
+
+e = 7
+f = str(e)             # число -> строка
+print("Строка: " + f)
+
+g = float("2.5")
+print("2.5 * 2 =", g * 2)
+`,
+    ifelse: `# Условный оператор — 3 вида
+
+# 1. Только if
+age = 20
+
+if age >= 18:
+    print("Доступ разрешён")
+
+print()
+
+# 2. if / else
+temperature = 5
+
+if temperature > 0:
+    print("На улице тепло")
+else:
+    print("На улице холодно")
+
+print()
+
+# 3. if / elif / else
+mark = 4
+
+if mark == 5:
+    print("Отлично")
+elif mark == 4:
+    print("Хорошо")
+elif mark == 3:
+    print("Удовлетворительно")
+else:
+    print("Плохо")
+`,
+    whileloop: `# Цикл while
+
+# 1. Классическое использование
+count = 5
+
+while count > 0:
+    print("Осталось:", count)
+    count = count - 1
+
+print("Поехали!")
+print()
+
+# 2. Использование счётчика
+i = 1
+total = 0
+
+while i <= 5:
+    total = total + i
+    print("Шаг", i, "— сумма", total)
+    i = i + 1
+
+print()
+print("Итоговая сумма:", total)
+`,
+    forloop: `# Цикл for
+
+# 1. Перебор элементов коллекции
+fruits = ["яблоко", "банан", "вишня"]
+
+for fruit in fruits:
+    print(fruit)
+
+print()
+
+word = "Python"
+
+for letter in word:
+    print(letter)
+
+print()
+
+# 2. Повтор действия через range()
+for i in range(5):
+    print("Повтор номер", i)
+
+print()
+
+for i in range(1, 6):
+    print(i, "в квадрате =", i * i)
+
+print()
+
+for i in range(10, 0, -2):
+    print(i)
+`,
+    functions: `# Объявление функций
+
+# 1. Функция без возвращаемого значения
+def say_hello():
+    print("Привет!")
+
+def greet(name):
+    print("Здравствуй,", name, "!")
+
+say_hello()
+say_hello()
+greet("Аня")
+greet("Боря")
+
+print()
+
+# 2. Функция, возвращающая значение
+def add(a, b):
+    return a + b
+
+def square(x):
+    return x * x
+
+result = add(3, 5)
+print("3 + 5 =", result)
+
+print("Квадрат 7 =", square(7))
+
+print("(2 + 3) в квадрате =", square(add(2, 3)))
+`,
+    random_time: `# Модуль random и модуль time
+import random
+import time
+
+# --- random ---
+
+dice = random.randint(1, 6)
+print("Выпало:", dice)
+
+x = random.random()
+print("Случайное число:", x)
+
+colors = ["красный", "зелёный", "синий", "жёлтый"]
+print("Цвет:", random.choice(colors))
+
+numbers = [1, 2, 3, 4, 5]
+random.shuffle(numbers)
+print("Перемешали:", numbers)
+
+print()
+
+# --- time ---
+
+print("Ждём...")
+time.sleep(1)
+print("Прошла секунда")
+
+start = time.time()
+total = 0
+for i in range(100000):
+    total = total + i
+end = time.time()
+print("Сумма:", total)
+print("Потребовалось секунд:", round(end - start, 4))
+`,
+    classes: `# Классы и объекты
+
+class Dog:
+    def __init__(self, name, age):
+        self.name = name
+        self.age = age
+
+    def bark(self):
+        print(self.name, "говорит: Гав!")
+
+    def info(self):
+        print("Собака по имени", self.name + ",", self.age, "лет")
+
+
+dog1 = Dog("Рекс", 3)
+dog2 = Dog("Бим", 5)
+
+print(dog1.name)
+print(dog2.age)
+
+print()
+
+dog1.bark()
+dog2.bark()
+
+dog1.info()
+dog2.info()
+`,
+    oop: `# Объектно-ориентированное программирование
+# Наследование: один класс берёт свойства другого.
+
+class Animal:
+    def __init__(self, name):
+        self.name = name
+
+    def speak(self):
+        print(self.name, "издаёт звук")
+
+
+class Cat(Animal):
+    def speak(self):
+        print(self.name, "говорит: Мяу")
+
+
+class Dog(Animal):
+    def speak(self):
+        print(self.name, "говорит: Гав")
+
+
+a = Animal("Зверь")
+a.speak()
+
+cat = Cat("Мурка")
+dog = Dog("Рекс")
+
+cat.speak()
+dog.speak()
+
+print()
+
+animals = [Animal("Зверь"), Cat("Барсик"), Dog("Шарик")]
+
+for animal in animals:
+    animal.speak()
+`,
+    lists: `# Списки
+
+fruits = ["яблоко", "банан", "вишня", "груша"]
+
+print("Список:", fruits)
+print("Первый:", fruits[0])
+print("Последний:", fruits[-1])
+print("Всего:", len(fruits))
+
+print()
+
+fruits.append("слива")
+print("После append:", fruits)
+
+fruits.insert(1, "абрикос")
+print("После insert:", fruits)
+
+fruits.remove("банан")
+print("После remove:", fruits)
+
+fruits[0] = "зелёное яблоко"
+print("После замены:", fruits)
+
+print()
+
+for fruit in fruits:
+    print("-", fruit)
+
+print()
+
+numbers = [10, 20, 30, 40, 50]
+print("Первые три:", numbers[:3])
+print("С 2-го по 4-й:", numbers[1:4])
+print("Задом наперёд:", numbers[::-1])
+
+numbers.sort()
+print("По возрастанию:", numbers)
+
+numbers.sort(reverse=True)
+print("По убыванию:", numbers)
+
+print("Сумма:", sum(numbers))
+print("Минимум:", min(numbers))
+print("Максимум:", max(numbers))
+`,
+    dicts: `# Словари
+
+person = {
+    "имя": "Аня",
+    "возраст": 12,
+    "город": "Москва"
+}
+
+print(person)
+print()
+
+print("Имя:", person["имя"])
+print("Возраст:", person["возраст"])
+
+print()
+
+print("Email:", person.get("email", "не указан"))
+
+print()
+
+person["email"] = "anya@example.com"
+person["возраст"] = 13
+print("После изменений:", person)
+
+print()
+
+for key in person:
+    print(key, "=", person[key])
+
+print()
+
+for key, value in person.items():
+    print(key, "->", value)
+
+print()
+
+if "город" in person:
+    print("Город есть в словаре")
+
+del person["email"]
+print("Итог:", person)
+`,
+    turtle_demo: `# Модуль turtle
+# ВНИМАНИЕ: в браузере окно turtle не откроется —
+# этот пример запустите на компьютере в обычном Python.
+
+# import turtle
+#
+# t = turtle.Turtle()
+#
+# # Квадрат
+# for i in range(4):
+#     t.forward(100)
+#     t.left(90)
+#
+# # Треугольник
+# for i in range(3):
+#     t.forward(80)
+#     t.left(120)
+#
+# # Круг
+# t.circle(50)
+#
+# # Звезда
+# for i in range(5):
+#     t.forward(100)
+#     t.right(144)
+#
+# turtle.done()
+
+print("Пример turtle — в комментариях кода.")
+print()
+print("Ключевые команды turtle:")
+print("  t.forward(100)   — вперёд на 100")
+print("  t.backward(50)   — назад на 50")
+print("  t.left(90)       — поворот влево")
+print("  t.right(90)      — поворот вправо")
+print("  t.circle(50)     — круг радиусом 50")
+print("  t.penup()        — поднять перо")
+print("  t.pendown()      — опустить перо")
+print("  t.color('red')   — цвет линии")
+print("  t.speed(0)       — самая быстрая скорость")
+print("  turtle.done()    — не закрывать окно")
+`
+  };
+
+  var DEFAULT_NAME = 'main.py';
+  var DEFAULT_CODE = EXAMPLES.vars;
+
+  /* ============================================================
+     БАЗОВЫЕ УТИЛИТЫ
+  ============================================================ */
+  function setStatus(text, cls){
+    statusText.textContent = text;
+    statusEl.className = 'status ' + (cls || '');
+  }
+  function write(text, cls){
+    if (cls){
+      var span = document.createElement('span');
+      span.className = cls;
+      span.textContent = text;
+      output.appendChild(span);
+    } else {
+      output.appendChild(document.createTextNode(text));
+    }
+    output.scrollTop = output.scrollHeight;
+  }
+  function writeLine(t, cls){
+    write(t, cls);
+    if (!t.endsWith('\n')) write('\n');
+  }
+  function clearOutput(){ output.textContent = ''; }
+
+  function showToast(msg, type){
+    toast.textContent = msg;
+    toast.className = 'toast show ' + (type || '');
+    clearTimeout(showToast._t);
+    showToast._t = setTimeout(function(){ toast.classList.remove('show'); }, 2200);
+  }
+  function uid(){
+    return 's' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+  }
+  function escapeHtml(s){
+    return s.replace(/[&<>"']/g, function(c){
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+    });
+  }
+
+  /* ============================================================
+     SNIPPETS
+  ============================================================ */
+  var LS_SNIPS = 'py_playground_snippets_v5';
+  var LS_CURRENT = 'py_playground_current_v5';
+
+  function loadState(){
+    try {
+      var raw = localStorage.getItem(LS_SNIPS);
+      if (raw){
+        var parsed = JSON.parse(raw);
+        if (parsed && Array.isArray(parsed.snippets) && parsed.snippets.length){
+          return parsed;
+        }
+      }
+    } catch(e){}
+    var id = uid();
+    return {
+      currentId: id,
+      snippets: [
+        { id: id, name: DEFAULT_NAME, code: DEFAULT_CODE, updated: Date.now() }
+      ]
+    };
+  }
+  function saveState(){
+    try { localStorage.setItem(LS_SNIPS, JSON.stringify(state)); } catch(e){}
+  }
+  var state = loadState();
+
+  function currentSnip(){
+    for (var i=0; i<state.snippets.length; i++){
+      if (state.snippets[i].id === state.currentId) return state.snippets[i];
+    }
+    return state.snippets[0];
+  }
+
+  function renderSnips(){
+    snipList.innerHTML = '';
+    state.snippets.forEach(function(s){
+      var el = document.createElement('div');
+      el.className = 'snip' + (s.id === state.currentId ? ' active' : '');
+      el.dataset.id = s.id;
+      el.innerHTML =
+        '<span class="name">' + escapeHtml(s.name) + '</span>' +
+        '<button class="menu-btn" title="Меню">⋯</button>' +
+        '<div class="snip-menu">' +
+          '<button data-act="rename">Переименовать</button>' +
+          '<button data-act="duplicate">Дублировать</button>' +
+          '<button data-act="download">Скачать .py</button>' +
+          '<button data-act="delete">Удалить</button>' +
+        '</div>';
+
+      el.addEventListener('click', function(e){
+        if (e.target.closest('.menu-btn') || e.target.closest('.snip-menu')) return;
+        selectSnip(s.id);
+      });
+      el.querySelector('.menu-btn').addEventListener('click', function(e){
+        e.stopPropagation();
+        closeAllMenus();
+        el.querySelector('.snip-menu').classList.add('show');
+      });
+      el.querySelector('.snip-menu').addEventListener('click', function(e){
+        e.stopPropagation();
+        var act = e.target.dataset.act;
+        if (!act) return;
+        closeAllMenus();
+        handleSnipAction(act, s.id);
+      });
+      snipList.appendChild(el);
+    });
+  }
+
+  function closeAllMenus(){
+    var all = snipList.querySelectorAll('.snip-menu.show');
+    for (var i=0; i<all.length; i++) all[i].classList.remove('show');
+  }
+  document.addEventListener('click', closeAllMenus);
+
+  function selectSnip(id){
+    syncEditorToSnip();
+    state.currentId = id;
+    var s = currentSnip();
+    fileName.textContent = s.name;
+    cm.setValue(s.code);
+    saveState();
+    renderSnips();
+    cm.focus();
+  }
+
+  function syncEditorToSnip(){
+    if (!cm) return;
+    var s = currentSnip();
+    if (!s) return;
+    var v = cm.getValue();
+    if (s.code !== v){
+      s.code = v;
+      s.updated = Date.now();
+      saveState();
+    }
+  }
+
+  function newSnip(){
+    syncEditorToSnip();
+    var id = uid();
+    state.snippets.unshift({
+      id: id,
+      name: 'snippet_' + (state.snippets.length + 1) + '.py',
+      code: '# Новый сниппет\nprint("Hello!")\n',
+      updated: Date.now()
+    });
+    state.currentId = id;
+    saveState();
+    selectSnip(id);
+    renderSnips();
+    openModal('rename', id);
+  }
+
+  function handleSnipAction(act, id){
+    var idx = -1;
+    for (var i=0; i<state.snippets.length; i++){
+      if (state.snippets[i].id === id){ idx = i; break; }
+    }
+    if (idx === -1) return;
+    var s = state.snippets[idx];
+
+    if (act === 'rename'){ openModal('rename', id); }
+    else if (act === 'duplicate'){
+      var newId = uid();
+      state.snippets.splice(idx + 1, 0, {
+        id: newId,
+        name: s.name.replace(/\.py$/, '') + '_copy.py',
+        code: s.code, updated: Date.now()
+      });
+      state.currentId = newId;
+      saveState();
+      selectSnip(newId);
+      renderSnips();
+      showToast('Скопировано: ' + s.name, 'success');
+    }
+    else if (act === 'download'){ downloadSnip(s); }
+    else if (act === 'delete'){
+      if (state.snippets.length === 1){
+        showToast('Нельзя удалить единственный сниппет', 'error');
+        return;
+      }
+      if (!confirm('Удалить «' + s.name + '»?')) return;
+      var wasCurrent = (s.id === state.currentId);
+      state.snippets.splice(idx, 1);
+      if (wasCurrent) state.currentId = state.snippets[0].id;
+      saveState();
+      selectSnip(state.currentId);
+      renderSnips();
+      showToast('Сниппет удалён', 'success');
+    }
+  }
+
+  /* ============================================================
+     MODAL
+  ============================================================ */
+  var modalBg = $('modalBg');
+  var modalTitle = $('modalTitle');
+  var modalSub = $('modalSub');
+  var modalInput = $('modalInput');
+  var modalOk = $('modalOk');
+  var modalCancel = $('modalCancel');
+  var modalTargetId = null;
+
+  function openModal(mode, id){
+    modalTargetId = id;
+    var s = null;
+    for (var i=0; i<state.snippets.length; i++){
+      if (state.snippets[i].id === id){ s = state.snippets[i]; break; }
+    }
+    if (!s) return;
+    modalTitle.textContent = 'Переименовать сниппет';
+    modalSub.textContent = 'Введите имя файла с расширением .py';
+    modalInput.value = s.name;
+    modalBg.classList.add('show');
+    setTimeout(function(){ modalInput.focus(); modalInput.select(); }, 50);
+  }
+  function closeModal(){
+    modalBg.classList.remove('show');
+    modalTargetId = null;
+  }
+  function confirmModal(){
+    if (!modalTargetId){ closeModal(); return; }
+    var val = modalInput.value.trim();
+    if (!val){ showToast('Введите имя', 'error'); return; }
+    if (!/\.py$/i.test(val)) val += '.py';
+    for (var i=0; i<state.snippets.length; i++){
+      if (state.snippets[i].id === modalTargetId){
+        state.snippets[i].name = val;
+        break;
+      }
+    }
+    saveState();
+    renderSnips();
+    if (state.currentId === modalTargetId) fileName.textContent = val;
+    closeModal();
+  }
+  modalOk.addEventListener('click', confirmModal);
+  modalCancel.addEventListener('click', closeModal);
+  modalBg.addEventListener('click', function(e){ if (e.target === modalBg) closeModal(); });
+  modalInput.addEventListener('keydown', function(e){
+    if (e.key === 'Enter'){ e.preventDefault(); confirmModal(); }
+    if (e.key === 'Escape'){ closeModal(); }
+  });
+
+  /* ============================================================
+     DOWNLOAD / SHARE
+  ============================================================ */
+  function downloadSnip(s){
+    var name = /\.py$/i.test(s.name) ? s.name : s.name + '.py';
+    var blob = new Blob([s.code], { type: 'text/x-python;charset=utf-8' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = name;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
+    showToast('Скачано: ' + name, 'success');
+  }
+
+  downloadBtn.addEventListener('click', function(){
+    syncEditorToSnip();
+    downloadSnip(currentSnip());
+  });
+
+  function encodeCode(str){
+    return btoa(unescape(encodeURIComponent(str)))
+      .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  }
+  function decodeCode(str){
+    str = str.replace(/-/g, '+').replace(/_/g, '/');
+    while (str.length % 4) str += '=';
+    return decodeURIComponent(escape(atob(str)));
+  }
+
+  shareBtn.addEventListener('click', async function(){
+    syncEditorToSnip();
+    var code = cm.getValue();
+    if (!code.trim()){ showToast('Код пустой', 'error'); return; }
+    var encoded = encodeCode(code);
+    var base = location.origin + location.pathname;
+    var url = base + '#code=' + encoded;
+    if (url.length > 8000){
+      showToast('Код слишком длинный для ссылки — используйте «Скачать»', 'error');
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(url);
+      showToast('Ссылка скопирована в буфер обмена', 'success');
+      history.replaceState(null, '', '#code=' + encoded);
+    } catch(e){
+      prompt('Скопируйте ссылку:', url);
+    }
+  });
+
+  /* ============================================================
+     АВТОДОПОЛНЕНИЕ
+  ============================================================ */
+  var PY_KEYWORDS = [
+    'and','as','assert','async','await','break','class','continue',
+    'def','del','elif','else','except','False','finally','for','from',
+    'global','if','import','in','is','lambda','None','nonlocal','not',
+    'or','pass','raise','return','True','try','while','with','yield',
+    'match','case','self','cls','super'
+  ];
+  var PY_BUILTINS = [
+    'abs','all','any','bin','bool','bytes','callable','chr','complex',
+    'dict','dir','divmod','enumerate','eval','exec','filter','float',
+    'format','frozenset','getattr','globals','hasattr','hash','help',
+    'hex','id','input','int','isinstance','issubclass','iter','len',
+    'list','locals','map','max','min','next','object','oct','open',
+    'ord','pow','print','property','range','repr','reversed','round',
+    'set','setattr','slice','sorted','staticmethod','str','sum','tuple',
+    'type','vars','zip','__name__','__main__','__init__','__str__',
+    '__repr__','__len__','__eq__','__iter__','__next__','__enter__',
+    '__exit__','__call__','__add__','__getitem__','__contains__'
+  ];
+  var PY_MODULES = [
+    'math','random','datetime','time','os','sys','pathlib','json',
+    'csv','re','collections','itertools','functools','statistics',
+    'string','argparse','copy','decimal','fractions','heapq','io',
+    'logging','pickle','sqlite3','subprocess','threading','typing',
+    'unittest','urllib','uuid','warnings','tkinter','turtle'
+  ];
+  var PY_METHODS = [
+    'upper','lower','title','capitalize','strip','lstrip','rstrip',
+    'split','rsplit','splitlines','join','replace','find','rfind',
+    'index','rindex','count','startswith','endswith','isdigit',
+    'isalpha','isalnum','islower','isupper','isspace','zfill',
+    'center','ljust','rjust','swapcase','format','encode','casefold',
+    'append','extend','insert','remove','pop','clear','sort','reverse',
+    'copy','get','keys','values','items','update','setdefault','popitem',
+    'fromkeys','add','discard','union','intersection','difference',
+    'symmetric_difference','issubset','issuperset','isdisjoint',
+    'read','write','readline','readlines','writelines','close',
+    'seek','tell','flush','next','iter'
+  ];
+
+  function makeHintItem(text, kind){
+    return {
+      text: text,
+      displayText: text,
+      className: 'hint-' + kind
+    };
+  }
+
+  function pythonHint(cm){
+    var cur = cm.getCursor();
+    var line = cm.getLine(cur.line);
+    var end = cur.ch;
+    var start = end;
+    while (start > 0 && /[\w.]/.test(line.charAt(start - 1))) start--;
+    var token = line.slice(start, end);
+
+    var dotContext = token.indexOf('.') !== -1;
+    var pool = [];
+    var seen = {};
+
+    function add(arr, kind){
+      for (var i=0; i<arr.length; i++){
+        var w = arr[i];
+        if (seen[w]) continue;
+        seen[w] = true;
+        pool.push(makeHintItem(w, kind));
+      }
+    }
+
+    if (dotContext){
+      add(PY_METHODS, 'met');
+      add(PY_BUILTINS, 'bi');
+      add(PY_MODULES, 'mod');
+    } else {
+      add(PY_KEYWORDS, 'kw');
+      add(PY_BUILTINS, 'bi');
+      add(PY_MODULES, 'mod');
+      add(PY_METHODS, 'met');
+
+      var docWords = {};
+      var text = cm.getValue();
+      var re = /[A-Za-z_][A-Za-z0-9_]*/g, m;
+      while ((m = re.exec(text))) docWords[m[0]] = true;
+      var wrdList = Object.keys(docWords);
+      for (var j=0; j<wrdList.length; j++){
+        var w = wrdList[j];
+        if (seen[w]) continue;
+        seen[w] = true;
+        pool.push(makeHintItem(w, 'wrd'));
+      }
+    }
+
+    var lower = token.toLowerCase();
+    var filtered = [];
+    var order = {kw:0, bi:1, mod:2, met:3, wrd:4};
+    for (var k=0; k<pool.length; k++){
+      var it = pool[k];
+      if (it.text.toLowerCase().indexOf(lower) === 0) filtered.push(it);
+    }
+    if (!filtered.length) return null;
+
+    filtered.sort(function(a, b){
+      var oa = order[a.className.slice(5)] || 99;
+      var ob = order[b.className.slice(5)] || 99;
+      if (oa !== ob) return oa - ob;
+      return a.text.length - b.text.length;
+    });
+
+    return {
+      list: filtered,
+      from: CodeMirror.Pos(cur.line, start),
+      to: CodeMirror.Pos(cur.line, end)
+    };
+  }
+
+  function maybeAutoHint(cm, change){
+    if (!change || change.origin !== '+input') return;
+    var inserted = change.text.join('');
+    if (!/[A-Za-z_.]/.test(inserted)) return;
+    if (inserted.length > 1) return;
+
+    var cur = cm.getCursor();
+    var line = cm.getLine(cur.line);
+    var ch = line.charAt(cur.ch - 1);
+    if (ch === '' || ch === ' ' || ch === '\n') return;
+    if (document.querySelector('.CodeMirror-hints')) return;
+
+    cm.showHint({
+      hint: pythonHint,
+      completeSingle: false,
+      alignWithWord: true,
+      closeOnUnfocus: true
+    });
+  }
+
+  /* ============================================================
+     CODEMIRROR
+  ============================================================ */
+  var cm = null;
+
+  function initEditor(){
+    cm = CodeMirror.fromTextArea($('editor'), {
+      mode: 'python',
+      theme: 'material-darker',
+      lineNumbers: true,
+      indentUnit: 4,
+      tabSize: 4,
+      indentWithTabs: false,
+      smartIndent: true,
+      autoCloseBrackets: true,
+      matchBrackets: true,
+      styleActiveLine: true,
+      lineWrapping: false,
+      foldGutter: true,
+      gutters: ['CodeMirror-linenumbers', 'CodeMirror-foldgutter'],
+      extraKeys: {
+        'Ctrl-Enter': function(){ runCode(); },
+        'Cmd-Enter':  function(){ runCode(); },
+        'Ctrl-/':     'toggleComment',
+        'Cmd-/':      'toggleComment',
+        'Ctrl-Space': function(cmir){
+          cmir.showHint({
+            hint: pythonHint,
+            completeSingle: false,
+            alignWithWord: true
+          });
+        },
+        'Tab': function(cmir){
+          if (cmir.somethingSelected()) cmir.indentSelection('add');
+          else cmir.replaceSelection('    ', 'end');
+        },
+        'Shift-Tab': function(cmir){ cmir.indentSelection('subtract'); }
+      }
+    });
+
+    cm.on('change', function(instance, change){
+      syncEditorToSnip();
+      clearTimeout(initEditor._t);
+      initEditor._t = setTimeout(saveState, 400);
+      maybeAutoHint(instance, change);
+    });
+  }
+
+  /* ============================================================
+     PYODIDE
+  ============================================================ */
+  var pyodide = null;
+  var pyodideReady = false;
+
+  async function initPyodide(){
+    try {
+      pyodide = await loadPyodide({
+        indexURL: 'https://cdn.jsdelivr.net/pyodide/v0.26.2/full/'
+      });
+      pyodide.setStdout({ batched: function(s){ writeLine(s); } });
+      pyodide.setStderr({ batched: function(s){ writeLine(s, 'line-err'); } });
+      pyodide.runPython(`
+import builtins
+from js import window
+
+def _browser_input(prompt=""):
+    result = window.prompt(str(prompt))
+    if result is None:
+        raise EOFError("Ввод отменён")
+    return str(result)
+
+builtins.input = _browser_input
+`);
+      pyodideReady = true;
+      setStatus('Python готов', 'ready');
+      runBtn.disabled = false;
+    } catch (err){
+      console.error(err);
+      setStatus('Ошибка загрузки', 'error');
+      writeLine('Не удалось загрузить Pyodide: ' + err.message, 'line-err');
+      writeLine('Проверьте интернет-соединение и обновите страницу.', 'line-err');
+    }
+  }
+
+  /* ============================================================
+     RUN
+  ============================================================ */
+  var running = false;
+
+  async function runCode(){
+    if (!pyodideReady || running) return;
+    var code = cm.getValue();
+    if (!code.trim()){
+      writeLine('// Пустой код — нечего выполнять.', 'line-info');
+      return;
+    }
+    running = true;
+    runBtn.disabled = true;
+    setStatus('Выполняется…', 'running');
+    outStatus.textContent = 'running';
+    clearOutput();
+
+    var t0 = performance.now();
+    try {
+      await pyodide.runPythonAsync(code);
+      var dt = (performance.now() - t0).toFixed(0);
+      if (output.textContent.length === 0){
+        writeLine('// Код выполнен без вывода.', 'line-info');
+      }
+      writeLine('\n// Завершено за ' + dt + ' мс', 'line-ok');
+      setStatus('Python готов', 'ready');
+    } catch (err){
+      var msg = String(err.message || err);
+      var lines = msg.split('\n');
+      var short = [];
+      for (var i=0; i<lines.length; i++){
+        var L = lines[i];
+        if (/File "\/lib\/python3/.test(L)) continue;
+        if (/File "<exec>"/.test(L)) continue;
+        if (/pyodide\/_pyodide/.test(L)) continue;
+        short.push(L);
+      }
+      if (!short.length) short = lines.slice(-3);
+      writeLine('\n' + short.join('\n'), 'line-err');
+      setStatus('Ошибка выполнения', 'error');
+    } finally {
+      running = false;
+      runBtn.disabled = false;
+      outStatus.textContent = 'console';
+    }
+  }
+
+  runBtn.addEventListener('click', runCode);
+
+  /* ============================================================
+     КНОПКИ ПАНЕЛИ
+  ============================================================ */
+  clearBtn.addEventListener('click', clearOutput);
+  scrollBtn.addEventListener('click', function(){ output.scrollTop = output.scrollHeight; });
+  copyBtn.addEventListener('click', function(){
+    navigator.clipboard.writeText(cm.getValue()).then(function(){
+      var old = copyBtn.textContent;
+      copyBtn.textContent = 'Скопировано ✓';
+      setTimeout(function(){ copyBtn.textContent = old; }, 1400);
+    }).catch(function(){ showToast('Не удалось скопировать', 'error'); });
+  });
+  newSnipBtn.addEventListener('click', newSnip);
+  sidebarToggle.addEventListener('click', function(){
+    workspace.classList.toggle('no-sidebar');
+    setTimeout(function(){ cm.refresh(); }, 100);
+  });
+  hintBtn.addEventListener('click', function(){
+    cm.focus();
+    cm.showHint({ hint: pythonHint, completeSingle: false, alignWithWord: true });
+  });
+
+  examples.addEventListener('change', function(){
+    var key = examples.value;
+    if (EXAMPLES[key]){
+      cm.setValue(EXAMPLES[key]);
+      syncEditorToSnip();
+      saveState();
+      clearOutput();
+      cm.focus();
+    }
+    examples.value = '';
+  });
+
+  document.addEventListener('keydown', function(e){
+    var isInputFocused = /INPUT|TEXTAREA/.test(document.activeElement.tagName);
+    var inCM = cm && cm.getWrapperElement().contains(document.activeElement);
+
+    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter' && !inCM){
+      e.preventDefault();
+      runCode();
+    }
+    else if ((e.ctrlKey || e.metaKey) && e.key === 's'){
+      e.preventDefault();
+      syncEditorToSnip();
+      downloadSnip(currentSnip());
+    }
+    else if ((e.ctrlKey || e.metaKey) && e.key === 'n' && !isInputFocused){
+      e.preventDefault();
+      newSnip();
+    }
+  });
+
+  /* ============================================================
+     ИНИЦИАЛИЗАЦИЯ
+  ============================================================ */
+  function boot(){
+    initEditor();
+
+    var hash = location.hash;
+    var sharedCode = null;
+    if (hash && hash.indexOf('#code=') === 0){
+      try { sharedCode = decodeCode(hash.slice(6)); } catch(e){}
+    }
+
+    var s = currentSnip();
+    if (sharedCode !== null){
+      var id = uid();
+      state.snippets.unshift({
+        id: id, name: 'shared.py',
+        code: sharedCode, updated: Date.now()
+      });
+      state.currentId = id;
+      saveState();
+      s = currentSnip();
+      history.replaceState(null, '', location.pathname);
+      setTimeout(function(){ showToast('Загружен код из ссылки', 'success'); }, 800);
+    }
+
+    fileName.textContent = s.name;
+    cm.setValue(s.code);
+    renderSnips();
+
+    setStatus('Загрузка Python…', 'loading');
+    writeLine('// Инициализация Pyodide…', 'line-info');
+
+    if (window.requestIdleCallback){
+      requestIdleCallback(initPyodide, { timeout: 500 });
+    } else {
+      setTimeout(initPyodide, 200);
+    }
+  }
+
+  if (document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', boot);
+  } else {
+    boot();
+  }
+
+})();
+</script>
+</body>
+</html>

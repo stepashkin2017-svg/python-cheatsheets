@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Работа с текстовыми файлами в Python — Cheatsheet</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Onest:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#EEF3F8; --card:#FFFFFF; --text:#172033; --muted:#607087;
+  --line:#D9E2EC; --code:#0F1A30; --code-text:#E8EEF8;
+  --teal:#0C7C86; --orange:#B9660A; --purple:#5B4BC4;
+  --pink:#B8325A; --green:#3A7D2C; --blue:#2873B8;
+  --shadow:0 8px 24px rgba(23,32,51,.07);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0; background:var(--bg); color:var(--text);
+  font-family:Onest,Arial,sans-serif; line-height:1.55;
+}
+.container{max-width:1180px;margin:auto;padding:0 20px}
+header{
+  padding:42px 0 28px;
+  background:linear-gradient(135deg,#e7f4f5,#f8fafc 55%,#eeeafb);
+  border-bottom:1px solid var(--line);
+}
+h1{margin:0 0 10px;font-size:clamp(30px,5vw,48px);line-height:1.08}
+.subtitle{color:var(--muted);font-size:17px;max-width:800px}
+.badges{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.badge{
+  background:#fff;border:1px solid var(--line);border-radius:999px;
+  padding:6px 11px;font-size:13px;font-weight:600;
+}
+nav{
+  position:sticky;top:0;z-index:10;background:#172033;
+  border-bottom:2px solid #0C7C86;
+  box-shadow:0 4px 14px rgba(23,32,51,.20);
+}
+.nav-inner{display:flex;gap:9px;overflow-x:auto;padding:10px 20px}
+nav a{
+  white-space:nowrap;text-decoration:none;color:#FFFFFF;
+  background:#30415C;border:1px solid #526580;
+  font-size:13px;font-weight:700;padding:8px 12px;border-radius:8px;
+  transition:.15s ease;
+}
+nav a:hover{
+  background:#0C7C86;color:#FFFFFF;border-color:#39B7C0;
+  transform:translateY(-1px);
+}
+main{padding:28px 0 48px}
+.section-title{margin:35px 0 15px;font-size:25px}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+.card{
+  background:var(--card);border:1px solid var(--line);border-left:5px solid var(--teal);
+  border-radius:12px;padding:20px;box-shadow:var(--shadow);
+}
+.s1{border-left-color:var(--teal)} .s2{border-left-color:var(--orange)}
+.s3{border-left-color:var(--purple)} .s4{border-left-color:var(--pink)}
+.s5{border-left-color:var(--green)} .s6{border-left-color:var(--blue)}
+.card h3{margin:0 0 8px;font-size:19px}
+.card p{margin:7px 0;color:#405067}
+code,.inline-code{
+  font-family:"JetBrains Mono",monospace;
+  background:#EEF2F6;border-radius:5px;padding:2px 5px;font-size:.9em;
+}
+pre{
+  margin:12px 0 0;background:var(--code);color:var(--code-text);
+  padding:14px 16px;border-radius:9px;overflow:auto;
+  font:13px/1.55 "JetBrains Mono",monospace;
+}
+.tip{
+  margin-top:12px;padding:10px 12px;background:#F5F8FB;
+  border:1px solid var(--line);border-radius:8px;font-size:13px;color:#506078;
+}
+table{width:100%;border-collapse:collapse;margin-top:10px;font-size:14px}
+th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{background:#F5F7FA;font-weight:700}
+.flow{
+  display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:12px
+}
+.step{
+  background:#F5F8FB;border:1px solid var(--line);border-radius:9px;
+  padding:12px;text-align:center;font-size:13px;font-weight:600
+}
+footer{
+  border-top:1px solid var(--line);padding:25px 0 40px;color:var(--muted);
+  font-size:13px;text-align:center
+}
+@media(max-width:800px){.grid{grid-template-columns:1fr}.flow{grid-template-columns:1fr 1fr}}
+@media(max-width:520px){.container{padding:0 14px}.card{padding:16px}.flow{grid-template-columns:1fr}}
+@media(prefers-color-scheme:dark){
+  :root{
+    --bg:#0C1321;--card:#121B2C;--text:#EAF0F8;--muted:#9AA9BD;
+    --line:#26344A;--code:#080F1D;--code-text:#E8EEF8;
+  }
+  header{background:linear-gradient(135deg,#0D252A,#101827 55%,#191532)}
+  nav{background:#050A14;border-bottom-color:#23AEB8}
+  nav a{background:#24344E;border-color:#526A8A;color:#FFFFFF}
+  nav a:hover{background:#0C7C86;border-color:#55D5DC;color:#FFFFFF}
+  code,.inline-code,.tip,.step,th{background:#182235}
+  .card p{color:#AAB8CA}
+}
+</style>
+</head>
+<body>
+
+<header>
+<div class="container">
+  <h1>Работа с текстовыми файлами<br>в Python</h1>
+  <div class="subtitle">
+    Cheatsheet по созданию, открытию, чтению, записи, добавлению данных,
+    обработке строк и безопасной работе с текстовыми файлами.
+  </div>
+  <div class="badges">
+    <span class="badge">Python 3</span>
+    <span class="badge">open()</span>
+    <span class="badge">with</span>
+    <span class="badge">UTF-8</span>
+    <span class="badge">read / write</span>
+    <span class="badge">CSV / TXT — базовый уровень</span>
+  </div>
+</div>
+</header>
+
+<nav>
+<div class="nav-inner">
+  <a href="#open">Открытие</a>
+  <a href="#modes">Режимы</a>
+  <a href="#read">Чтение</a>
+  <a href="#write">Запись</a>
+  <a href="#lines">Строки</a>
+  <a href="#encoding">Кодировка</a>
+  <a href="#path">Пути</a>
+  <a href="#errors">Ошибки</a>
+  <a href="#json">JSON</a>
+  <a href="#project">Мини-проект</a>
+  <a href="#api">API</a>
+</div>
+</nav>
+
+<main class="container">
+
+<h2 class="section-title" id="open">1. Открытие текстового файла</h2>
+<div class="grid">
+
+<section class="card s1">
+<h3>Базовый синтаксис <code>open()</code></h3>
+<p>Функция <code>open()</code> открывает файл и возвращает файловый объект.</p>
+<pre>file = open("data.txt", "r", encoding="utf-8")
+
+print(file.read())
+
+file.close()</pre>
+<div class="tip"><b>Важно:</b> после ручного <code>open()</code> файл нужно закрыть методом <code>close()</code>.</div>
+</section>
+
+<section class="card s1">
+<h3>Рекомендуемый способ — <code>with</code></h3>
+<p>Конструкция <code>with</code> автоматически закрывает файл после завершения блока.</p>
+<pre>with open("data.txt", "r", encoding="utf-8") as file:
+    text = file.read()
+
+print(text)</pre>
+<div class="tip">В большинстве обычных задач используйте именно <code>with open(...)</code>.</div>
+</section>
+
+<section class="card s2">
+<h3>Создание нового файла</h3>
+<p>Режим <code>"w"</code> создаёт файл, если его ещё нет.</p>
+<pre>with open("new.txt", "w", encoding="utf-8") as file:
+    file.write("Привет, Python!")</pre>
+<div class="tip"><b>Осторожно:</b> режим <code>w</code> очищает существующий файл.</div>
+</section>
+
+<section class="card s2">
+<h3>Проверка существования файла</h3>
+<p>Для проверки удобно использовать <code>Path</code> из модуля <code>pathlib</code>.</p>
+<pre>from pathlib import Path
+
+path = Path("data.txt")
+
+if path.exists():
+    print("Файл существует")
+else:
+    print("Файла нет")</pre>
+</section>
+
+</div>
+
+<h2 class="section-title" id="modes">2. Режимы открытия файла</h2>
+<section class="card s2">
+<table>
+<tr><th>Режим</th><th>Назначение</th><th>Пример</th></tr>
+<tr><td><code>r</code></td><td>Чтение</td><td><code>open("a.txt", "r")</code></td></tr>
+<tr><td><code>w</code></td><td>Запись с очисткой файла</td><td><code>open("a.txt", "w")</code></td></tr>
+<tr><td><code>a</code></td><td>Добавление в конец</td><td><code>open("a.txt", "a")</code></td></tr>
+<tr><td><code>x</code></td><td>Создание нового файла; ошибка, если он уже есть</td><td><code>open("a.txt", "x")</code></td></tr>
+<tr><td><code>r+</code></td><td>Чтение и запись</td><td><code>open("a.txt", "r+")</code></td></tr>
+<tr><td><code>w+</code></td><td>Запись и чтение с очисткой</td><td><code>open("a.txt", "w+")</code></td></tr>
+<tr><td><code>a+</code></td><td>Добавление и чтение</td><td><code>open("a.txt", "a+")</code></td></tr>
+</table>
+<pre># Добавить строку в конец файла
+with open("log.txt", "a", encoding="utf-8") as file:
+    file.write("Новая запись\n")</pre>
+</section>
+
+<h2 class="section-title" id="read">3. Чтение текстового файла</h2>
+<div class="grid">
+
+<section class="card s3">
+<h3><code>read()</code> — весь файл</h3>
+<p>Возвращает всё содержимое файла одной строкой.</p>
+<pre>with open("data.txt", encoding="utf-8") as file:
+    text = file.read()
+
+print(text)</pre>
+</section>
+
+<section class="card s3">
+<h3><code>read(n)</code> — несколько символов</h3>
+<p>Можно прочитать указанное количество символов.</p>
+<pre>with open("data.txt", encoding="utf-8") as file:
+    text = file.read(10)
+
+print(text)</pre>
+</section>
+
+<section class="card s3">
+<h3><code>readline()</code> — одна строка</h3>
+<p>Каждый вызов читает следующую строку.</p>
+<pre>with open("data.txt", encoding="utf-8") as file:
+    line1 = file.readline()
+    line2 = file.readline()
+
+print(line1)
+print(line2)</pre>
+</section>
+
+<section class="card s3">
+<h3><code>readlines()</code> — список строк</h3>
+<p>Возвращает строки файла в виде списка.</p>
+<pre>with open("data.txt", encoding="utf-8") as file:
+    lines = file.readlines()
+
+print(lines)</pre>
+<div class="tip">Обычно каждая строка в списке сохраняет символ перевода строки <code>\n</code>.</div>
+</section>
+
+<section class="card s3">
+<h3>Чтение файла циклом</h3>
+<p>Файловый объект можно перебирать построчно.</p>
+<pre>with open("data.txt", encoding="utf-8") as file:
+    for line in file:
+        print(line.strip())</pre>
+<div class="tip">Такой способ удобен для больших файлов: не обязательно загружать весь файл в память.</div>
+</section>
+
+<section class="card s3">
+<h3>Количество строк</h3>
+<pre>with open("data.txt", encoding="utf-8") as file:
+    count = 0
+
+    for line in file:
+        count += 1
+
+print("Строк:", count)</pre>
+</section>
+
+</div>
+
+<h2 class="section-title" id="write">4. Запись в текстовый файл</h2>
+<div class="grid">
+
+<section class="card s4">
+<h3><code>write()</code> — записать строку</h3>
+<pre>with open("result.txt", "w", encoding="utf-8") as file:
+    file.write("Первая строка")</pre>
+<div class="tip"><code>write()</code> не добавляет <code>\n</code> автоматически.</div>
+</section>
+
+<section class="card s4">
+<h3>Несколько строк</h3>
+<pre>with open("result.txt", "w", encoding="utf-8") as file:
+    file.write("Первая строка\n")
+    file.write("Вторая строка\n")
+    file.write("Третья строка\n")</pre>
+</section>
+
+<section class="card s4">
+<h3><code>writelines()</code></h3>
+<p>Записывает последовательность строк. Переводы строк нужно добавить самостоятельно.</p>
+<pre>lines = [
+    "Анна\n",
+    "Борис\n",
+    "Виктор\n"
+]
+
+with open("names.txt", "w", encoding="utf-8") as file:
+    file.writelines(lines)</pre>
+</section>
+
+<section class="card s4">
+<h3>Добавление через <code>"a"</code></h3>
+<pre>with open("notes.txt", "a", encoding="utf-8") as file:
+    file.write("Новая заметка\n")</pre>
+<div class="tip">Режим <code>a</code> сохраняет старое содержимое и дописывает новые данные в конец.</div>
+</section>
+
+<section class="card s4">
+<h3>Запись числа</h3>
+<p><code>write()</code> принимает строку, поэтому число нужно преобразовать.</p>
+<pre>age = 15
+
+with open("age.txt", "w", encoding="utf-8") as file:
+    file.write(str(age))</pre>
+</section>
+
+<section class="card s4">
+<h3>Запись с f-строкой</h3>
+<pre>name = "Анна"
+score = 95
+
+with open("result.txt", "w", encoding="utf-8") as file:
+    file.write(f"Ученик: {name}\n")
+    file.write(f"Баллы: {score}\n")</pre>
+</section>
+
+</div>
+
+<h2 class="section-title" id="lines">5. Обработка строк файла</h2>
+<div class="grid">
+
+<section class="card s5">
+<h3><code>strip()</code> — убрать пробелы и <code>\n</code></h3>
+<pre>with open("names.txt", encoding="utf-8") as file:
+    for line in file:
+        name = line.strip()
+        print(name)</pre>
+</section>
+
+<section class="card s5">
+<h3><code>split()</code> — разделить строку</h3>
+<pre>text = "Иван;15;Москва"
+
+parts = text.split(";")
+
+print(parts)
+# ['Иван', '15', 'Москва']</pre>
+</section>
+
+<section class="card s5">
+<h3><code>splitlines()</code> — строки из текста</h3>
+<pre>text = """Первая
+Вторая
+Третья"""
+
+lines = text.splitlines()
+
+print(lines)</pre>
+</section>
+
+<section class="card s5">
+<h3>Фильтрация строк</h3>
+<pre>with open("numbers.txt", encoding="utf-8") as file:
+    for line in file:
+        number = int(line.strip())
+
+        if number > 10:
+            print(number)</pre>
+</section>
+
+<section class="card s5">
+<h3>Подсчёт слов</h3>
+<pre>with open("text.txt", encoding="utf-8") as file:
+    text = file.read()
+
+words = text.split()
+
+print("Слов:", len(words))</pre>
+</section>
+
+<section class="card s5">
+<h3>Поиск текста</h3>
+<pre>with open("data.txt", encoding="utf-8") as file:
+    for line in file:
+        if "Python" in line:
+            print(line.strip())</pre>
+</section>
+
+</div>
+
+<h2 class="section-title" id="encoding">6. Кодировка текста</h2>
+<div class="grid">
+
+<section class="card s1">
+<h3>UTF-8</h3>
+<p>Для русскоязычных текстов удобно явно указывать <code>encoding="utf-8"</code>.</p>
+<pre>with open("text.txt", "r", encoding="utf-8") as file:
+    text = file.read()
+
+print(text)</pre>
+</section>
+
+<section class="card s1">
+<h3>Запись UTF-8</h3>
+<pre>with open("text.txt", "w", encoding="utf-8") as file:
+    file.write("Привет! Это русский текст.")</pre>
+<div class="tip">Явное указание кодировки делает программу более предсказуемой на разных системах.</div>
+</section>
+
+<section class="card s1">
+<h3>Ошибка кодировки</h3>
+<p>При несовместимой кодировке может возникнуть <code>UnicodeDecodeError</code>.</p>
+<pre>try:
+    with open("text.txt", encoding="ascii") as file:
+        text = file.read()
+except UnicodeDecodeError:
+    print("Проблема с кодировкой")</pre>
+</section>
+
+</div>
+
+<h2 class="section-title" id="path">7. Пути к файлам и pathlib</h2>
+<div class="grid">
+
+<section class="card s6">
+<h3>Текущая папка</h3>
+<pre>from pathlib import Path
+
+path = Path("data.txt")
+
+print(path)
+print(path.exists())</pre>
+</section>
+
+<section class="card s6">
+<h3>Вложенная папка</h3>
+<pre>from pathlib import Path
+
+path = Path("data") / "notes" / "text.txt"
+
+with open(path, encoding="utf-8") as file:
+    print(file.read())</pre>
+</section>
+
+<section class="card s6">
+<h3>Запись через <code>Path.write_text()</code></h3>
+<pre>from pathlib import Path
+
+path = Path("hello.txt")
+
+path.write_text(
+    "Привет, Python!",
+    encoding="utf-8"
+)</pre>
+</section>
+
+<section class="card s6">
+<h3>Чтение через <code>Path.read_text()</code></h3>
+<pre>from pathlib import Path
+
+path = Path("hello.txt")
+
+text = path.read_text(encoding="utf-8")
+
+print(text)</pre>
+</section>
+
+<section class="card s6">
+<h3>Поиск TXT-файлов</h3>
+<pre>from pathlib import Path
+
+folder = Path("data")
+
+for path in folder.glob("*.txt"):
+    print(path)</pre>
+</section>
+
+<section class="card s6">
+<h3>Размер файла</h3>
+<pre>from pathlib import Path
+
+path = Path("data.txt")
+
+print("Размер:", path.stat().st_size, "байт")</pre>
+</section>
+
+</div>
+
+<h2 class="section-title" id="errors">8. Обработка ошибок</h2>
+<div class="grid">
+
+<section class="card s2">
+<h3>Файл не найден</h3>
+<pre>try:
+    with open("data.txt", encoding="utf-8") as file:
+        text = file.read()
+except FileNotFoundError:
+    print("Файл не найден")</pre>
+</section>
+
+<section class="card s2">
+<h3>Несколько исключений</h3>
+<pre>try:
+    with open("data.txt", encoding="utf-8") as file:
+        text = file.read()
+except FileNotFoundError:
+    print("Нет файла")
+except UnicodeDecodeError:
+    print("Ошибка кодировки")</pre>
+</section>
+
+<section class="card s2">
+<h3>Полный пример с <code>else</code> и <code>finally</code></h3>
+<pre>try:
+    with open("data.txt", encoding="utf-8") as file:
+        text = file.read()
+except FileNotFoundError:
+    print("Файл не найден")
+else:
+    print("Файл успешно прочитан")
+finally:
+    print("Операция завершена")</pre>
+</section>
+
+</div>
+
+
+<h2 class="section-title" id="json">9. Работа с JSON-файлами</h2>
+<div class="grid">
+
+<section class="card s6">
+<h3>Что такое JSON?</h3>
+<p>JSON — текстовый формат хранения структурированных данных. В Python для работы с ним используется стандартный модуль <code>json</code>.</p>
+<pre>import json
+
+data = {
+    "name": "Анна",
+    "age": 15,
+    "city": "Москва"
+}
+
+print(data)</pre>
+<div class="tip">JSON-файл обычно имеет расширение <code>.json</code>.</div>
+</section>
+
+<section class="card s6">
+<h3>Запись объекта в JSON — <code>json.dump()</code></h3>
+<p><code>dump()</code> записывает Python-объект непосредственно в открытый файл.</p>
+<pre>import json
+
+data = {
+    "name": "Анна",
+    "age": 15,
+    "city": "Москва"
+}
+
+with open("user.json", "w", encoding="utf-8") as file:
+    json.dump(data, file, ensure_ascii=False, indent=4)</pre>
+<div class="tip"><code>ensure_ascii=False</code> сохраняет русские буквы, а <code>indent=4</code> делает файл удобным для чтения.</div>
+</section>
+
+<section class="card s6">
+<h3>Чтение JSON-файла — <code>json.load()</code></h3>
+<p><code>load()</code> читает JSON из открытого файла и превращает его в объект Python.</p>
+<pre>import json
+
+with open("user.json", "r", encoding="utf-8") as file:
+    data = json.load(file)
+
+print(data)
+print(data["name"])
+print(data["age"])</pre>
+</section>
+
+<section class="card s6">
+<h3><code>json.dumps()</code> — объект → строка</h3>
+<p>Метод <code>dumps()</code> преобразует Python-объект в JSON-строку.</p>
+<pre>import json
+
+data = {
+    "name": "Анна",
+    "age": 15
+}
+
+text = json.dumps(
+    data,
+    ensure_ascii=False,
+    indent=4
+)
+
+print(text)</pre>
+</section>
+
+<section class="card s6">
+<h3><code>json.loads()</code> — строка → объект</h3>
+<p><code>loads()</code> преобразует JSON-строку обратно в объект Python.</p>
+<pre>import json
+
+text = '{"name": "Анна", "age": 15}'
+
+data = json.loads(text)
+
+print(data)
+print(data["name"])</pre>
+</section>
+
+<section class="card s6">
+<h3>Список объектов в JSON</h3>
+<p>JSON удобно использовать для хранения коллекций записей.</p>
+<pre>import json
+
+users = [
+    {"name": "Анна", "age": 15},
+    {"name": "Иван", "age": 16},
+    {"name": "Олег", "age": 14}
+]
+
+with open("users.json", "w", encoding="utf-8") as file:
+    json.dump(
+        users,
+        file,
+        ensure_ascii=False,
+        indent=4
+    )</pre>
+</section>
+
+<section class="card s6">
+<h3>Чтение списка из JSON</h3>
+<pre>import json
+
+with open("users.json", encoding="utf-8") as file:
+    users = json.load(file)
+
+for user in users:
+    print(user["name"], user["age"])</pre>
+</section>
+
+<section class="card s6">
+<h3>Изменение JSON-данных</h3>
+<pre>import json
+
+with open("user.json", encoding="utf-8") as file:
+    user = json.load(file)
+
+user["age"] += 1
+
+with open("user.json", "w", encoding="utf-8") as file:
+    json.dump(
+        user,
+        file,
+        ensure_ascii=False,
+        indent=4
+    )</pre>
+</section>
+
+<section class="card s6">
+<h3>Обработка ошибки JSON</h3>
+<pre>import json
+
+try:
+    with open("data.json", encoding="utf-8") as file:
+        data = json.load(file)
+except FileNotFoundError:
+    print("JSON-файл не найден")
+except json.JSONDecodeError:
+    print("Некорректный JSON")</pre>
+</section>
+
+</div>
+
+<h2 class="section-title">10. Быстрая таблица JSON</h2>
+<section class="card s1">
+<table>
+<tr><th>Метод</th><th>Направление</th><th>Пример</th></tr>
+<tr><td><code>json.dump()</code></td><td>Python-объект → JSON-файл</td><td><code>json.dump(data, file)</code></td></tr>
+<tr><td><code>json.load()</code></td><td>JSON-файл → Python-объект</td><td><code>data = json.load(file)</code></td></tr>
+<tr><td><code>json.dumps()</code></td><td>Python-объект → JSON-строка</td><td><code>text = json.dumps(data)</code></td></tr>
+<tr><td><code>json.loads()</code></td><td>JSON-строка → Python-объект</td><td><code>data = json.loads(text)</code></td></tr>
+<tr><td><code>ensure_ascii=False</code></td><td>Сохраняет Unicode-символы напрямую</td><td><code>json.dump(..., ensure_ascii=False)</code></td></tr>
+<tr><td><code>indent=4</code></td><td>Красиво форматирует JSON</td><td><code>json.dump(..., indent=4)</code></td></tr>
+</table>
+</section>
+
+<h2 class="section-title" id="project">11. Мини-проект: обработка списка чисел</h2>
+<section class="card s3">
+<p>Прочитаем числа из <code>numbers.txt</code>, найдём сумму и среднее значение, затем сохраним результат.</p>
+<pre># numbers.txt:
+# 10
+# 20
+# 30
+# 40
+
+with open("numbers.txt", encoding="utf-8") as file:
+    numbers = []
+
+    for line in file:
+        number = int(line.strip())
+        numbers.append(number)
+
+total = sum(numbers)
+average = total / len(numbers)
+
+with open("result.txt", "w", encoding="utf-8") as file:
+    file.write(f"Сумма: {total}\n")
+    file.write(f"Среднее: {average:.2f}\n")
+
+print("Результат сохранён в result.txt")</pre>
+</section>
+
+<h2 class="section-title">12. Мини-проект: текстовый журнал</h2>
+<section class="card s4">
+<p>Добавляем события в файл, не удаляя предыдущие записи.</p>
+<pre>from datetime import datetime
+
+message = input("Введите сообщение: ")
+
+now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+with open("journal.txt", "a", encoding="utf-8") as file:
+    file.write(f"[{now}] {message}\n")
+
+print("Запись добавлена.")</pre>
+<div class="tip">Режим <code>a</code> особенно удобен для журналов, логов и истории действий.</div>
+</section>
+
+<h2 class="section-title" id="api">13. Быстрая таблица API</h2>
+<section class="card s1">
+<table>
+<tr><th>Команда / метод</th><th>Что делает</th><th>Короткий пример</th></tr>
+<tr><td><code>open()</code></td><td>Открывает файл</td><td><code>open("a.txt")</code></td></tr>
+<tr><td><code>close()</code></td><td>Закрывает файл</td><td><code>file.close()</code></td></tr>
+<tr><td><code>read()</code></td><td>Читает содержимое</td><td><code>file.read()</code></td></tr>
+<tr><td><code>read(n)</code></td><td>Читает n символов</td><td><code>file.read(10)</code></td></tr>
+<tr><td><code>readline()</code></td><td>Читает одну строку</td><td><code>file.readline()</code></td></tr>
+<tr><td><code>readlines()</code></td><td>Читает строки в список</td><td><code>file.readlines()</code></td></tr>
+<tr><td><code>write()</code></td><td>Записывает строку</td><td><code>file.write("Hi")</code></td></tr>
+<tr><td><code>writelines()</code></td><td>Записывает последовательность строк</td><td><code>file.writelines(lines)</code></td></tr>
+<tr><td><code>strip()</code></td><td>Убирает пробелы и переводы строк по краям</td><td><code>line.strip()</code></td></tr>
+<tr><td><code>split()</code></td><td>Разделяет строку</td><td><code>line.split(";")</code></td></tr>
+<tr><td><code>Path.exists()</code></td><td>Проверяет существование</td><td><code>path.exists()</code></td></tr>
+<tr><td><code>Path.read_text()</code></td><td>Читает текст</td><td><code>path.read_text()</code></td></tr>
+<tr><td><code>Path.write_text()</code></td><td>Записывает текст</td><td><code>path.write_text(...)</code></td></tr>
+</table>
+</section>
+
+<h2 class="section-title">14. Типичный алгоритм работы</h2>
+<section class="card s5">
+<div class="flow">
+  <div class="step">1. Определить путь<br>к файлу</div>
+  <div class="step">2. Выбрать<br>режим</div>
+  <div class="step">3. Открыть<br>через with</div>
+  <div class="step">4. Прочитать /<br>записать</div>
+  <div class="step">5. Обработать<br>данные</div>
+</div>
+<pre>with open("data.txt", "r", encoding="utf-8") as file:
+    for line in file:
+        line = line.strip()
+        # обработка строки</pre>
+</section>
+
+<h2 class="section-title">15. Главное, что нужно запомнить</h2>
+<div class="grid">
+<section class="card s1">
+<h3>Чтение</h3>
+<pre>with open("data.txt", encoding="utf-8") as file:
+    text = file.read()</pre>
+</section>
+
+<section class="card s2">
+<h3>Запись</h3>
+<pre>with open("data.txt", "w", encoding="utf-8") as file:
+    file.write("Hello")</pre>
+</section>
+
+<section class="card s3">
+<h3>Добавление</h3>
+<pre>with open("data.txt", "a", encoding="utf-8") as file:
+    file.write("New line\n")</pre>
+</section>
+
+<section class="card s4">
+<h3>Построчное чтение</h3>
+<pre>with open("data.txt", encoding="utf-8") as file:
+    for line in file:
+        print(line.strip())</pre>
+</section>
+</div>
+
+</main>
+
+<footer>
+  <div class="container">
+    Python Cheatsheet · Работа с текстовыми файлами · <code>open()</code> · <code>with</code> · <code>pathlib</code>
+  </div>
+</footer>
+
+</body>
+</html>

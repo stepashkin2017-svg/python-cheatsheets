@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Структуры данных Python — шпаргалка</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;700;800&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+:root {
+  --bg: #EEF3F8;
+  --card: #FFFFFF;
+  --ink: #13203A;
+  --mute: #5A6A85;
+  --line: #D5DEEA;
+  --a1: #0C7C86;
+  --a2: #B9660A;
+  --a3: #5B4BC4;
+  --a4: #B8325A;
+  --a5: #3A7D2C;
+  --code: #0F1A30;
+  --ct: #E3EAF6;
+  box-sizing: border-box;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0B1220;
+    --card: #131D31;
+    --ink: #E6ECF7;
+    --mute: #9AABC6;
+    --line: #27344F;
+    --a1: #4FD1C5;
+    --a2: #F2B25C;
+    --a3: #A99BFF;
+    --a4: #FF8FB0;
+    --a5: #8FD97C;
+    --code: #080F1D;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0B1220;
+  --card: #131D31;
+  --ink: #E6ECF7;
+  --mute: #9AABC6;
+  --line: #27344F;
+  --a1: #4FD1C5;
+  --a2: #F2B25C;
+  --a3: #A99BFF;
+  --a4: #FF8FB0;
+  --a5: #8FD97C;
+  --code: #080F1D;
+}
+html { scroll-padding-top: calc(env(safe-area-inset-top, 0px) + 60px); }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.55 Onest, system-ui, Arial, sans-serif; }
+header { padding: 48px 20px 28px; max-width: 1180px; margin: 0 auto; }
+h1 { font-size: clamp(30px, 5vw, 52px); line-height: 1.05; margin: 0 0 12px; font-weight: 800; letter-spacing: -.02em; }
+header p { margin: 0; color: var(--mute); max-width: 64ch; }
+nav { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg); border-bottom: 1px solid var(--line); display: flex; gap: 8px; padding: 10px 20px; overflow-x: auto; }
+nav a { color: var(--ink); text-decoration: none; font-weight: 600; padding: 6px 14px; border-radius: 99px; border: 1px solid var(--line); white-space: nowrap; }
+nav a:hover, nav a:focus-visible { background: var(--ink); color: var(--bg); outline: none; }
+main { max-width: 1180px; margin: 0 auto; padding: 8px 20px 60px; }
+h2 { font-size: 28px; margin: 44px 0 6px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+h2 code { font: 600 15px 'JetBrains Mono', monospace; background: var(--ink); color: var(--bg); padding: 3px 10px; border-radius: 6px; }
+.sub { color: var(--mute); margin: 0 0 18px; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr)); gap: 16px; }
+article { background: var(--card); border: 1px solid var(--line); border-left: 5px solid var(--c, var(--a1)); border-radius: 10px; padding: 16px 18px; min-width: 0; }
+.s1 { --c: var(--a1); } .s2 { --c: var(--a2); } .s3 { --c: var(--a3); } .s4 { --c: var(--a4); } .s5 { --c: var(--a5); }
+h3 { margin: 0 0 6px; font-size: 17px; }
+article p { margin: 0 0 10px; color: var(--mute); font-size: 14.5px; }
+article ul { margin: 0 0 10px; padding-left: 20px; color: var(--mute); font-size: 14.5px; }
+pre { margin: 0; background: var(--code); color: var(--ct); border-radius: 8px; padding: 12px 14px; overflow-x: auto; font: 400 13px/1.55 'JetBrains Mono', ui-monospace, Consolas, monospace; }
+pre + pre { margin-top: 8px; }
+i.k { color: #FFB454; font-style: normal; font-weight: 600; }
+i.s { color: #8EE6A0; font-style: normal; }
+i.c { color: #7F90B0; font-style: italic; }
+i.n { color: #7FC4FF; font-style: normal; }
+.wide { grid-column: 1 / -1; }
+table { width: 100%; border-collapse: collapse; font-size: 14px; }
+th, td { text-align: left; padding: 7px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { color: var(--mute); font-weight: 600; }
+td code, p code, li code, .sub code, footer code, header code { font: 500 13px 'JetBrains Mono', monospace; background: var(--bg); padding: 1px 6px; border-radius: 4px; }
+.tw { overflow-x: auto; }
+footer { color: var(--mute); font-size: 13px; text-align: center; padding: 0 20px 30px; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Структуры данных Python</h1>
+  <p>Списки, кортежи, словари, множества и неизменяемые множества: создание, операции, методы и простые примеры. Комментарий <code>#</code> показывает результат.</p>
+</header>
+
+<nav>
+  <a href="#over">Обзор</a>
+  <a href="#list">Списки</a>
+  <a href="#tuple">Кортежи</a>
+  <a href="#dict">Словари</a>
+  <a href="#set">Множества</a>
+  <a href="#fset">frozenset</a>
+  <a href="#pick">Выбор</a>
+</nav>
+
+<main>
+
+<h2 id="over">Обзор и сравнение</h2>
+<p class="sub">Структура данных хранит набор значений и определяет, как с ним работать. Главные отличия: изменяемость, порядок и уникальность.</p>
+<div class="grid">
+  <article class="s1 wide">
+    <h3>Сравнительная таблица</h3>
+    <div class="tw">
+      <table>
+        <tr><th>Структура</th><th>Запись</th><th>Изменяемая</th><th>Порядок</th><th>Дубликаты</th><th>Доступ</th></tr>
+        <tr><td><code>list</code></td><td><code>[1, 2, 3]</code></td><td>да</td><td>сохраняется</td><td>разрешены</td><td>по индексу</td></tr>
+        <tr><td><code>tuple</code></td><td><code>(1, 2, 3)</code></td><td>нет</td><td>сохраняется</td><td>разрешены</td><td>по индексу</td></tr>
+        <tr><td><code>dict</code></td><td><code>{"a": 1}</code></td><td>да</td><td>порядок вставки</td><td>ключи уникальны</td><td>по ключу</td></tr>
+        <tr><td><code>set</code></td><td><code>{1, 2, 3}</code></td><td>да</td><td>не гарантируется</td><td>нет</td><td>проверка <code>in</code></td></tr>
+        <tr><td><code>frozenset</code></td><td><code>frozenset({1, 2})</code></td><td>нет</td><td>не гарантируется</td><td>нет</td><td>проверка <code>in</code></td></tr>
+      </table>
+    </div>
+  </article>
+
+  <article class="s1">
+    <h3>Общие операции</h3>
+    <p>Работают для большинства структур.</p>
+<pre><code>len(x)          # количество элементов
+3 in x          # есть ли элемент
+for item in x:  # перебор
+    ...
+min(x), max(x), sum(x)   # для чисел
+sorted(x)       # новый отсортированный список</code></pre>
+  </article>
+
+  <article class="s1">
+    <h3>Преобразования между типами</h3>
+<pre><code>list((1, 2))            # [1, 2]
+tuple([1, 2])           # (1, 2)
+set([1, 1, 2])          # {1, 2}
+frozenset([1, 2])       # frozenset({1, 2})
+dict([("a", 1)])        # {'a': 1}
+dict(zip("ab", [1, 2])) # {'a': 1, 'b': 2}
+list({"a": 1})          # ['a'] — ключи</code></pre>
+  </article>
+
+  <article class="s1">
+    <h3>Скорость проверки in</h3>
+    <p>Для больших данных выбор структуры влияет на скорость.</p>
+<pre><code>x in список       # перебор: O(n)
+x in кортеж       # перебор: O(n)
+x in множество    # хеш: в среднем O(1)
+k in словарь      # хеш: в среднем O(1)</code></pre>
+  </article>
+</div>
+
+<h2 id="list">Списки <code>list</code></h2>
+<p class="sub">Упорядоченная изменяемая коллекция любых значений. Элементы нумеруются с 0.</p>
+<div class="grid">
+  <article class="s1">
+    <h3>Создание</h3>
+<pre><code>a = [1, 2, 3]
+b = []                  # пустой
+c = list("abc")         # ['a', 'b', 'c']
+d = [0] * 3             # [0, 0, 0]
+e = list(range(5))      # [0, 1, 2, 3, 4]
+mix = [1, "a", 2.5, [1, 2]]</code></pre>
+  </article>
+
+  <article class="s1">
+    <h3>Индексы и срезы</h3>
+<pre><code>a = [10, 20, 30, 40, 50]
+a[0]       # 10
+a[-1]      # 50
+a[1:3]     # [20, 30]
+a[:2]      # [10, 20]
+a[::2]     # [10, 30, 50]
+a[::-1]    # [50, 40, 30, 20, 10]</code></pre>
+  </article>
+
+  <article class="s1">
+    <h3>Изменение элементов</h3>
+<pre><code>a[0] = 99         # [99, 20, 30, 40, 50]
+a[1:3] = [0, 0]   # замена среза
+a += [60]         # добавить в конец</code></pre>
+  </article>
+
+  <article class="s1">
+    <h3>Добавление</h3>
+<pre><code>a = [1, 2]
+a.append(3)         # [1, 2, 3]
+a.insert(0, 9)      # [9, 1, 2, 3]
+a.extend([4, 5])    # [9, 1, 2, 3, 4, 5]
+a + [6]             # новый список</code></pre>
+  </article>
+
+  <article class="s1">
+    <h3>Удаление</h3>
+<pre><code>a = [1, 2, 3, 2]
+a.remove(2)    # [1, 3, 2] — первое значение 2
+a.pop()        # вернёт 2, список [1, 3]
+a.pop(0)       # вернёт 1, список [3]
+del a[0]       # удалить по индексу
+a.clear()      # []</code></pre>
+  </article>
+
+  <article class="s1">
+    <h3>Поиск и подсчёт</h3>
+<pre><code>a = [5, 3, 5, 1]
+a.index(3)     # 1 — позиция
+a.count(5)     # 2 — сколько раз
+3 in a         # True
+len(a)         # 4</code></pre>
+  </article>
+
+  <article class="s1">
+    <h3>Сортировка и разворот</h3>
+    <p><code>sort()</code> меняет список, <code>sorted()</code> возвращает новый.</p>
+<pre><code>n = [3, 1, 2]
+n.sort()                    # [1, 2, 3]
+n.sort(reverse=True)        # [3, 2, 1]
+sorted(n)                   # новый список
+words = ["ccc", "a", "bb"]
+words.sort(key=len)         # ['a', 'bb', 'ccc']
+n.reverse()                 # развернуть на месте</code></pre>
+  </article>
+
+  <article class="s1">
+    <h3>Распаковка</h3>
+<pre><code>x, y, z = [1, 2, 3]
+first, *rest = [1, 2, 3, 4]    # 1, [2, 3, 4]
+*init, last = [1, 2, 3]        # [1, 2], 3</code></pre>
+  </article>
+
+  <article class="s1">
+    <h3>Генератор списка</h3>
+<pre><code>[x * x for x in range(5)]            # [0, 1, 4, 9, 16]
+[x for x in range(10) if x % 2 == 0]  # [0, 2, 4, 6, 8]
+[c.upper() for c in "abc"]           # ['A', 'B', 'C']</code></pre>
+  </article>
+
+  <article class="s1">
+    <h3>Копирование</h3>
+    <p><code>b = a</code> даёт вторую ссылку на тот же список. Для копии используйте <code>copy()</code>; для вложенных структур — <code>deepcopy</code>.</p>
+<pre><code>a = [1, 2]
+b = a            # один объект
+c = a.copy()     # копия (то же: a[:] , list(a))
+import copy
+d = copy.deepcopy([[1], [2]])   # полная копия</code></pre>
+  </article>
+
+  <article class="s1">
+    <h3>Вложенные списки</h3>
+    <p>Ловушка: умножение копирует ссылки, а не списки.</p>
+<pre><code>m = [[1, 2], [3, 4]]
+m[1][0]                        # 3
+bad  = [[0] * 3] * 3           # три ссылки на один список
+good = [[0] * 3 for _ in range(3)]
+bad[0][0] = 1                  # [[1,0,0],[1,0,0],[1,0,0]]</code></pre>
+  </article>
+
+  <article class="s1">
+    <h3>Перебор</h3>
+<pre><code>for x in [10, 20]:
+    print(x)
+for i, x in enumerate(["a", "b"]):
+    print(i, x)               # 0 a / 1 b</code></pre>
+  </article>
+</div>
+
+<h2 id="tuple">Кортежи <code>tuple</code></h2>
+<p class="sub">Упорядоченная <b>неизменяемая</b> последовательность. Подходит для данных, которые не должны меняться: координаты, записи, возвращаемые значения.</p>
+<div class="grid">
+  <article class="s2">
+    <h3>Создание</h3>
+<pre><code>t = (1, 2, 3)
+t = 1, 2, 3            # скобки необязательны
+one = (5,)             # кортеж из одного элемента: нужна запятая
+empty = ()
+tuple([1, 2])          # (1, 2)
+type((5))              # &lt;class 'int'&gt; — просто скобки</code></pre>
+  </article>
+
+  <article class="s2">
+    <h3>Доступ и срезы</h3>
+<pre><code>t = (10, 20, 30, 40)
+t[0]       # 10
+t[-1]      # 40
+t[1:3]     # (20, 30)
+len(t)     # 4
+20 in t    # True</code></pre>
+  </article>
+
+  <article class="s2">
+    <h3>Неизменяемость</h3>
+<pre><code>t = (1, 2, 3)
+t[0] = 9           # TypeError
+t = t + (4,)       # (1, 2, 3, 4) — создан новый кортеж
+# но изменяемый элемент внутри менять можно:
+m = ([1], 2)
+m[0].append(5)     # ([1, 5], 2)</code></pre>
+  </article>
+
+  <article class="s2">
+    <h3>Методы</h3>
+    <p>Только два, раз кортеж менять нельзя.</p>
+<pre><code>t = (1, 2, 2, 3)
+t.count(2)     # 2
+t.index(3)     # 3</code></pre>
+  </article>
+
+  <article class="s2">
+    <h3>Распаковка и обмен</h3>
+<pre><code>x, y = (10, 20)
+a, b = b, a            # обмен значений
+first, *rest = (1, 2, 3)</code></pre>
+  </article>
+
+  <article class="s2">
+    <h3>Несколько значений из функции</h3>
+<pre><code>def min_max(nums):
+    return min(nums), max(nums)    # возвращается кортеж
+
+lo, hi = min_max([4, 1, 9])        # 1, 9</code></pre>
+  </article>
+
+  <article class="s2">
+    <h3>Кортеж как ключ словаря</h3>
+    <p>Изменяемый список ключом быть не может, а кортеж — может.</p>
+<pre><code>grid = {(0, 0): "старт", (2, 3): "финиш"}
+grid[(2, 3)]      # 'финиш'</code></pre>
+  </article>
+
+  <article class="s2">
+    <h3>Именованный кортеж</h3>
+    <p>Элементы доступны по именам, как у объекта.</p>
+<pre><code>from collections import namedtuple
+Point = namedtuple("Point", "x y")
+p = Point(3, 4)
+p.x, p[1]         # (3, 4)
+p._replace(x=10)  # Point(x=10, y=4)</code></pre>
+  </article>
+</div>
+
+<h2 id="dict">Словари <code>dict</code></h2>
+<p class="sub">Набор пар «ключ: значение». Доступ по ключу, ключи уникальны и должны быть неизменяемыми (строки, числа, кортежи). Порядок вставки сохраняется (Python 3.7+).</p>
+<div class="grid">
+  <article class="s3">
+    <h3>Создание</h3>
+<pre><code>d = {"name": "Аня", "age": 20}
+e = {}                         # пустой
+f = dict(a=1, b=2)             # {'a': 1, 'b': 2}
+g = dict([("x", 1), ("y", 2)])
+h = dict.fromkeys(["a", "b"], 0)   # {'a': 0, 'b': 0}</code></pre>
+  </article>
+
+  <article class="s3">
+    <h3>Чтение значения</h3>
+    <p><code>d[k]</code> вызывает <code>KeyError</code>, если ключа нет. <code>get</code> безопаснее.</p>
+<pre><code>d["name"]              # 'Аня'
+d["city"]              # KeyError
+d.get("city")          # None
+d.get("city", "—")     # '—' — значение по умолчанию</code></pre>
+  </article>
+
+  <article class="s3">
+    <h3>Добавление и изменение</h3>
+<pre><code>d["city"] = "Москва"          # добавить
+d["age"] = 21                 # изменить
+d.update({"age": 22, "x": 1}) # несколько сразу
+d.setdefault("tags", [])      # создать, если нет
+d | {"z": 0}                  # новый словарь (Python 3.9+)</code></pre>
+  </article>
+
+  <article class="s3">
+    <h3>Удаление</h3>
+<pre><code>d.pop("x")         # вернёт значение и удалит
+d.pop("q", None)   # без ошибки, если нет
+del d["city"]
+d.popitem()        # удалить последнюю пару
+d.clear()          # {}</code></pre>
+  </article>
+
+  <article class="s3">
+    <h3>keys, values, items</h3>
+<pre><code>d = {"a": 1, "b": 2}
+d.keys()      # dict_keys(['a', 'b'])
+d.values()    # dict_values([1, 2])
+d.items()     # dict_items([('a', 1), ('b', 2)])
+"a" in d      # True — проверка по ключам
+list(d)       # ['a', 'b']</code></pre>
+  </article>
+
+  <article class="s3">
+    <h3>Перебор</h3>
+<pre><code>for k in d:               print(k)
+for v in d.values():      print(v)
+for k, v in d.items():    print(k, v)   # a 1 / b 2</code></pre>
+  </article>
+
+  <article class="s3">
+    <h3>Генератор словаря</h3>
+<pre><code>{x: x * x for x in range(4)}      # {0: 0, 1: 1, 2: 4, 3: 9}
+{k: v for k, v in d.items() if v &gt; 1}   # {'b': 2}
+{v: k for k, v in d.items()}      # поменять ключи и значения</code></pre>
+  </article>
+
+  <article class="s3">
+    <h3>Подсчёт: частота слов</h3>
+<pre><code>count = {}
+for w in "a b a c a b".split():
+    count[w] = count.get(w, 0) + 1
+# {'a': 3, 'b': 2, 'c': 1}
+# проще: collections.Counter("a b a c a b".split())</code></pre>
+  </article>
+
+  <article class="s3">
+    <h3>Сортировка</h3>
+<pre><code>scores = {"Аня": 5, "Боря": 3, "Вика": 4}
+sorted(scores)                          # по ключам
+sorted(scores.items(), key=lambda kv: kv[1])
+# [('Боря', 3), ('Вика', 4), ('Аня', 5)]
+max(scores, key=scores.get)             # 'Аня'</code></pre>
+  </article>
+
+  <article class="s3">
+    <h3>Вложенные словари</h3>
+<pre><code>user = {"name": "Аня",
+        "addr": {"city": "Москва", "zip": "101000"},
+        "langs": ["ru", "en"]}
+user["addr"]["city"]       # 'Москва'
+user["langs"][0]           # 'ru'
+user.get("addr", {}).get("street", "—")   # безопасно</code></pre>
+  </article>
+
+  <article class="s3">
+    <h3>Объединение и копия</h3>
+<pre><code>a = {"x": 1}; b = {"y": 2}
+c = {**a, **b}        # {'x': 1, 'y': 2}
+a | b                 # то же (3.9+)
+d = a.copy()          # поверхностная копия</code></pre>
+  </article>
+</div>
+
+<h2 id="set">Множества <code>set</code></h2>
+<p class="sub">Неупорядоченный набор <b>уникальных</b> неизменяемых элементов. Мгновенная проверка принадлежности и операции теории множеств.</p>
+<div class="grid">
+  <article class="s4">
+    <h3>Создание</h3>
+    <p>Пустое множество — только <code>set()</code>: <code>{}</code> создаёт словарь.</p>
+<pre><code>s = {1, 2, 3}
+e = set()                    # пустое
+set("hello")                 # {'h', 'e', 'l', 'o'}
+set([1, 1, 2, 2, 3])         # {1, 2, 3}
+type({})                     # &lt;class 'dict'&gt;</code></pre>
+  </article>
+
+  <article class="s4">
+    <h3>Добавление и удаление</h3>
+<pre><code>s = {1, 2}
+s.add(3)            # {1, 2, 3}
+s.update([4, 5])    # {1, 2, 3, 4, 5}
+s.remove(5)         # KeyError, если нет
+s.discard(10)       # без ошибки
+s.pop()             # удалит произвольный элемент
+s.clear()</code></pre>
+  </article>
+
+  <article class="s4">
+    <h3>Проверка и размер</h3>
+<pre><code>s = {1, 2, 3}
+2 in s         # True — очень быстро
+len(s)         # 3
+s[0]           # TypeError — индексов нет</code></pre>
+  </article>
+
+  <article class="s4">
+    <h3>Операции над множествами</h3>
+<pre><code>a = {1, 2, 3}
+b = {3, 4}
+a | b     # {1, 2, 3, 4} — объединение
+a &amp; b     # {3}           — пересечение
+a - b     # {1, 2}        — разность
+a ^ b     # {1, 2, 4}     — симметрическая разность</code></pre>
+  </article>
+
+  <article class="s4">
+    <h3>Методы-аналоги</h3>
+<pre><code>a.union(b)                 # a | b
+a.intersection(b)          # a &amp; b
+a.difference(b)            # a - b
+a.symmetric_difference(b)  # a ^ b
+a |= {9}                   # изменить на месте</code></pre>
+  </article>
+
+  <article class="s4">
+    <h3>Сравнение множеств</h3>
+<pre><code>{1, 2} &lt;= {1, 2, 3}          # True — подмножество
+{1, 2, 3} &gt;= {1, 2}          # True — надмножество
+{1, 2}.issubset({1, 2, 3})   # True
+{1, 2}.isdisjoint({3, 4})    # True — общих нет</code></pre>
+  </article>
+
+  <article class="s4">
+    <h3>Удаление дубликатов</h3>
+<pre><code>nums = [3, 1, 3, 2, 1]
+list(set(nums))              # порядок не гарантируется
+list(dict.fromkeys(nums))    # [3, 1, 2] — с сохранением порядка</code></pre>
+  </article>
+
+  <article class="s4">
+    <h3>Генератор множества</h3>
+<pre><code>{x % 3 for x in range(10)}      # {0, 1, 2}
+{w.lower() for w in ["A", "a", "B"]}   # {'a', 'b'}</code></pre>
+  </article>
+
+  <article class="s4">
+    <h3>Практика: общие и разные элементы</h3>
+<pre><code>mon = {"Аня", "Боря", "Вика"}
+tue = {"Боря", "Гоша"}
+mon &amp; tue      # {'Боря'} — были оба дня
+mon | tue      # все, кто приходил
+mon - tue      # только в понедельник</code></pre>
+  </article>
+</div>
+
+<h2 id="fset">Неизменяемые множества <code>frozenset</code></h2>
+<p class="sub">То же множество, но после создания не меняется. Поэтому оно хешируемо: может быть ключом словаря и элементом другого множества.</p>
+<div class="grid">
+  <article class="s5">
+    <h3>Создание</h3>
+<pre><code>fs = frozenset([1, 2, 2, 3])   # frozenset({1, 2, 3})
+frozenset("abc")
+frozenset()                    # пустое</code></pre>
+  </article>
+
+  <article class="s5">
+    <h3>Нельзя менять</h3>
+<pre><code>fs = frozenset({1, 2})
+fs.add(3)       # AttributeError
+fs.remove(1)    # AttributeError
+# нет add, remove, discard, pop, clear, update</code></pre>
+  </article>
+
+  <article class="s5">
+    <h3>Можно читать и вычислять</h3>
+    <p>Все операции из <code>set</code>, которые не меняют объект, работают и возвращают новый <code>frozenset</code>.</p>
+<pre><code>a = frozenset({1, 2, 3})
+b = frozenset({3, 4})
+2 in a           # True
+a | b            # frozenset({1, 2, 3, 4})
+a &amp; b            # frozenset({3})
+a &lt;= a | b       # True</code></pre>
+  </article>
+
+  <article class="s5">
+    <h3>Ключ словаря</h3>
+    <p>Обычное множество ключом быть не может, <code>frozenset</code> — может.</p>
+<pre><code>{ {1, 2}: "x" }                    # TypeError
+pairs = {frozenset({1, 2}): "пара"}
+pairs[frozenset({2, 1})]           # 'пара' — порядок не важен</code></pre>
+  </article>
+
+  <article class="s5">
+    <h3>Множество множеств</h3>
+<pre><code>groups = {frozenset({1, 2}), frozenset({3})}
+frozenset({1, 2}) in groups        # True
+{ {1}, {2} }                       # TypeError</code></pre>
+  </article>
+
+  <article class="s5">
+    <h3>Практика: неупорядоченные пары</h3>
+    <p>Пары (A, B) и (B, A) считаются одним ребром.</p>
+<pre><code>edges = {frozenset(("A", "B")), frozenset(("B", "A")),
+         frozenset(("B", "C"))}
+len(edges)    # 2 — первая и вторая совпали</code></pre>
+  </article>
+</div>
+
+<h2 id="pick">Что выбрать</h2>
+<div class="grid">
+  <article class="s1 wide">
+    <h3>Подсказка по выбору</h3>
+    <div class="tw">
+      <table>
+        <tr><th>Задача</th><th>Структура</th></tr>
+        <tr><td>Последовательность, которую нужно менять, сортировать, дополнять</td><td><code>list</code></td></tr>
+        <tr><td>Фиксированная запись, координаты, возврат нескольких значений</td><td><code>tuple</code></td></tr>
+        <tr><td>Поиск значения по имени или идентификатору</td><td><code>dict</code></td></tr>
+        <tr><td>Уникальные элементы, быстрая проверка наличия, пересечения</td><td><code>set</code></td></tr>
+        <tr><td>Уникальный набор, который нужен как ключ или элемент множества</td><td><code>frozenset</code></td></tr>
+      </table>
+    </div>
+  </article>
+</div>
+
+</main>
+
+<footer>Совет: если данные не должны меняться — берите <code>tuple</code> или <code>frozenset</code>, если важна скорость поиска — <code>set</code> или <code>dict</code>.</footer>
+
+<script>
+document.querySelectorAll('pre code').forEach(function(c){
+  var t = c.textContent;
+  c.innerHTML = t.replace(/[&<>]/g, function(m){ return {'&':'&amp;','<':'&lt;','>':'&gt;'}[m]; })
+  .replace(/(#.*$)|("[^"\n]*"|'[^'\n]*')|\b(import|from|def|class|return|if|else|for|while|in|and|or|not|lambda|del|True|False|None)\b|\b(\d+)\b/gm, function(m, c1, s, k){
+    return '<i class="' + (c1 ? 'c' : s ? 's' : k ? 'k' : 'n') + '">' + m + '</i>';
+  });
+});
+</script>
+
+</body>
+</html>

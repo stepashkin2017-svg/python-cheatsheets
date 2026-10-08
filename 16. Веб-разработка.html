@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Веб-разработка — шпаргалка</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;700;800&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+:root{--bg:#EEF3F8;--card:#FFFFFF;--ink:#13203A;--mute:#5A6A85;--line:#D5DEEA;--a1:#0C7C86;--a2:#B9660A;--a3:#5B4BC4;--a4:#B8325A;--a5:#3A7D2C;--code:#0F1A30;--ct:#E3EAF6;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0B1220;--card:#131D31;--ink:#E6ECF7;--mute:#9AABC6;--line:#27344F;--a1:#4FD1C5;--a2:#F2B25C;--a3:#A99BFF;--a4:#FF8FB0;--a5:#8FD97C;--code:#080F1D}}
+:root[data-theme="dark"]{--bg:#0B1220;--card:#131D31;--ink:#E6ECF7;--mute:#9AABC6;--line:#27344F;--a1:#4FD1C5;--a2:#F2B25C;--a3:#A99BFF;--a4:#FF8FB0;--a5:#8FD97C;--code:#080F1D}
+html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 60px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 Onest,system-ui,Arial,sans-serif}
+header{padding:48px 20px 28px;max-width:1180px;margin:0 auto}
+h1{font-size:clamp(30px,5vw,52px);line-height:1.05;margin:0 0 12px;font-weight:800;letter-spacing:-.02em}
+header p{margin:0;color:var(--mute);max-width:66ch}
+nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);border-bottom:1px solid var(--line);display:flex;gap:8px;padding:10px 20px;overflow-x:auto}
+nav a{color:var(--ink);text-decoration:none;font-weight:600;padding:6px 14px;border-radius:99px;border:1px solid var(--line);white-space:nowrap}
+nav a:hover,nav a:focus-visible{background:var(--ink);color:var(--bg);outline:none}
+main{max-width:1180px;margin:0 auto;padding:8px 20px 60px}
+h2{font-size:28px;margin:44px 0 6px}
+.sub{color:var(--mute);margin:0 0 18px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,340px),1fr));gap:16px}
+article{background:var(--card);border:1px solid var(--line);border-left:5px solid var(--c,var(--a1));border-radius:10px;padding:16px 18px;min-width:0}
+.s1{--c:var(--a1)}.s2{--c:var(--a2)}.s3{--c:var(--a3)}.s4{--c:var(--a4)}.s5{--c:var(--a5)}
+h3{margin:0 0 6px;font-size:17px}
+article p{margin:0 0 10px;color:var(--mute);font-size:14.5px}
+article ul,article ol{margin:0 0 10px;padding-left:20px;color:var(--mute);font-size:14.5px}
+pre{margin:0;background:var(--code);color:var(--ct);border-radius:8px;padding:12px 14px;overflow-x:auto;font:400 13px/1.55 'JetBrains Mono',ui-monospace,Consolas,monospace}
+pre+pre,pre+p,p+pre{margin-top:8px}
+i.k{color:#FFB454;font-style:normal;font-weight:600}i.s{color:#8EE6A0;font-style:normal}i.c{color:#7F90B0;font-style:italic}i.n{color:#7FC4FF;font-style:normal}
+.wide{grid-column:1/-1}
+.hl{border-width:2px;border-left-width:6px}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;padding:7px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{color:var(--mute);font-weight:600}
+td code,p code,li code,.sub code,footer code,header code{font:500 13px 'JetBrains Mono',monospace;background:var(--bg);padding:1px 6px;border-radius:4px}
+.tw{overflow-x:auto}
+footer{color:var(--mute);font-size:13px;text-align:center;padding:0 20px 30px}
+</style>
+</head>
+<body>
+<header>
+<h1>Веб-разработка: Flask, HTML/CSS, SQLite</h1>
+<p>От вёрстки и базы данных до публикации приложения. В конце — мини-проект «Список задач». Комментарий <code>#</code> или <code>--</code> показывает результат.</p>
+</header>
+<nav><a href="#html">HTML</a><a href="#css">CSS</a><a href="#sql">SQLite и SQL</a><a href="#ph">Плейсхолдеры</a><a href="#design">Проектирование БД</a><a href="#tools">Инструменты БД</a><a href="#flask">Flask</a><a href="#stack">Стек и публикация</a><a href="#proj">Мини-проект</a></nav>
+<main>
+
+<h2 id="html">HTML: основы вёрстки</h2>
+<p class="sub">HTML описывает <b>структуру и содержимое</b> страницы с помощью тегов. Тег бывает парным (<code>&lt;p&gt;…&lt;/p&gt;</code>) и одиночным (<code>&lt;img&gt;</code>); свойства задаются атрибутами.</p>
+<div class="grid">
+<article class="s1"><h3>Каркас страницы</h3>
+<pre><code class="html">&lt;!DOCTYPE html&gt;
+&lt;html lang="ru"&gt;
+&lt;head&gt;
+  &lt;meta charset="utf-8"&gt;
+  &lt;meta name="viewport" content="width=device-width, initial-scale=1"&gt;
+  &lt;title&gt;Моя страница&lt;/title&gt;
+  &lt;link rel="stylesheet" href="style.css"&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;h1&gt;Привет!&lt;/h1&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre></article>
+
+<article class="s1"><h3>Текст и ссылки</h3>
+<pre><code class="html">&lt;h1&gt;Заголовок&lt;/h1&gt;  &lt;!-- h1…h6 --&gt;
+&lt;p&gt;Абзац с &lt;strong&gt;жирным&lt;/strong&gt; и &lt;em&gt;курсивом&lt;/em&gt;.&lt;br&gt;Новая строка.&lt;/p&gt;
+&lt;hr&gt;
+&lt;a href="https://example.com" target="_blank"&gt;Ссылка&lt;/a&gt;
+&lt;a href="/about"&gt;Внутренняя&lt;/a&gt;</code></pre></article>
+
+<article class="s1"><h3>Списки и изображения</h3>
+<pre><code class="html">&lt;ul&gt;&lt;li&gt;Маркированный&lt;/li&gt;&lt;li&gt;список&lt;/li&gt;&lt;/ul&gt;
+&lt;ol&gt;&lt;li&gt;Нумерованный&lt;/li&gt;&lt;/ol&gt;
+&lt;img src="cat.png" alt="Кот" width="200"&gt;</code></pre></article>
+
+<article class="s1"><h3>Таблица</h3>
+<pre><code class="html">&lt;table&gt;
+  &lt;tr&gt;&lt;th&gt;Имя&lt;/th&gt;&lt;th&gt;Балл&lt;/th&gt;&lt;/tr&gt;
+  &lt;tr&gt;&lt;td&gt;Аня&lt;/td&gt;&lt;td&gt;5&lt;/td&gt;&lt;/tr&gt;
+&lt;/table&gt;</code></pre></article>
+
+<article class="s1"><h3>Формы</h3><p><code>method</code> — GET или POST, <code>action</code> — куда отправить, <code>name</code> — ключ данных на сервере.</p>
+<pre><code class="html">&lt;form action="/add" method="post"&gt;
+  &lt;label for="n"&gt;Имя&lt;/label&gt;
+  &lt;input id="n" name="name" type="text" required&gt;
+  &lt;input name="age" type="number" min="1"&gt;
+  &lt;input name="pwd" type="password"&gt;
+  &lt;textarea name="msg"&gt;&lt;/textarea&gt;
+  &lt;select name="lang"&gt;&lt;option&gt;ru&lt;/option&gt;&lt;option&gt;en&lt;/option&gt;&lt;/select&gt;
+  &lt;button type="submit"&gt;Отправить&lt;/button&gt;
+&lt;/form&gt;</code></pre></article>
+
+<article class="s1"><h3>Блоки и семантика</h3><p><code>div</code> — блок, <code>span</code> — фрагмент в строке. Семантические теги описывают роль области. <code>id</code> уникален, <code>class</code> может повторяться.</p>
+<pre><code class="html">&lt;header&gt;&lt;nav&gt;…&lt;/nav&gt;&lt;/header&gt;
+&lt;main&gt;
+  &lt;section id="news" class="card"&gt;…&lt;/section&gt;
+  &lt;article&gt;…&lt;/article&gt;
+&lt;/main&gt;
+&lt;footer&gt;© 2026&lt;/footer&gt;</code></pre></article>
+</div>
+
+<h2 id="css">CSS: основы и сравнение</h2>
+<p class="sub">CSS отвечает за <b>внешний вид</b>: цвета, шрифты, отступы, расположение. HTML — что показываем, CSS — как.</p>
+<div class="grid">
+<article class="s2"><h3>Три способа подключения</h3>
+<pre><code class="html">&lt;!-- 1. Внешний файл (лучше всего) --&gt;
+&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;!-- 2. Блок в head --&gt;
+&lt;style&gt; p { color: red; } &lt;/style&gt;
+&lt;!-- 3. Атрибут style (точечно) --&gt;
+&lt;p style="color: red"&gt;Текст&lt;/p&gt;</code></pre></article>
+
+<article class="s2"><h3>Селекторы</h3>
+<pre><code class="css">p { color: #333; }              /* по тегу */
+.card { padding: 16px; }        /* по классу */
+#menu { width: 200px; }         /* по id */
+nav a { text-decoration: none; }/* потомок */
+a:hover { color: tomato; }      /* состояние */
+h1, h2 { margin: 0; }           /* несколько */
+input[type="text"] { border: 1px solid #999; }</code></pre></article>
+
+<article class="s2"><h3>Текст, цвет, фон</h3>
+<pre><code class="css">body {
+  font-family: Arial, sans-serif;
+  font-size: 16px;
+  color: #222;
+  background: #f4f4f4;
+  line-height: 1.5;
+  text-align: center;
+}
+.btn { background: rgb(40, 120, 200); color: white; }</code></pre></article>
+
+<article class="s2"><h3>Блочная модель</h3><p>Элемент состоит из содержимого, <code>padding</code>, <code>border</code> и <code>margin</code>.</p>
+<pre><code class="css">* { box-sizing: border-box; }   /* ширина включает padding */
+.box {
+  width: 300px;
+  padding: 10px 20px;           /* верх-низ, лево-право */
+  border: 2px solid #333;
+  border-radius: 8px;
+  margin: 0 auto;               /* по центру */
+}</code></pre></article>
+
+<article class="s2"><h3>Flexbox: ряд или колонка</h3>
+<pre><code class="css">.row {
+  display: flex;
+  gap: 12px;
+  justify-content: space-between; /* по главной оси */
+  align-items: center;            /* по поперечной */
+  flex-wrap: wrap;
+}</code></pre></article>
+
+<article class="s2"><h3>Grid: сетка</h3>
+<pre><code class="css">.cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}</code></pre></article>
+
+<article class="s2"><h3>Адаптивность</h3>
+<pre><code class="css">@media (max-width: 600px) {
+  .cards { grid-template-columns: 1fr; }
+}</code></pre></article>
+
+<article class="s2 wide"><h3>Оформление без CSS и сравнение</h3><p>Раньше внешний вид задавали прямо в HTML тегами и атрибутами. В HTML5 они считаются устаревшими, браузеры пока их поддерживают, но использовать их не рекомендуется.</p>
+<pre><code class="html">&lt;!-- Без CSS (устаревший способ) --&gt;
+&lt;body bgcolor="#eeeeee" text="#222222"&gt;
+  &lt;center&gt;&lt;font face="Arial" color="red" size="5"&gt;&lt;b&gt;Заголовок&lt;/b&gt;&lt;/font&gt;&lt;/center&gt;
+  &lt;table border="1" cellpadding="8" width="300" align="center"&gt;…&lt;/table&gt;
+  &lt;img src="cat.png" border="0" align="left" hspace="10"&gt;
+&lt;/body&gt;</code></pre>
+<pre><code class="css">/* То же самое через CSS */
+body { background: #eee; color: #222; }
+h1 { text-align: center; font: bold 24px Arial; color: red; }
+table { border: 1px solid; width: 300px; margin: 0 auto; }
+td { padding: 8px; }
+img { float: left; margin: 0 10px; }</code></pre>
+<div class="tw" style="margin-top:10px"><table>
+<tr><th>Критерий</th><th>Без CSS (атрибуты, <code>&lt;font&gt;</code>)</th><th>С CSS</th></tr>
+<tr><td>Структура и оформление</td><td>перемешаны в одном файле</td><td>разделены</td></tr>
+<tr><td>Изменить дизайн на 50 страницах</td><td>править каждый тег</td><td>правка одного файла</td></tr>
+<tr><td>Возможности</td><td>цвет, размер, выравнивание</td><td>сетки, анимации, <code>:hover</code>, адаптивность</td></tr>
+<tr><td>Размер кода</td><td>растёт с каждым элементом</td><td>правило применяется ко многим</td></tr>
+<tr><td>Статус в HTML5</td><td>устарело</td><td>стандарт</td></tr>
+</table></div></article>
+</div>
+
+<h2 id="sql">SQLite, модуль sqlite3 и основы SQL</h2>
+<p class="sub">SQLite — база данных в одном файле, без отдельного сервера. Модуль <code>sqlite3</code> входит в стандартную библиотеку Python, устанавливать ничего не нужно.</p>
+<div class="grid">
+<article class="s3"><h3>Подключение и работа</h3>
+<pre><code class="py">import sqlite3
+
+con = sqlite3.connect("shop.db")   # файл создастся сам
+cur = con.cursor()
+cur.execute("SELECT 1")
+print(cur.fetchone())              # (1,)
+con.commit()                       # сохранить изменения
+con.close()</code></pre></article>
+
+<article class="s3"><h3>Получение результатов</h3>
+<pre><code class="py">cur.execute("SELECT id, name FROM users")
+cur.fetchone()      # одна строка (или None)
+cur.fetchmany(5)    # пять строк
+cur.fetchall()      # список всех строк
+for row in cur:     # построчно
+    print(row)
+cur.lastrowid       # id последней вставки
+cur.rowcount        # сколько строк затронуто</code></pre></article>
+
+<article class="s3"><h3>Строки как словари</h3>
+<pre><code class="py">con.row_factory = sqlite3.Row
+row = con.execute("SELECT * FROM users").fetchone()
+row["name"]           # доступ по имени столбца
+dict(row)             # в обычный словарь</code></pre></article>
+
+<article class="s3"><h3>Контекстный менеджер</h3><p><code>with con:</code> делает <code>commit</code> при успехе и <code>rollback</code> при ошибке, но соединение не закрывает.</p>
+<pre><code class="py">with con:
+    con.execute("INSERT INTO users(name) VALUES (?)", ("Аня",))
+con.close()</code></pre></article>
+
+<article class="s3"><h3>CREATE TABLE</h3>
+<pre><code class="sql">CREATE TABLE IF NOT EXISTS users (
+    id      INTEGER PRIMARY KEY AUTOINCREMENT,
+    name    TEXT    NOT NULL,
+    email   TEXT    UNIQUE,
+    age     INTEGER CHECK (age &gt;= 0),
+    balance REAL    DEFAULT 0,
+    created TEXT    DEFAULT CURRENT_TIMESTAMP
+);
+DROP TABLE IF EXISTS old_table;</code></pre></article>
+
+<article class="s3"><h3>Типы и ограничения</h3><div class="tw"><table>
+<tr><td><code>INTEGER</code></td><td>целые числа</td></tr>
+<tr><td><code>REAL</code></td><td>дробные</td></tr>
+<tr><td><code>TEXT</code></td><td>строки (даты — текстом ISO)</td></tr>
+<tr><td><code>BLOB</code></td><td>двоичные данные</td></tr>
+<tr><td><code>PRIMARY KEY</code></td><td>уникальный идентификатор строки</td></tr>
+<tr><td><code>NOT NULL</code></td><td>значение обязательно</td></tr>
+<tr><td><code>UNIQUE</code></td><td>без повторов</td></tr>
+<tr><td><code>DEFAULT</code></td><td>значение по умолчанию</td></tr>
+<tr><td><code>FOREIGN KEY</code></td><td>ссылка на другую таблицу</td></tr>
+</table></div></article>
+
+<article class="s3"><h3>INSERT: добавить</h3>
+<pre><code class="py">cur.execute("INSERT INTO users (name, age) VALUES (?, ?)", ("Аня", 20))
+con.commit()
+print(cur.lastrowid)   # 1
+
+users = [("Боря", 31), ("Вика", 25)]
+cur.executemany("INSERT INTO users (name, age) VALUES (?, ?)", users)
+con.commit()</code></pre></article>
+
+<article class="s3"><h3>SELECT: выбрать</h3>
+<pre><code class="sql">SELECT * FROM users;                       -- все столбцы
+SELECT name, age FROM users WHERE age &gt;= 21;
+SELECT * FROM users WHERE name LIKE 'А%';  -- начинается с А
+SELECT * FROM users ORDER BY age DESC LIMIT 3;
+SELECT COUNT(*), AVG(age) FROM users;
+SELECT age, COUNT(*) FROM users GROUP BY age;
+SELECT * FROM users WHERE age IS NULL AND (name = 'Аня' OR id = 2);</code></pre></article>
+
+<article class="s3"><h3>UPDATE: изменить</h3><p>Без <code>WHERE</code> изменятся <b>все</b> строки.</p>
+<pre><code class="py">cur.execute("UPDATE users SET age = ? WHERE id = ?", (21, 1))
+con.commit()
+print(cur.rowcount)    # 1 — сколько строк обновлено</code></pre></article>
+
+<article class="s3"><h3>DELETE: удалить</h3><p>Без <code>WHERE</code> удалится вся таблица построчно.</p>
+<pre><code class="py">cur.execute("DELETE FROM users WHERE id = ?", (3,))
+con.commit()</code></pre></article>
+
+<article class="s3"><h3>Скрипт из нескольких команд</h3>
+<pre><code class="py">con.executescript("""
+    CREATE TABLE a (id INTEGER PRIMARY KEY);
+    CREATE TABLE b (id INTEGER PRIMARY KEY);
+""")</code></pre></article>
+</div>
+
+<h2 id="ph">Плейсхолдеры</h2>
+<p class="sub">Плейсхолдер — метка (<code>?</code> или <code>:имя</code>) вместо значения в SQL-запросе. Значения передаются отдельно вторым аргументом.</p>
+<div class="grid">
+<article class="s4"><h3>Два вида</h3>
+<pre><code class="py"># позиционные ?
+cur.execute("SELECT * FROM users WHERE name = ? AND age &gt; ?", ("Аня", 18))
+# именованные :name
+cur.execute("SELECT * FROM users WHERE name = :n", {"n": "Аня"})
+# один параметр — всё равно кортеж!
+cur.execute("DELETE FROM users WHERE id = ?", (5,))</code></pre></article>
+
+<article class="s4 hl"><h3>Опасно: f-строка вместо плейсхолдера</h3><p>Ввод пользователя становится частью SQL-кода (<b>SQL-инъекция</b>).</p>
+<pre><code class="py">name = "x' OR '1'='1"
+cur.execute(f"SELECT * FROM users WHERE name = '{name}'")
+# запрос: ... WHERE name = 'x' OR '1'='1'
+# вернёт ВСЕХ пользователей
+
+name = "x'; DROP TABLE users; --"   # ещё хуже в БД с несколькими командами</code></pre></article>
+
+<article class="s4 hl"><h3>Правильно</h3>
+<pre><code class="py">cur.execute("SELECT * FROM users WHERE name = ?", (name,))
+# драйвер передаёт name как данные, а не как код
+# запрос ищет пользователя с именем ровно "x' OR '1'='1"</code></pre></article>
+
+<article class="s4 wide"><h3>Зачем нужны плейсхолдеры</h3>
+<ul><li><b>Безопасность.</b> Защита от SQL-инъекций: данные не могут изменить смысл запроса.</li>
+<li><b>Правильное экранирование.</b> Кавычки в данных (<code>О'Брайен</code>) не ломают запрос.</li>
+<li><b>Типы данных.</b> Числа, <code>None</code> (станет <code>NULL</code>), строки передаются корректно без ручного форматирования.</li>
+<li><b>Читаемость.</b> Запрос и значения разделены, нет склейки строк.</li>
+<li><b>Повторное использование.</b> Один запрос с разными данными: <code>executemany</code>.</li></ul>
+<p>Ограничение: плейсхолдером можно заменить только <b>значение</b>. Имя таблицы или столбца подставить нельзя — их проверяйте по белому списку.</p>
+<pre><code class="py">ALLOWED = {"users", "orders"}
+if table in ALLOWED:
+    cur.execute(f"SELECT * FROM {table}")</code></pre></article>
+</div>
+
+<h2 id="design">Проектирование БД: связи между таблицами</h2>
+<p class="sub">Таблицы связывают через <b>внешний ключ</b> (<code>FOREIGN KEY</code>) — столбец, хранящий <code>id</code> строки из другой таблицы. В SQLite проверку ключей нужно включить: <code>PRAGMA foreign_keys = ON</code>.</p>
+<div class="grid">
+<article class="s5"><h3>Один к одному (1:1)</h3><p>Одному пользователю — один профиль. Столбец-ссылка делают <code>UNIQUE</code>.</p>
+<pre><code class="sql">CREATE TABLE users (
+    id INTEGER PRIMARY KEY, login TEXT NOT NULL
+);
+CREATE TABLE profiles (
+    id INTEGER PRIMARY KEY,
+    user_id INTEGER UNIQUE NOT NULL,
+    bio TEXT,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
+SELECT u.login, p.bio
+FROM users u JOIN profiles p ON p.user_id = u.id;</code></pre></article>
+
+<article class="s5"><h3>Один ко многим (1:N)</h3><p>У автора много книг, у книги один автор. Ссылка лежит в таблице «многих».</p>
+<pre><code class="sql">CREATE TABLE authors (
+    id INTEGER PRIMARY KEY, name TEXT NOT NULL
+);
+CREATE TABLE books (
+    id INTEGER PRIMARY KEY,
+    title TEXT NOT NULL,
+    author_id INTEGER NOT NULL,
+    FOREIGN KEY (author_id) REFERENCES authors(id)
+);
+SELECT a.name, COUNT(b.id) AS books
+FROM authors a LEFT JOIN books b ON b.author_id = a.id
+GROUP BY a.id;</code></pre></article>
+
+<article class="s5"><h3>Многие ко многим (M:N)</h3><p>Студент ходит на много курсов, на курсе много студентов. Нужна <b>связующая таблица</b> с двумя внешними ключами.</p>
+<pre><code class="sql">CREATE TABLE students (id INTEGER PRIMARY KEY, name TEXT);
+CREATE TABLE courses  (id INTEGER PRIMARY KEY, title TEXT);
+CREATE TABLE enrollments (
+    student_id INTEGER NOT NULL,
+    course_id  INTEGER NOT NULL,
+    PRIMARY KEY (student_id, course_id),
+    FOREIGN KEY (student_id) REFERENCES students(id),
+    FOREIGN KEY (course_id)  REFERENCES courses(id)
+);
+SELECT s.name, c.title
+FROM enrollments e
+JOIN students s ON s.id = e.student_id
+JOIN courses  c ON c.id = e.course_id;</code></pre></article>
+
+<article class="s5"><h3>Каскадное удаление</h3>
+<pre><code class="sql">FOREIGN KEY (author_id) REFERENCES authors(id)
+    ON DELETE CASCADE   -- удалили автора — удалились его книги</code></pre></article>
+
+<article class="s5"><h3>Принципы проектирования</h3>
+<ul><li>У каждой таблицы свой <code>PRIMARY KEY</code>.</li><li>Одна таблица — одна сущность (пользователи, заказы, товары).</li><li>Не дублируйте данные — храните ссылку на <code>id</code>.</li><li>Одно значение в ячейке, без списков через запятую.</li><li>Связь M:N всегда через третью таблицу.</li></ul></article>
+</div>
+
+<h2 id="tools">Работа с БД: шаблон на Python и инструменты</h2>
+<div class="grid">
+<article class="s1 wide"><h3>Шаблон db.py (используется и в мини-проекте)</h3><p>Один модуль отвечает за соединение, схему и простые функции запросов. Остальной код БД «не видит».</p>
+<pre><code class="py">import sqlite3
+from contextlib import closing
+from pathlib import Path
+
+DB_PATH = Path(__file__).with_name("app.db")
+SCHEMA = """
+CREATE TABLE IF NOT EXISTS tasks (
+    id    INTEGER PRIMARY KEY AUTOINCREMENT,
+    owner TEXT    NOT NULL,
+    title TEXT    NOT NULL,
+    done  INTEGER NOT NULL DEFAULT 0
+);
+"""
+
+def connect():
+    con = sqlite3.connect(DB_PATH)
+    con.row_factory = sqlite3.Row
+    con.execute("PRAGMA foreign_keys = ON")
+    return con
+
+def init_db():
+    with closing(connect()) as con, con:
+        con.executescript(SCHEMA)
+
+def query(sql, args=(), one=False):
+    """SELECT: список строк или одна строка."""
+    with closing(connect()) as con:
+        rows = con.execute(sql, args).fetchall()
+    return (rows[0] if rows else None) if one else rows
+
+def execute(sql, args=()):
+    """INSERT/UPDATE/DELETE с автосохранением. Возвращает id вставки."""
+    with closing(connect()) as con, con:
+        return con.execute(sql, args).lastrowid</code></pre></article>
+
+<article class="s1"><h3>DB Browser for SQLite</h3><p>Бесплатная программа с интерфейсом для просмотра и правки <code>.db</code>-файлов (sqlitebrowser.org).</p>
+<ol><li>Установите и откройте программу.</li><li><b>Open Database</b> → выберите файл <code>app.db</code>.</li><li>Вкладка <b>Database Structure</b>: таблицы и столбцы, <b>Create Table</b> — создать таблицу мышью.</li><li>Вкладка <b>Browse Data</b>: просмотр и правка строк.</li><li>Вкладка <b>Execute SQL</b>: пишите запросы и запускайте (<code>Ctrl+Enter</code>).</li><li>Изменения сохраняйте <b>Write Changes</b> (<code>Ctrl+S</code>).</li></ol>
+<p>Закройте программу или сохраните изменения, пока приложение пишет в тот же файл, иначе возможна блокировка базы.</p></article>
+
+<article class="s1"><h3>SQLite Viewer для VS Code</h3><p>Расширение показывает таблицы прямо в редакторе.</p>
+<ol><li>В VS Code откройте <b>Extensions</b> (<code>Ctrl+Shift+X</code>).</li><li>Найдите <b>SQLite Viewer</b> и нажмите <b>Install</b>.</li><li>Щёлкните по файлу <code>.db</code> в проводнике — откроется просмотр таблиц.</li><li>Выберите таблицу слева, чтобы увидеть строки; можно фильтровать и экспортировать в CSV.</li></ol>
+<p>Расширение подходит для просмотра, а сложные запросы удобнее в DB Browser.</p></article>
+</div>
+
+<h2 id="flask">Flask: основы</h2>
+<p class="sub">Flask — лёгкий веб-фреймворк. Принимает запрос от браузера, вызывает функцию-обработчик (<b>view</b>) и возвращает ответ.</p>
+<div class="grid">
+<article class="s2"><h3>Установка и запуск</h3>
+<pre><code class="sh">pip install flask
+python app.py
+# или: flask --app app run --debug
+# откройте http://127.0.0.1:5000</code></pre></article>
+
+<article class="s2"><h3>Приложение с декоратором</h3><p>Декоратор <code>@app.route</code> связывает адрес (правило) с функцией.</p>
+<pre><code class="py">from flask import Flask
+app = Flask(__name__)
+
+@app.route("/")
+def index():
+    return "Привет, мир!"
+
+@app.route("/about")
+def about():
+    return "&lt;h1&gt;О нас&lt;/h1&gt;"
+
+if __name__ == "__main__":
+    app.run(debug=True)</code></pre></article>
+
+<article class="s2"><h3>Без декораторов: add_url_rule</h3><p>Тот же результат: функцию регистрируют вручную. Удобно, когда правила собираются в цикле.</p>
+<pre><code class="py">def index():
+    return "Привет, мир!"
+
+app.add_url_rule("/", "index", index)
+app.add_url_rule("/about", "about", lambda: "О нас")
+# app.add_url_rule(правило, имя_эндпоинта, функция, methods=[...])</code></pre></article>
+
+<article class="s2"><h3>Добавление правил: параметры в адресе</h3>
+<pre><code class="py">@app.route("/user/&lt;name&gt;")
+def user(name):                  # строка
+    return f"Привет, {name}!"
+
+@app.route("/post/&lt;int:post_id&gt;")
+def post(post_id):               # целое число
+    return f"Пост №{post_id}"
+# конвертеры: string, int, float, path, uuid</code></pre></article>
+
+<article class="s2"><h3>Методы GET и POST</h3><p>GET — получить страницу, POST — отправить данные формы.</p>
+<pre><code class="py">from flask import request
+
+@app.route("/hello", methods=["GET", "POST"])
+def hello():
+    if request.method == "POST":
+        name = request.form["name"]        # поле формы
+        return f"Привет, {name}!"
+    return '&lt;form method="post"&gt;&lt;input name="name"&gt;&lt;button&gt;OK&lt;/button&gt;&lt;/form&gt;'
+
+# сокращения: @app.get("/x"), @app.post("/x")
+# request.args.get("q")  — параметры ?q=...</code></pre></article>
+
+<article class="s2"><h3>Перенаправление</h3><p><code>redirect</code> отправляет браузер на другой URL, <code>url_for</code> строит адрес по имени функции (не ломается при смене правила).</p>
+<pre><code class="py">from flask import redirect, url_for
+
+@app.route("/old")
+def old():
+    return redirect(url_for("index"))     # на "/"
+
+@app.route("/go/&lt;int:n&gt;")
+def go(n):
+    return redirect(url_for("post", post_id=n))
+# redirect("https://example.com") — внешний адрес</code></pre></article>
+
+<article class="s2"><h3>Ошибки</h3>
+<pre><code class="py">from flask import abort
+
+@app.route("/item/&lt;int:i&gt;")
+def item(i):
+    if i &gt; 10:
+        abort(404)
+    return "ok"
+
+@app.errorhandler(404)
+def not_found(e):
+    return "Страница не найдена", 404</code></pre></article>
+
+<article class="s2"><h3>Сессии</h3><p>Данные пользователя между запросами хранятся в подписанной cookie. Нужен <code>secret_key</code>.</p>
+<pre><code class="py">from flask import session
+
+app.secret_key = "длинная-случайная-строка"
+
+@app.route("/login", methods=["POST"])
+def login():
+    session["user"] = request.form["name"]
+    return redirect(url_for("index"))
+
+@app.route("/")
+def index():
+    return f"Вы: {session.get('user', 'гость')}"
+
+@app.route("/logout")
+def logout():
+    session.pop("user", None)    # или session.clear()
+    return redirect(url_for("index"))</code></pre></article>
+
+<article class="s2"><h3>Шаблоны Jinja2</h3><p>HTML-файлы лежат в папке <code>templates/</code>. В них можно вставлять данные из Python.</p>
+<pre><code class="py">from flask import render_template
+
+@app.route("/")
+def index():
+    return render_template("index.html", title="Главная", items=["a", "b"])</code></pre>
+<pre><code class="html">&lt;h1&gt;{{ title }}&lt;/h1&gt;
+{% if items %}
+  &lt;ul&gt;
+  {% for x in items %}
+    &lt;li&gt;{{ loop.index }}. {{ x|upper }}&lt;/li&gt;
+  {% endfor %}
+  &lt;/ul&gt;
+{% else %}
+  &lt;p&gt;Пусто&lt;/p&gt;
+{% endif %}</code></pre></article>
+
+<article class="s2"><h3>Наследование шаблонов</h3>
+<pre><code class="html">&lt;!-- templates/base.html --&gt;
+&lt;title&gt;{% block title %}Сайт{% endblock %}&lt;/title&gt;
+&lt;nav&gt;…меню…&lt;/nav&gt;
+{% block content %}{% endblock %}
+
+&lt;!-- templates/page.html --&gt;
+{% extends "base.html" %}
+{% block title %}Страница{% endblock %}
+{% block content %}&lt;p&gt;Привет&lt;/p&gt;{% endblock %}</code></pre></article>
+
+<article class="s2"><h3>Статика (CSS, картинки)</h3><p>Файлы из папки <code>static/</code> подключаются через <code>url_for</code>.</p>
+<pre><code class="html">&lt;link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"&gt;
+&lt;img src="{{ url_for('static', filename='logo.png') }}"&gt;</code></pre></article>
+
+<article class="s2"><h3>Структура проекта</h3>
+<pre><code class="sh">todo/
+├── app.py            # Flask: маршруты
+├── db.py             # работа с БД
+├── app.db            # файл SQLite (создаётся сам)
+├── requirements.txt
+├── templates/        # HTML (Jinja2)
+│   ├── base.html
+│   └── index.html
+└── static/           # CSS, JS, картинки
+    └── style.css</code></pre></article>
+</div>
+
+<h2 id="stack">Связка в стек и публикация</h2>
+<div class="grid">
+<article class="s3 wide"><h3>Как части работают вместе</h3>
+<pre><code class="sh">Браузер  ──запрос GET /──────────►  Flask (Python, app.py)
+ (HTML/CSS)                              │ маршрут → функция
+                                         ▼
+                                    db.py → SQLite (app.db)
+                                         │ строки результата
+                                         ▼
+Браузер  ◄──HTML (render_template)── Jinja2 шаблон + данные
+         ◄──CSS из /static───────────
+
+Форма (POST) → Flask → INSERT/UPDATE/DELETE → redirect → новая страница (GET)</code></pre>
+<ul style="margin-top:10px"><li><b>Фронтенд:</b> HTML-шаблоны + CSS в браузере пользователя.</li><li><b>Бэкенд:</b> Flask принимает запросы, проверяет данные, обращается к БД.</li><li><b>База данных:</b> SQLite хранит данные в файле.</li></ul></article>
+
+<article class="s3"><h3>Доступ из локальной сети</h3><p>Другие устройства в вашей Wi-Fi/LAN сети откроют сайт по IP вашего компьютера.</p>
+<ol><li>Запустите на всех интерфейсах:</li></ol>
+<pre><code class="py">app.run(host="0.0.0.0", port=5000)
+# или: flask --app app run --host=0.0.0.0</code></pre>
+<ol start="2"><li>Узнайте свой IP: <code>ipconfig</code> (Windows, «IPv4-адрес») или <code>ip a</code> / <code>ifconfig</code> (Linux, macOS).</li><li>На другом устройстве откройте <code>http://192.168.1.25:5000</code> (подставьте свой IP).</li><li>Разрешите порт 5000 в брандмауэре, если соединение блокируется.</li></ol>
+<p>Не используйте <code>debug=True</code> с <code>host="0.0.0.0"</code> в сети, где вам не доверяют: отладчик позволяет выполнять код на сервере.</p></article>
+
+<article class="s3"><h3>Подготовка к публикации</h3>
+<pre><code class="sh">pip install gunicorn            # сервер для Linux-хостингов
+pip freeze &gt; requirements.txt
+# запуск: gunicorn app:app
+# на Windows вместо gunicorn: pip install waitress
+#                            waitress-serve --port=8000 app:app</code></pre>
+<ul><li><code>debug=False</code> в рабочей версии.</li><li>Секретный ключ берите из переменной окружения: <code>os.environ["SECRET_KEY"]</code>.</li><li>Не публикуйте файлы с паролями и <code>.venv</code>.</li></ul></article>
+
+<article class="s3"><h3>Публикация на PythonAnywhere</h3><p>Хостинг, рассчитанный на Python; есть бесплатный тариф (условия проверьте на сайте).</p>
+<ol><li>Зарегистрируйтесь на pythonanywhere.com.</li><li>Вкладка <b>Files</b>: загрузите проект (или <code>git clone</code> в консоли <b>Bash</b>).</li><li>В консоли: <code>pip install --user flask</code> (или создайте virtualenv и поставьте <code>requirements.txt</code>).</li><li>Вкладка <b>Web</b> → <b>Add a new web app</b> → <b>Flask</b>, укажите путь к <code>app.py</code>.</li><li>В WSGI-файле подключите приложение:</li></ol>
+<pre><code class="py">import sys
+sys.path.insert(0, "/home/ИМЯ/todo")
+from app import app as application</code></pre>
+<ol start="6"><li>Нажмите <b>Reload</b>. Сайт откроется по адресу <code>ИМЯ.pythonanywhere.com</code>.</li></ol></article>
+
+<article class="s3"><h3>Публикация через Git (Render, Railway и подобные)</h3>
+<ol><li>Загрузите проект на GitHub (с <code>requirements.txt</code>, без <code>.venv</code>).</li><li>Создайте на хостинге Web Service и подключите репозиторий.</li><li>Команда сборки: <code>pip install -r requirements.txt</code>.</li><li>Команда запуска: <code>gunicorn app:app</code>.</li><li>Добавьте переменную окружения <code>SECRET_KEY</code>.</li></ol>
+<p>Внимание: на многих облачных тарифах файловая система временная, и файл SQLite может обнулиться при перезапуске. Для постоянных данных нужен подключаемый диск или облачная СУБД (например, PostgreSQL). Условия тарифов смотрите на сайте хостинга.</p></article>
+</div>
+
+<h2 id="proj">Мини-проект: «Список задач»</h2>
+<p class="sub">Вход по имени (сессия), добавление, отметка и удаление задач. Используются: Flask, шаблоны, форма POST, redirect, SQLite с плейсхолдерами, HTML и CSS. Файл <code>db.py</code> — из шаблона выше.</p>
+<div class="grid">
+<article class="s4 wide"><h3>app.py</h3>
+<pre><code class="py">import os
+from flask import Flask, render_template, request, redirect, url_for, session
+from db import init_db, query, execute
+
+app = Flask(__name__)
+app.secret_key = os.environ.get("SECRET_KEY", "dev-only-change-me")
+init_db()
+
+def current_user():
+    return session.get("user")
+
+@app.route("/")
+def index():
+    user = current_user()
+    if not user:
+        return redirect(url_for("login"))
+    tasks = query("SELECT * FROM tasks WHERE owner = ? ORDER BY done, id DESC", (user,))
+    return render_template("index.html", tasks=tasks)
+
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    if request.method == "POST":
+        name = request.form.get("name", "").strip()
+        if name:
+            session["user"] = name
+            return redirect(url_for("index"))
+    return render_template("login.html")
+
+@app.route("/logout")
+def logout():
+    session.clear()
+    return redirect(url_for("login"))
+
+@app.post("/add")
+def add():
+    title = request.form.get("title", "").strip()
+    if current_user() and title:
+        execute("INSERT INTO tasks (owner, title) VALUES (?, ?)", (current_user(), title))
+    return redirect(url_for("index"))
+
+@app.post("/toggle/&lt;int:task_id&gt;")
+def toggle(task_id):
+    execute("UPDATE tasks SET done = 1 - done WHERE id = ? AND owner = ?", (task_id, current_user()))
+    return redirect(url_for("index"))
+
+@app.post("/delete/&lt;int:task_id&gt;")
+def delete(task_id):
+    execute("DELETE FROM tasks WHERE id = ? AND owner = ?", (task_id, current_user()))
+    return redirect(url_for("index"))
+
+if __name__ == "__main__":
+    app.run(debug=True)</code></pre></article>
+
+<article class="s4"><h3>templates/base.html</h3>
+<pre><code class="html">&lt;!DOCTYPE html&gt;
+&lt;html lang="ru"&gt;
+&lt;head&gt;
+  &lt;meta charset="utf-8"&gt;
+  &lt;meta name="viewport" content="width=device-width, initial-scale=1"&gt;
+  &lt;title&gt;{% block title %}Задачи{% endblock %}&lt;/title&gt;
+  &lt;link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;main&gt;
+  {% if session.user %}
+    &lt;p class="top"&gt;Привет, {{ session.user }}!
+      &lt;a href="{{ url_for('logout') }}"&gt;Выйти&lt;/a&gt;&lt;/p&gt;
+  {% endif %}
+  {% block content %}{% endblock %}
+&lt;/main&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre></article>
+
+<article class="s4"><h3>templates/login.html</h3>
+<pre><code class="html">{% extends "base.html" %}
+{% block content %}
+&lt;h1&gt;Вход&lt;/h1&gt;
+&lt;form method="post" class="row"&gt;
+  &lt;input name="name" placeholder="Ваше имя" required autofocus&gt;
+  &lt;button&gt;Войти&lt;/button&gt;
+&lt;/form&gt;
+{% endblock %}</code></pre></article>
+
+<article class="s4"><h3>templates/index.html</h3>
+<pre><code class="html">{% extends "base.html" %}
+{% block content %}
+&lt;h1&gt;Мои задачи&lt;/h1&gt;
+&lt;form action="{{ url_for('add') }}" method="post" class="row"&gt;
+  &lt;input name="title" placeholder="Что сделать?" required&gt;
+  &lt;button&gt;Добавить&lt;/button&gt;
+&lt;/form&gt;
+&lt;ul&gt;
+{% for t in tasks %}
+  &lt;li class="{{ 'done' if t.done else '' }}"&gt;
+    &lt;form action="{{ url_for('toggle', task_id=t.id) }}" method="post"&gt;
+      &lt;button&gt;{{ '↩' if t.done else '✓' }}&lt;/button&gt;&lt;/form&gt;
+    &lt;span&gt;{{ t.title }}&lt;/span&gt;
+    &lt;form action="{{ url_for('delete', task_id=t.id) }}" method="post"&gt;
+      &lt;button&gt;✕&lt;/button&gt;&lt;/form&gt;
+  &lt;/li&gt;
+{% else %}
+  &lt;li class="empty"&gt;Пока пусто&lt;/li&gt;
+{% endfor %}
+&lt;/ul&gt;
+{% endblock %}</code></pre></article>
+
+<article class="s4"><h3>static/style.css</h3>
+<pre><code class="css">* { box-sizing: border-box; }
+body { font-family: Arial, sans-serif; background: #f2f5f9; margin: 0; }
+main { max-width: 520px; margin: 40px auto; padding: 0 16px; }
+h1 { margin: 0 0 16px; }
+.top { color: #556; text-align: right; }
+.row { display: flex; gap: 8px; margin-bottom: 16px; }
+input { flex: 1; padding: 10px; border: 1px solid #bbc; border-radius: 8px; }
+button { padding: 8px 12px; border: 0; border-radius: 8px;
+         background: #2a7de1; color: #fff; cursor: pointer; }
+button:hover { background: #1c63bb; }
+ul { list-style: none; padding: 0; margin: 0; }
+li { display: flex; align-items: center; gap: 10px; background: #fff;
+     padding: 10px; border-radius: 8px; margin-bottom: 8px; }
+li span { flex: 1; }
+li.done span { text-decoration: line-through; color: #889; }
+.empty { color: #889; justify-content: center; }</code></pre></article>
+
+<article class="s4"><h3>Запуск и проверка</h3>
+<pre><code class="sh">python -m venv .venv
+source .venv/bin/activate        # Windows: .venv\Scripts\activate
+pip install flask
+python app.py
+# http://127.0.0.1:5000 → введите имя → добавляйте задачи
+# откройте app.db в DB Browser и посмотрите таблицу tasks</code></pre>
+<p style="margin-top:8px">Идеи для развития: пароли (хеширование <code>werkzeug.security</code>), таблица <code>users</code> и связь 1:N, сообщения <code>flash</code>, публикация на хостинге.</p></article>
+</div>
+</main>
+<footer>Совет: запрос и данные держите раздельно (плейсхолдеры), структуру в HTML, оформление в CSS, а работу с БД в одном модуле.</footer>
+<script>
+(function(){
+var esc=function(t){return t.replace(/[&<>]/g,function(m){return {'&':'&amp;','<':'&lt;','>':'&gt;'}[m]})};
+var L={
+py:[/(#.*$)|("[^"\n]*"|'[^'\n]*')|\b(import|from|def|class|return|if|elif|else|for|in|with|not|and|or|as|None|True|False|lambda)\b|\b(\d+)\b/gm,['c','s','k','n']],
+sql:[/(--.*$)|('[^'\n]*')|\b(CREATE|TABLE|IF|NOT|EXISTS|PRIMARY|KEY|AUTOINCREMENT|NULL|UNIQUE|DEFAULT|FOREIGN|REFERENCES|INSERT|INTO|VALUES|SELECT|FROM|WHERE|ORDER|BY|DESC|ASC|LIMIT|UPDATE|SET|DELETE|DROP|JOIN|ON|GROUP|AND|OR|LIKE|COUNT|AVG|INTEGER|TEXT|REAL|CHECK|LEFT|IS|AS|CASCADE|CURRENT_TIMESTAMP)\b|\b(\d+)\b/gim,['c','s','k','n']],
+html:[/(&lt;!--[\s\S]*?--&gt;)|("[^"\n]*")|(&lt;\/?[\w!]+|\/?&gt;)|(\{\{[^}]*\}\}|\{%[^%]*%\})/g,['c','s','k','n']],
+css:[/(\/\*[\s\S]*?\*\/)|("[^"\n]*"|'[^'\n]*')|([\w-]+)(?=\s*:\s)|(#[0-9a-fA-F]{3,6}\b|\b\d+(?:px|rem|em|%|fr)?)/g,['c','s','k','n']],
+sh:[/(#.*$)|("[^"\n]*"|'[^'\n]*')/gm,['c','s']]
+};
+document.querySelectorAll('pre code').forEach(function(c){
+var l=L[c.className]||L.py,cls=l[1];
+c.innerHTML=esc(c.textContent).replace(l[0],function(m){
+for(var i=1;i<=cls.length;i++){if(arguments[i]!==undefined)return '<i class="'+cls[i-1]+'">'+m+'</i>'}
+return m});
+});
+})();
+</script>
+</body>
+</html>

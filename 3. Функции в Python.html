@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Функции в Python — шпаргалка</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="top">
+  <h1>Функции в Python</h1>
+  <p class="subtitle">
+    От простого <code>def</code> до декораторов и генераторов. Сначала посмотрите,
+    в каком порядке пишутся параметры.
+  </p>
+
+  <div class="term" style="max-width:760px;margin-top:18px">
+    <div class="term-bar"><i></i><i></i><i></i><em>Сигнатура</em></div>
+    <pre class="term-body">def name(a, /, b, d=0, *args, c, **kwargs) -&gt; int:</pre>
+  </div>
+
+  <div class="badges" style="margin-top:14px">
+    <span class="badge">1. a, / — только по позиции</span>
+    <span class="badge">2. b — позиция или имя</span>
+    <span class="badge">3. d=0 — по умолчанию</span>
+    <span class="badge">4. *args — лишние позиционные</span>
+    <span class="badge">5. c — только по имени</span>
+    <span class="badge">6. **kwargs — лишние именованные</span>
+  </div>
+</header>
+
+<nav class="toc">
+  <div class="nav-inner">
+    <a href="#basic">Основы</a>
+    <a href="#args">Аргументы</a>
+    <a href="#scope">Области видимости</a>
+    <a href="#advanced">Продвинутое</a>
+  </div>
+</nav>
+
+<main>
+
+<h2 id="basic">Основы</h2>
+<div class="grid">
+
+<article class="s1"><h3>Определение и вызов</h3>
+<p>Без <code>return</code> функция вернёт <code>None</code>.</p>
+<pre><code>def greet(name):
+    """Возвращает приветствие."""
+    return "Привет, " + name + "!"
+
+msg = greet("Аня")   # вызов
+print(msg)</code></pre></article>
+
+<article class="s1"><h3>Значения по умолчанию</h3>
+<p>Параметры со значением по умолчанию идут после обычных.</p>
+<pre><code>def power(base, exp=2):
+    return base ** exp
+
+power(3)               # 9
+power(3, 3)            # 27
+power(exp=3, base=2)   # 8</code></pre></article>
+
+<article class="s1"><h3>Несколько возвращаемых значений</h3>
+<p>На самом деле возвращается один кортеж.</p>
+<pre><code>def min_max(items):
+    return min(items), max(items)
+
+lo, hi = min_max([4, 1, 9])   # 1, 9</code></pre></article>
+
+<article class="s1"><h3>Аннотации типов</h3>
+<p>Python их не проверяет. Они помогают читателю, IDE и <code>mypy</code>.</p>
+<pre><code>def area(w: float, h: float = 1.0) -&gt; float:
+    return w * h
+
+def find(xs: list[int], x: int) -&gt; int | None:
+    return xs.index(x) if x in xs else None</code></pre></article>
+
+</div>
+
+<h2 id="args">Аргументы</h2>
+<div class="grid">
+
+<article class="s2"><h3>*args и **kwargs</h3>
+<p><code>*args</code> собирает позиционные аргументы в кортеж, <code>**kwargs</code> — именованные в словарь.</p>
+<pre><code>def log(*args, **kwargs):
+    print(args)
+    print(kwargs)
+
+log(1, 2, sep="-")
+# (1, 2)
+# {'sep': '-'}
+
+nums = [1, 2, 3]
+opts = {"sep": "-"}
+log(*nums, **opts)   # распаковка</code></pre></article>
+
+<article class="s2"><h3>Только позиционные и только ключевые</h3>
+<p>До <code>/</code> — только по позиции, после <code>*</code> — только по имени.</p>
+<pre><code>def f(a, b, /, c, *, d):
+    ...
+
+f(1, 2, 3, d=4)          # ok
+f(1, 2, c=3, d=4)        # ok
+f(a=1, b=2, c=3, d=4)    # TypeError</code></pre></article>
+
+<article class="s2 warn"><h3>Ловушка: изменяемое значение по умолчанию</h3>
+<p>Значение по умолчанию создаётся один раз, при определении функции. Список будет общим для всех вызовов.</p>
+<pre><code># плохо
+def add(x, bucket=[]):
+    bucket.append(x)
+    return bucket
+
+# хорошо
+def add(x, bucket=None):
+    if bucket is None:
+        bucket = []
+    bucket.append(x)
+    return bucket</code></pre></article>
+
+<article class="s2"><h3>lambda</h3>
+<p>Одно выражение, без <code>return</code>. Для сложной логики берите обычный <code>def</code>.</p>
+<pre><code>square = lambda x: x ** 2
+
+words = ["кот", "слон", "ёж"]
+sorted(words, key=lambda w: len(w))</code></pre></article>
+
+</div>
+
+<h2 id="scope">Области видимости</h2>
+<div class="grid">
+
+<article class="s3"><h3>global и nonlocal</h3>
+<p>Поиск имени идёт так: Local → Enclosing → Global → Built-in.</p>
+<pre><code>count = 0
+
+def inc():
+    global count
+    count += 1
+
+def outer():
+    n = 0
+    def inner():
+        nonlocal n
+        n += 1
+    inner()
+    return n   # 1</code></pre></article>
+
+<article class="s3"><h3>Замыкание: функция, которая делает функции</h3>
+<p>Внутренняя функция помнит переменные внешней.</p>
+<pre><code>def multiplier(k):
+    def mul(x):
+        return x * k
+    return mul
+
+double = multiplier(2)
+double(5)   # 10</code></pre></article>
+
+</div>
+
+<h2 id="advanced">Продвинутое</h2>
+<div class="grid">
+
+<article class="s4"><h3>Декоратор</h3>
+<p><code>@functools.wraps</code> сохраняет имя и docstring исходной функции.</p>
+<pre><code>import functools
+
+def logged(func):
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        print("вызов", func.__name__)
+        return func(*args, **kwargs)
+    return wrapper
+
+@logged
+def hello():
+    print("hi")</code></pre></article>
+
+<article class="s4"><h3>Генератор</h3>
+<p><code>yield</code> отдаёт значения по одному и приостанавливает функцию между ними.</p>
+<pre><code>def countdown(n):
+    while n &gt; 0:
+        yield n
+        n -= 1
+
+for i in countdown(3):
+    print(i)   # 3, 2, 1</code></pre></article>
+
+<article class="s4"><h3>async def</h3>
+<p>Вызов создаёт корутину. Она выполняется через <code>await</code> или <code>asyncio.run</code>.</p>
+<pre><code>import asyncio
+
+async def fetch(n):
+    await asyncio.sleep(1)
+    return n * 2
+
+async def main():
+    res = await asyncio.gather(fetch(1), fetch(2))
+    print(res)   # [2, 4]
+
+asyncio.run(main())</code></pre></article>
+
+<article class="s4"><h3>Методы класса</h3>
+<p>Первый параметр — <code>self</code> (экземпляр) или <code>cls</code> (класс). Это соглашение об именах.</p>
+<pre><code>class Counter:
+    def __init__(self, start=0):
+        self.n = start
+
+    def inc(self):          # метод экземпляра
+        self.n += 1
+
+    @classmethod
+    def zero(cls):          # получает класс
+        return cls(0)
+
+    @staticmethod
+    def is_valid(x):        # ни self, ни cls
+        return x &gt;= 0</code></pre></article>
+
+</div>
+
+</main>
+
+<footer class="site">
+  Python 3.10+ (для <code>X | None</code> и <code>list[int]</code> в аннотациях).
+</footer>
+
+<script src="app.js"></script>
+</body>
+</html>

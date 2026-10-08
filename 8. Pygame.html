@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Pygame — шпаргалка</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;700;800&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+:root{--bg:#EEF3F8;--card:#FFFFFF;--ink:#13203A;--mute:#5A6A85;--line:#D5DEEA;--a1:#0C7C86;--a2:#B9660A;--a3:#5B4BC4;--a4:#B8325A;--a5:#3A7D2C;--code:#0F1A30;--ct:#E3EAF6;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0B1220;--card:#131D31;--ink:#E6ECF7;--mute:#9AABC6;--line:#27344F;--a1:#4FD1C5;--a2:#F2B25C;--a3:#A99BFF;--a4:#FF8FB0;--a5:#8FD97C;--code:#080F1D}}
+:root[data-theme="dark"]{--bg:#0B1220;--card:#131D31;--ink:#E6ECF7;--mute:#9AABC6;--line:#27344F;--a1:#4FD1C5;--a2:#F2B25C;--a3:#A99BFF;--a4:#FF8FB0;--a5:#8FD97C;--code:#080F1D}
+html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 60px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 Onest,system-ui,Arial,sans-serif}
+header{padding:48px 20px 28px;max-width:1180px;margin:0 auto}
+h1{font-size:clamp(30px,5vw,52px);line-height:1.05;margin:0 0 12px;font-weight:800;letter-spacing:-.02em}
+header p{margin:0;color:var(--mute);max-width:64ch}
+nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);border-bottom:1px solid var(--line);display:flex;gap:8px;padding:10px 20px;overflow-x:auto}
+nav a{color:var(--ink);text-decoration:none;font-weight:600;padding:6px 14px;border-radius:99px;border:1px solid var(--line);white-space:nowrap}
+nav a:hover,nav a:focus-visible{background:var(--ink);color:var(--bg);outline:none}
+main{max-width:1180px;margin:0 auto;padding:8px 20px 60px}
+h2{font-size:28px;margin:44px 0 6px}
+.sub{color:var(--mute);margin:0 0 18px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,340px),1fr));gap:16px}
+article{background:var(--card);border:1px solid var(--line);border-left:5px solid var(--c,var(--a1));border-radius:10px;padding:16px 18px;min-width:0}
+.s1{--c:var(--a1)}.s2{--c:var(--a2)}.s3{--c:var(--a3)}.s4{--c:var(--a4)}.s5{--c:var(--a5)}
+h3{margin:0 0 6px;font-size:17px}
+article p{margin:0 0 10px;color:var(--mute);font-size:14.5px}
+article ul{margin:0 0 10px;padding-left:20px;color:var(--mute);font-size:14.5px}
+pre{margin:0;background:var(--code);color:var(--ct);border-radius:8px;padding:12px 14px;overflow-x:auto;font:400 13px/1.55 'JetBrains Mono',ui-monospace,Consolas,monospace}
+pre+pre{margin-top:8px}
+i.k{color:#FFB454;font-style:normal;font-weight:600}i.s{color:#8EE6A0;font-style:normal}i.c{color:#7F90B0;font-style:italic}i.n{color:#7FC4FF;font-style:normal}
+.wide{grid-column:1/-1}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;padding:7px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{color:var(--mute);font-weight:600}
+td code,p code,li code,.sub code,footer code,header code{font:500 13px 'JetBrains Mono',monospace;background:var(--bg);padding:1px 6px;border-radius:4px}
+.tw{overflow-x:auto}
+footer{color:var(--mute);font-size:13px;text-align:center;padding:0 20px 30px}
+</style>
+</head>
+<body>
+<header>
+<h1>Pygame: основы разработки игры</h1>
+<p>От виртуального окружения и заготовки до рисования, событий, спрайтов, столкновений и звука. Комментарий <code>#</code> показывает результат.</p>
+</header>
+<nav><a href="#env">Окружение</a><a href="#tpl">Заготовка</a><a href="#draw">Рисование</a><a href="#img">Картинки и текст</a><a href="#ev">События</a><a href="#move">Движение</a><a href="#col">Столкновения</a><a href="#snd">Звук и таймеры</a><a href="#proj">Мини-игра</a></nav>
+<main>
+
+<h2 id="env">Виртуальное окружение и зависимости</h2>
+<p class="sub">Окружение изолирует библиотеки проекта от системного Python. Команды выполняются в терминале в папке проекта.</p>
+<div class="grid">
+<article class="s1"><h3>1. Создание окружения</h3><p>Создаёт папку <code>.venv</code> с отдельной копией интерпретатора.</p>
+<pre><code>mkdir mygame
+cd mygame
+python -m venv .venv          # Windows: py -m venv .venv
+# на Linux/macOS при необходимости: python3 -m venv .venv</code></pre></article>
+
+<article class="s1"><h3>2. Активация</h3><p>После активации в начале строки терминала появится <code>(.venv)</code>.</p>
+<pre><code># Windows (PowerShell)
+.venv\Scripts\Activate.ps1
+# Windows (cmd)
+.venv\Scripts\activate.bat
+# Linux / macOS
+source .venv/bin/activate</code></pre><p style="margin-top:8px">Если PowerShell блокирует скрипт: <code>Set-ExecutionPolicy -Scope CurrentUser RemoteSigned</code>.</p></article>
+
+<article class="s1"><h3>3. Установка pygame</h3>
+<pre><code>python -m pip install --upgrade pip
+pip install pygame
+pip show pygame        # версия и путь
+pip list               # все пакеты окружения</code></pre></article>
+
+<article class="s1"><h3>4. Проверка установки</h3>
+<pre><code>python -c "import pygame; print(pygame.version.ver)"
+# встроенная демо-игра:
+python -m pygame.examples.aliens</code></pre></article>
+
+<article class="s1"><h3>5. Выгрузка зависимостей</h3><p><code>pip freeze</code> выводит установленные пакеты с точными версиями. Сохраняем в файл.</p>
+<pre><code>pip freeze &gt; requirements.txt
+cat requirements.txt     # Windows: type requirements.txt
+# pygame==2.6.1</code></pre><p style="margin-top:8px">Версия в вашем файле может отличаться — это нормально.</p></article>
+
+<article class="s1"><h3>6. Установка из requirements.txt</h3><p>Так проект разворачивают на другом компьютере или у коллеги.</p>
+<pre><code>python -m venv .venv
+source .venv/bin/activate       # или Activate на Windows
+pip install -r requirements.txt</code></pre></article>
+
+<article class="s1"><h3>7. Выход и удаление</h3>
+<pre><code>deactivate            # выйти из окружения
+rm -rf .venv          # удалить (Windows: rmdir /s /q .venv)</code></pre></article>
+
+<article class="s1"><h3>8. .gitignore</h3><p>Окружение в репозиторий не кладут — только <code>requirements.txt</code>.</p>
+<pre><code># .gitignore
+.venv/
+__pycache__/
+*.pyc</code></pre></article>
+
+<article class="s1"><h3>Структура проекта</h3>
+<pre><code>mygame/
+├── .venv/              # окружение (не в git)
+├── assets/
+│   ├── images/
+│   └── sounds/
+├── main.py             # точка входа
+├── requirements.txt
+└── .gitignore</code></pre></article>
+
+<article class="s1"><h3>pygame или pygame-ce</h3><p><code>pygame-ce</code> — активно развиваемая community-версия. Модуль называется так же (<code>import pygame</code>), но ставить обе в одно окружение нельзя.</p>
+<pre><code>pip uninstall pygame
+pip install pygame-ce</code></pre></article>
+</div>
+
+<h2 id="tpl">Заготовка игры</h2>
+<p class="sub">Любая игра на pygame — это бесконечный цикл из трёх шагов: <b>события → обновление → отрисовка</b>.</p>
+<div class="grid">
+<article class="s2 wide"><h3>Минимальный шаблон</h3>
+<pre><code>import sys
+import pygame
+
+pygame.init()
+
+WIDTH, HEIGHT = 800, 600
+FPS = 60
+screen = pygame.display.set_mode((WIDTH, HEIGHT))
+pygame.display.set_caption("Моя игра")
+clock = pygame.time.Clock()
+
+running = True
+while running:
+    dt = clock.tick(FPS) / 1000        # секунды с прошлого кадра
+
+    # 1. События
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+        elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+            running = False
+
+    # 2. Обновление логики
+    # ...
+
+    # 3. Отрисовка
+    screen.fill((20, 24, 40))          # очистить кадр
+    # ... рисуем ...
+    pygame.display.flip()              # показать кадр
+
+pygame.quit()
+sys.exit()</code></pre></article>
+
+<article class="s2 wide"><h3>Структура с классом Game</h3><p>Когда игра растёт, удобно разделить код на методы.</p>
+<pre><code>class Game:
+    def __init__(self):
+        pygame.init()
+        self.screen = pygame.display.set_mode((800, 600))
+        self.clock = pygame.time.Clock()
+        self.running = True
+
+    def events(self):
+        for e in pygame.event.get():
+            if e.type == pygame.QUIT:
+                self.running = False
+
+    def update(self, dt): ...
+
+    def draw(self):
+        self.screen.fill((0, 0, 0))
+        pygame.display.flip()
+
+    def run(self):
+        while self.running:
+            dt = self.clock.tick(60) / 1000
+            self.events(); self.update(dt); self.draw()
+        pygame.quit()
+
+if __name__ == "__main__":
+    Game().run()</code></pre></article>
+
+<article class="s2"><h3>Параметры окна</h3>
+<pre><code>pygame.display.set_mode((800, 600), pygame.RESIZABLE)
+pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
+pygame.display.set_mode((800, 600), pygame.SCALED)
+pygame.display.set_caption("Заголовок")
+pygame.mouse.set_visible(False)    # скрыть курсор</code></pre></article>
+
+<article class="s2"><h3>flip и update</h3>
+<pre><code>pygame.display.flip()                 # обновить весь экран
+pygame.display.update()               # то же
+pygame.display.update(rect)           # только часть экрана</code></pre></article>
+</div>
+
+<h2 id="draw">Рисование примитивов</h2>
+<p class="sub">Координаты в пикселях: <code>(0, 0)</code> — левый верхний угол, X вправо, Y вниз. Цвет — кортеж <code>(R, G, B)</code> от 0 до 255.</p>
+<div class="grid">
+<article class="s3"><h3>Цвета</h3>
+<pre><code>RED   = (255, 0, 0)
+WHITE = (255, 255, 255)
+color = pygame.Color("orange")
+color = pygame.Color("#3A7D2C")
+semi  = (255, 0, 0, 128)   # с прозрачностью (на Surface с alpha)</code></pre></article>
+
+<article class="s3"><h3>Прямоугольник</h3><p>Последний аргумент — толщина контура (0 — заливка), <code>border_radius</code> скругляет углы.</p>
+<pre><code>pygame.draw.rect(screen, RED, (50, 50, 200, 100))
+pygame.draw.rect(screen, WHITE, (50, 50, 200, 100), 3)
+pygame.draw.rect(screen, RED, r, border_radius=12)</code></pre></article>
+
+<article class="s3"><h3>Круг, эллипс, дуга</h3>
+<pre><code>pygame.draw.circle(screen, RED, (400, 300), 40)      # центр, радиус
+pygame.draw.ellipse(screen, RED, (100, 100, 160, 80))
+import math
+pygame.draw.arc(screen, WHITE, (100, 100, 100, 100),
+                0, math.pi, 3)   # углы в радианах</code></pre></article>
+
+<article class="s3"><h3>Линии и многоугольник</h3>
+<pre><code>pygame.draw.line(screen, WHITE, (0, 0), (200, 150), 3)
+pygame.draw.lines(screen, WHITE, False,
+                  [(10, 10), (60, 80), (120, 20)], 2)
+pygame.draw.polygon(screen, RED, [(100, 0), (150, 80), (50, 80)])
+pygame.draw.aaline(screen, WHITE, (0, 0), (100, 50))   # сглаженная</code></pre></article>
+
+<article class="s3"><h3>Поверхности (Surface)</h3><p>Отдельный «холст», который потом рисуется на экран. Прозрачность — флагом <code>SRCALPHA</code>.</p>
+<pre><code>surf = pygame.Surface((100, 100), pygame.SRCALPHA)
+pygame.draw.circle(surf, (255, 0, 0, 120), (50, 50), 50)
+screen.blit(surf, (200, 200))</code></pre></article>
+
+<article class="s3"><h3>Rect — главный помощник</h3><p>Хранит положение и размер, даёт готовые точки привязки.</p>
+<pre><code>r = pygame.Rect(100, 100, 80, 40)   # x, y, ширина, высота
+r.center, r.topleft, r.midbottom    # точки привязки
+r.right, r.bottom                   # края
+r.center = (400, 300)               # поставить по центру
+r.move_ip(5, 0)                     # сдвинуть на месте
+r.clamp_ip(screen.get_rect())       # не выходить за экран</code></pre></article>
+</div>
+
+<h2 id="img">Изображения и текст</h2>
+<div class="grid">
+<article class="s4"><h3>Загрузка и вывод</h3><p><code>convert_alpha()</code> ускоряет рисование картинок с прозрачностью (после <code>set_mode</code>). <code>blit</code> копирует картинку на экран.</p>
+<pre><code>hero = pygame.image.load("assets/images/hero.png").convert_alpha()
+rect = hero.get_rect(center=(400, 300))
+screen.blit(hero, rect)</code></pre></article>
+
+<article class="s4"><h3>Преобразования</h3>
+<pre><code>img = pygame.transform.scale(hero, (64, 64))
+img = pygame.transform.rotate(hero, 45)        # против часовой, градусы
+img = pygame.transform.flip(hero, True, False) # отразить по X
+img = pygame.transform.rotozoom(hero, 30, 0.5) # поворот + масштаб</code></pre></article>
+
+<article class="s4"><h3>Пути к ресурсам</h3><p>Так файлы находятся независимо от того, откуда запущена игра.</p>
+<pre><code>from pathlib import Path
+BASE = Path(__file__).parent
+hero = pygame.image.load(BASE / "assets" / "images" / "hero.png")</code></pre></article>
+
+<article class="s4"><h3>Текст</h3><p>Шрифт по умолчанию (<code>Font(None, …)</code>) не содержит кириллицу. Берите системный шрифт или свой <code>.ttf</code>.</p>
+<pre><code>font = pygame.font.SysFont("arial", 32)
+# или: font = pygame.font.Font("assets/Roboto.ttf", 32)
+text = font.render("Очки: 10", True, (255, 255, 255))   # True — сглаживание
+screen.blit(text, (10, 10))
+text.get_rect(center=(400, 50))   # для центрирования</code></pre></article>
+
+<article class="s4"><h3>Фон и прокрутка</h3>
+<pre><code>bg = pygame.image.load("assets/images/bg.png").convert()
+bg_y = (bg_y + 2) % bg.get_height()
+screen.blit(bg, (0, bg_y))
+screen.blit(bg, (0, bg_y - bg.get_height()))</code></pre></article>
+</div>
+
+<h2 id="ev">События и ввод</h2>
+<div class="grid">
+<article class="s5"><h3>Очередь событий</h3><p>События приходят в <code>pygame.event.get()</code>. Тип — в <code>event.type</code>.</p>
+<pre><code>for event in pygame.event.get():
+    if event.type == pygame.QUIT: ...
+    elif event.type == pygame.KEYDOWN:
+        event.key       # pygame.K_SPACE и т.д.
+    elif event.type == pygame.MOUSEBUTTONDOWN:
+        event.pos, event.button   # 1 лев, 2 средняя, 3 прав</code></pre></article>
+
+<article class="s5"><h3>Одиночное нажатие</h3><p>Срабатывает один раз при нажатии клавиши. Подходит для прыжка, выстрела, паузы.</p>
+<pre><code>if event.type == pygame.KEYDOWN:
+    if event.key == pygame.K_SPACE:
+        shoot()
+    if event.key == pygame.K_p:
+        paused = not paused</code></pre></article>
+
+<article class="s5"><h3>Удержание клавиши</h3><p><code>get_pressed()</code> опрашивает состояние клавиш прямо сейчас. Для плавного движения.</p>
+<pre><code>keys = pygame.key.get_pressed()
+if keys[pygame.K_LEFT]  or keys[pygame.K_a]: x -= speed * dt
+if keys[pygame.K_RIGHT] or keys[pygame.K_d]: x += speed * dt</code></pre></article>
+
+<article class="s5"><h3>Мышь</h3>
+<pre><code>mx, my = pygame.mouse.get_pos()
+left, middle, right = pygame.mouse.get_pressed()
+if event.type == pygame.MOUSEMOTION:
+    event.pos, event.rel          # позиция и сдвиг
+if event.type == pygame.MOUSEWHEEL:
+    event.y                       # прокрутка</code></pre></article>
+
+<article class="s5"><h3>Часто нужные клавиши</h3>
+<pre><code>K_UP K_DOWN K_LEFT K_RIGHT
+K_w K_a K_s K_d
+K_SPACE K_RETURN K_ESCAPE K_TAB
+K_LSHIFT K_LCTRL
+K_1 K_2 … K_F1</code></pre></article>
+
+<article class="s5"><h3>Повтор при удержании</h3>
+<pre><code>pygame.key.set_repeat(300, 50)   # задержка и интервал, мс
+# теперь KEYDOWN приходит повторно, пока клавиша зажата</code></pre></article>
+</div>
+
+<h2 id="move">Движение и время</h2>
+<div class="grid">
+<article class="s2"><h3>Clock и FPS</h3>
+<pre><code>clock = pygame.time.Clock()
+dt = clock.tick(60) / 1000     # ограничить 60 кадров/с, dt в секундах
+clock.get_fps()                # текущий FPS
+pygame.time.get_ticks()        # мс с запуска игры</code></pre></article>
+
+<article class="s2"><h3>Скорость не зависит от FPS</h3><p>Умножайте скорость (пикселей в секунду) на <code>dt</code>. Тогда игра идёт одинаково на слабых и мощных компьютерах.</p>
+<pre><code>speed = 300                    # px/с
+x += speed * dt
+rect.x = round(x)              # Rect хранит целые</code></pre></article>
+
+<article class="s2"><h3>Вектор скорости</h3><p><code>Vector2</code> удобен для диагоналей, направлений и расстояний.</p>
+<pre><code>from pygame.math import Vector2
+pos = Vector2(100, 100)
+vel = Vector2(1, 1)
+if vel.length() &gt; 0:
+    vel = vel.normalize()      # одинаковая скорость по диагонали
+pos += vel * speed * dt
+pos.distance_to(Vector2(0, 0))</code></pre></article>
+
+<article class="s2"><h3>Отскок от стен</h3>
+<pre><code>ball.x += vx * dt
+if ball.left &lt; 0 or ball.right &gt; WIDTH:
+    vx = -vx
+if ball.top &lt; 0 or ball.bottom &gt; HEIGHT:
+    vy = -vy</code></pre></article>
+
+<article class="s2"><h3>Гравитация и прыжок</h3>
+<pre><code>vy += 1500 * dt                # ускорение вниз
+y  += vy * dt
+if y &gt;= ground:                # приземление
+    y, vy, on_ground = ground, 0, True
+if on_ground and jump_pressed:
+    vy, on_ground = -600, False</code></pre></article>
+</div>
+
+<h2 id="col">Столкновения и спрайты</h2>
+<div class="grid">
+<article class="s3"><h3>Столкновения прямоугольников</h3>
+<pre><code>player.colliderect(enemy)             # True/False
+player.collidepoint(mouse_pos)        # точка в прямоугольнике
+player.collidelist(enemies)           # индекс или -1
+player.collidelistall(enemies)        # список индексов</code></pre></article>
+
+<article class="s3"><h3>Класс Sprite</h3><p>Спрайт имеет <code>image</code> и <code>rect</code>; метод <code>update</code> вызывается группой.</p>
+<pre><code>class Player(pygame.sprite.Sprite):
+    def __init__(self):
+        super().__init__()
+        self.image = pygame.Surface((40, 40))
+        self.image.fill((80, 200, 120))
+        self.rect = self.image.get_rect(center=(400, 500))
+        self.speed = 300
+    def update(self, dt):
+        k = pygame.key.get_pressed()
+        self.rect.x += (k[pygame.K_RIGHT] - k[pygame.K_LEFT]) * self.speed * dt
+        self.rect.clamp_ip(pygame.display.get_surface().get_rect())</code></pre></article>
+
+<article class="s3"><h3>Группы спрайтов</h3>
+<pre><code>all_sprites = pygame.sprite.Group()
+enemies = pygame.sprite.Group()
+player = Player()
+all_sprites.add(player)
+
+all_sprites.update(dt)       # обновить всех
+all_sprites.draw(screen)     # нарисовать всех</code></pre></article>
+
+<article class="s3"><h3>Столкновения спрайтов</h3>
+<pre><code>hits = pygame.sprite.spritecollide(player, enemies, True)
+# True — удалить задетых из группы
+if hits:
+    score += len(hits)
+
+pygame.sprite.groupcollide(bullets, enemies, True, True)
+pygame.sprite.collide_circle   # столкновение по кругу</code></pre></article>
+
+<article class="s3"><h3>Точные столкновения по маске</h3><p>Учитывают форму непрозрачных пикселей, а не весь прямоугольник.</p>
+<pre><code>self.mask = pygame.mask.from_surface(self.image)
+pygame.sprite.spritecollide(player, enemies, False,
+                            pygame.sprite.collide_mask)</code></pre></article>
+
+<article class="s3"><h3>Удаление спрайтов</h3>
+<pre><code>def update(self, dt):
+    self.rect.y += 300 * dt
+    if self.rect.top &gt; 600:
+        self.kill()      # убрать из всех групп</code></pre></article>
+</div>
+
+<h2 id="snd">Звук и таймеры</h2>
+<div class="grid">
+<article class="s4"><h3>Звуковые эффекты</h3>
+<pre><code>pygame.mixer.init()
+shot = pygame.mixer.Sound("assets/sounds/shot.wav")
+shot.set_volume(0.5)     # 0.0 … 1.0
+shot.play()</code></pre></article>
+
+<article class="s4"><h3>Фоновая музыка</h3>
+<pre><code>pygame.mixer.music.load("assets/sounds/theme.mp3")
+pygame.mixer.music.set_volume(0.4)
+pygame.mixer.music.play(-1)    # -1 — по кругу
+pygame.mixer.music.pause()     # unpause(), stop()</code></pre></article>
+
+<article class="s4"><h3>Таймер событий</h3><p>Раз в заданное число миллисекунд в очередь приходит своё событие.</p>
+<pre><code>SPAWN = pygame.USEREVENT + 1
+pygame.time.set_timer(SPAWN, 1000)    # каждую секунду
+# в цикле событий:
+if event.type == SPAWN:
+    spawn_enemy()
+pygame.time.set_timer(SPAWN, 0)       # выключить</code></pre></article>
+
+<article class="s4"><h3>Задержка без остановки игры</h3>
+<pre><code>last_shot = 0
+now = pygame.time.get_ticks()
+if now - last_shot &gt; 300:    # не чаще раза в 0,3 с
+    last_shot = now
+    shoot()</code></pre></article>
+
+<article class="s4"><h3>Состояния игры</h3><p>Один переменный флаг переключает меню, игру и «Game Over».</p>
+<pre><code>state = "menu"          # menu / play / over
+if state == "menu":
+    draw_menu()
+elif state == "play":
+    update(dt); draw_game()
+else:
+    draw_game_over()</code></pre></article>
+</div>
+
+<h2 id="proj">Мини-игра: «Уворачивайся»</h2>
+<div class="grid">
+<article class="s5 wide"><h3>Полный пример</h3><p>Игрок двигается стрелками, уворачивается от падающих блоков. Очки — время выживания. После проигрыша <code>R</code> начинает заново.</p>
+<pre><code>import random, sys
+import pygame
+
+pygame.init()
+W, H = 480, 640
+screen = pygame.display.set_mode((W, H))
+pygame.display.set_caption("Уворачивайся")
+clock = pygame.time.Clock()
+font = pygame.font.SysFont("arial", 28)
+
+player = pygame.Rect(W // 2 - 25, H - 60, 50, 30)
+px, enemies, score, spawn, alive = float(player.x), [], 0.0, 0.0, True
+
+def reset():
+    global px, enemies, score, spawn, alive
+    px, enemies, score, spawn, alive = W // 2 - 25.0, [], 0.0, 0.0, True
+
+while True:
+    dt = clock.tick(60) / 1000
+    for e in pygame.event.get():
+        if e.type == pygame.QUIT:
+            pygame.quit(); sys.exit()
+        if e.type == pygame.KEYDOWN and e.key == pygame.K_r and not alive:
+            reset()
+
+    if alive:
+        k = pygame.key.get_pressed()
+        px += (k[pygame.K_RIGHT] - k[pygame.K_LEFT]) * 400 * dt
+        px = max(0, min(W - player.w, px))
+        player.x = round(px)
+
+        spawn += dt
+        if spawn &gt; 0.5:
+            spawn = 0
+            enemies.append(pygame.Rect(random.randint(0, W - 30), -30, 30, 30))
+        for en in enemies:
+            en.y += round(300 * dt)
+        enemies = [en for en in enemies if en.top &lt; H]
+
+        if player.collidelist(enemies) != -1:
+            alive = False
+        score += dt
+
+    screen.fill((20, 24, 40))
+    pygame.draw.rect(screen, (80, 200, 120), player, border_radius=6)
+    for en in enemies:
+        pygame.draw.rect(screen, (230, 80, 80), en, border_radius=4)
+    screen.blit(font.render(f"Очки: {int(score)}", True, (255, 255, 255)), (10, 10))
+    if not alive:
+        msg = font.render("Игра окончена. R — заново", True, (255, 220, 120))
+        screen.blit(msg, msg.get_rect(center=(W // 2, H // 2)))
+    pygame.display.flip()</code></pre></article>
+</div>
+</main>
+<footer>Совет: каждый кадр — это «события → обновление → отрисовка». Держите эти три части отдельно, и код останется понятным по мере роста игры.</footer>
+<script>
+document.querySelectorAll('pre code').forEach(function(c){
+var t=c.textContent;
+c.innerHTML=t.replace(/[&<>]/g,function(m){return {'&':'&amp;','<':'&lt;','>':'&gt;'}[m]})
+.replace(/(#.*$)|("[^"\n]*"|'[^'\n]*')|\b(import|from|as|def|class|return|global|pass|if|elif|else|for|while|in|and|or|not|self|super|True|False|None)\b|\b(\d+)\b/gm,function(m,c1,s,k){
+return '<i class="'+(c1?'c':s?'s':k?'k':'n')+'">'+m+'</i>'});
+});
+</script>
+</body>
+</html>

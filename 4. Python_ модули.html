@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Python: модули — шпаргалка</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;700;800&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+:root{--bg:#EEF3F8;--card:#FFFFFF;--ink:#13203A;--mute:#5A6A85;--line:#D5DEEA;--a1:#0C7C86;--a2:#B9660A;--a3:#5B4BC4;--a4:#B8325A;--code:#0F1A30;--ct:#E3EAF6;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0B1220;--card:#131D31;--ink:#E6ECF7;--mute:#9AABC6;--line:#27344F;--a1:#4FD1C5;--a2:#F2B25C;--a3:#A99BFF;--a4:#FF8FB0;--code:#080F1D}}
+:root[data-theme="dark"]{--bg:#0B1220;--card:#131D31;--ink:#E6ECF7;--mute:#9AABC6;--line:#27344F;--a1:#4FD1C5;--a2:#F2B25C;--a3:#A99BFF;--a4:#FF8FB0;--code:#080F1D}
+html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 60px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 Onest,system-ui,Arial,sans-serif}
+header{padding:48px 20px 28px;max-width:1180px;margin:0 auto}
+h1{font-size:clamp(30px,5vw,52px);line-height:1.05;margin:0 0 12px;font-weight:800;letter-spacing:-.02em}
+header p{margin:0;color:var(--mute);max-width:62ch}
+nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);border-bottom:1px solid var(--line);display:flex;gap:8px;padding:10px 20px;overflow-x:auto}
+nav a{color:var(--ink);text-decoration:none;font-weight:600;padding:6px 14px;border-radius:99px;border:1px solid var(--line);white-space:nowrap}
+nav a:hover,nav a:focus-visible{background:var(--ink);color:var(--bg);outline:none}
+main{max-width:1180px;margin:0 auto;padding:8px 20px 60px}
+h2{font-size:28px;margin:44px 0 6px}
+.sub{color:var(--mute);margin:0 0 18px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,340px),1fr));gap:16px}
+article{background:var(--card);border:1px solid var(--line);border-left:5px solid var(--c,var(--a1));border-radius:10px;padding:16px 18px;min-width:0}
+.i{--c:var(--a1)}.l{--c:var(--a2)}.o{--c:var(--a3)}.p{--c:var(--a4)}
+h3{margin:0 0 6px;font-size:17px}
+article p{margin:0 0 10px;color:var(--mute);font-size:14.5px}
+pre{margin:0;background:var(--code);color:var(--ct);border-radius:8px;padding:12px 14px;overflow-x:auto;font:400 13px/1.55 'JetBrains Mono',ui-monospace,Consolas,monospace}
+pre+pre{margin-top:8px}
+i.k{color:#FFB454;font-style:normal;font-weight:600}i.s{color:#8EE6A0;font-style:normal}i.c{color:#7F90B0;font-style:italic}i.n{color:#7FC4FF;font-style:normal}
+.wide{grid-column:1/-1}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;padding:7px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{color:var(--mute);font-weight:600}
+td code,p code,.sub code,footer code{font:500 13px 'JetBrains Mono',monospace;background:var(--bg);padding:1px 6px;border-radius:4px}
+.tw{overflow-x:auto}
+footer{color:var(--mute);font-size:13px;text-align:center;padding:0 20px 30px}
+</style>
+</head>
+<body>
+<header>
+<h1>Модули Python</h1>
+<p>Импорт, стандартная библиотека и создание собственных модулей и пакетов. Комментарий <code>#</code> показывает результат.</p>
+</header>
+<nav><a href="#imp">Импорт</a><a href="#std">Стандартная библиотека</a><a href="#own">Свои модули</a><a href="#pkg">Пакеты</a></nav>
+<main>
+
+<h2 id="imp">Импорт модулей</h2>
+<p class="sub">Модуль — это файл <code>.py</code> с кодом. Импорт подключает его имена в вашу программу. Модуль выполняется один раз и кешируется в <code>sys.modules</code>.</p>
+<div class="grid">
+<article class="i"><h3>import модуль</h3><p>Обращаться к содержимому нужно через имя модуля и точку.</p>
+<pre><code>import math
+math.sqrt(16)   # 4.0
+math.pi         # 3.14159…</code></pre></article>
+
+<article class="i"><h3>import … as</h3><p>Псевдоним сокращает длинное имя или избегает конфликта.</p>
+<pre><code>import datetime as dt
+dt.date(2026, 1, 1)
+import numpy as np   # сторонний пакет</code></pre></article>
+
+<article class="i"><h3>from модуль import имя</h3><p>Берёт конкретные имена, префикс не нужен.</p>
+<pre><code>from math import sqrt, pi
+sqrt(25)        # 5.0
+from math import floor as fl
+fl(2.7)         # 2</code></pre></article>
+
+<article class="i"><h3>from модуль import *</h3><p>Импортирует все публичные имена. Засоряет пространство имён, в рабочем коде лучше избегать.</p>
+<pre><code>from math import *
+cos(0)          # 1.0
+# какие имена придут — см. __all__</code></pre></article>
+
+<article class="i"><h3>Изучение модуля</h3><p>Встроенные функции помогают узнать, что внутри.</p>
+<pre><code>import math
+dir(math)            # список имён
+help(math.hypot)     # справка
+math.__name__        # 'math'
+math.__file__        # путь к файлу (если есть)</code></pre></article>
+
+<article class="i"><h3>Где Python ищет модули</h3><p>Порядок: текущая папка скрипта, затем <code>PYTHONPATH</code>, затем стандартные и установленные пакеты. Список — в <code>sys.path</code>.</p>
+<pre><code>import sys
+sys.path           # список папок поиска
+sys.path.append("/my/libs")
+sys.modules.keys() # уже загруженные</code></pre></article>
+
+<article class="i"><h3>Установка сторонних пакетов</h3><p><code>pip</code> ставит пакеты из PyPI, <code>venv</code> изолирует их по проектам. Команды выполняются в терминале.</p>
+<pre><code>python -m venv .venv
+source .venv/bin/activate    # Windows: .venv\Scripts\activate
+pip install requests
+pip freeze &gt; requirements.txt
+pip install -r requirements.txt</code></pre></article>
+
+<article class="i"><h3>Ошибка импорта и опциональные модули</h3>
+<pre><code>try:
+    import ujson as json
+except ImportError:
+    import json          # запасной вариант</code></pre></article>
+</div>
+
+<h2 id="std">Стандартная библиотека</h2>
+<p class="sub">Модули, которые идут вместе с Python — устанавливать не нужно. Ниже самые полезные с короткими примерами.</p>
+<div class="grid">
+<article class="l"><h3>math — математика</h3>
+<pre><code>import math
+math.sqrt(9)         # 3.0
+math.ceil(2.1)       # 3
+math.floor(2.9)      # 2
+math.factorial(5)    # 120
+math.gcd(12, 18)     # 6
+math.log(8, 2)       # 3.0
+math.isclose(0.1+0.2, 0.3)  # True</code></pre></article>
+
+<article class="l"><h3>random — случайные числа</h3>
+<pre><code>import random
+random.randint(1, 6)       # целое от 1 до 6
+random.random()            # float от 0 до 1
+random.choice(["a", "b"])  # один элемент
+random.sample(range(10), 3)  # 3 разных
+lst = [1, 2, 3]
+random.shuffle(lst)        # перемешать на месте
+random.seed(42)            # воспроизводимость</code></pre></article>
+
+<article class="l"><h3>datetime — дата и время</h3>
+<pre><code>from datetime import datetime, date, timedelta
+now = datetime.now()
+now.strftime("%d.%m.%Y %H:%M")   # '02.10.2026 14:30'
+d = date(2026, 1, 15)
+d + timedelta(days=30)           # 2026-02-14
+datetime.strptime("2026-03-01", "%Y-%m-%d")
+(date(2026, 12, 31) - d).days    # 350</code></pre></article>
+
+<article class="l"><h3>time — пауза и замер</h3>
+<pre><code>import time
+time.sleep(1.5)            # пауза 1.5 с
+t = time.perf_counter()
+# ... код ...
+print(time.perf_counter() - t)   # затраченное время</code></pre></article>
+
+<article class="l"><h3>os и sys — система</h3>
+<pre><code>import os, sys
+os.getcwd()                 # текущая папка
+os.listdir(".")             # содержимое
+os.makedirs("a/b", exist_ok=True)
+os.path.join("a", "b.txt")  # 'a/b.txt'
+os.path.exists("f.txt")     # True/False
+os.environ.get("HOME")      # переменная окружения
+sys.argv                    # аргументы командной строки
+sys.exit(0)                 # завершить программу</code></pre></article>
+
+<article class="l"><h3>pathlib — пути объектами</h3>
+<pre><code>from pathlib import Path
+p = Path("data") / "notes.txt"
+p.exists()
+p.write_text("привет", encoding="utf-8")
+p.read_text(encoding="utf-8")   # 'привет'
+p.suffix, p.stem, p.parent      # ('.txt', 'notes', Path('data'))
+list(Path(".").glob("*.py"))    # все .py</code></pre></article>
+
+<article class="l"><h3>json — обмен данными</h3>
+<pre><code>import json
+data = {"name": "Аня", "age": 20}
+s = json.dumps(data, ensure_ascii=False)  # в строку
+json.loads(s)                              # из строки
+with open("u.json", "w", encoding="utf-8") as f:
+    json.dump(data, f, ensure_ascii=False, indent=2)
+with open("u.json", encoding="utf-8") as f:
+    json.load(f)</code></pre></article>
+
+<article class="l"><h3>csv — таблицы</h3>
+<pre><code>import csv
+with open("t.csv", "w", newline="", encoding="utf-8") as f:
+    w = csv.writer(f)
+    w.writerow(["имя", "возраст"])
+    w.writerow(["Аня", 20])
+with open("t.csv", encoding="utf-8") as f:
+    for row in csv.DictReader(f):
+        print(row["имя"])     # Аня</code></pre></article>
+
+<article class="l"><h3>re — регулярные выражения</h3>
+<pre><code>import re
+re.findall(r"\d+", "a1 b22 c333")  # ['1', '22', '333']
+re.search(r"(\w+)@(\w+)", "me@site").groups()  # ('me', 'site')
+re.sub(r"\s+", " ", "a   b    c")   # 'a b c'
+re.match(r"\d{3}", "123x") is not None  # True</code></pre></article>
+
+<article class="l"><h3>collections — удобные структуры</h3>
+<pre><code>from collections import Counter, defaultdict, deque
+Counter("banana")              # {'a': 3, 'n': 2, 'b': 1}
+Counter("banana").most_common(1)  # [('a', 3)]
+d = defaultdict(list)
+d["x"].append(1)               # ключ создаётся сам
+q = deque([1, 2]); q.appendleft(0)  # быстрая очередь</code></pre></article>
+
+<article class="l"><h3>itertools и functools</h3>
+<pre><code>from itertools import permutations, product, chain
+list(permutations([1, 2, 3], 2))  # 6 пар
+list(product("ab", [1, 2]))       # [('a',1),('a',2),…]
+list(chain([1], [2, 3]))          # [1, 2, 3]
+from functools import lru_cache, reduce
+@lru_cache(maxsize=None)
+def fib(n): return n if n &lt; 2 else fib(n-1) + fib(n-2)
+reduce(lambda a, b: a * b, [1, 2, 3, 4])  # 24</code></pre></article>
+
+<article class="l"><h3>statistics и string</h3>
+<pre><code>import statistics as st, string
+st.mean([1, 2, 6])     # 3
+st.median([1, 5, 9])   # 5
+string.ascii_letters   # 'abc…XYZ'
+string.digits          # '0123456789'
+string.punctuation     # '!"#$%…'</code></pre></article>
+
+<article class="l"><h3>argparse — аргументы командной строки</h3>
+<pre><code>import argparse
+p = argparse.ArgumentParser()
+p.add_argument("name")
+p.add_argument("-n", "--times", type=int, default=1)
+args = p.parse_args()
+print(args.name * args.times)
+# python tool.py hi -n 3 → hihihi</code></pre></article>
+</div>
+
+<h2 id="own">Создание собственных модулей</h2>
+<p class="sub">Любой файл <code>.py</code> — уже модуль. Его имя без расширения становится именем для импорта.</p>
+<div class="grid">
+<article class="o"><h3>Простой модуль</h3><p>Файл <code>geometry.py</code> с функциями и константой.</p>
+<pre><code># geometry.py
+"""Геометрические расчёты."""
+PI = 3.14159
+
+def circle_area(r):
+    """Площадь круга."""
+    return PI * r ** 2</code></pre>
+<pre><code># main.py (в той же папке)
+import geometry
+geometry.circle_area(2)   # 12.56636
+from geometry import PI</code></pre></article>
+
+<article class="o"><h3>if __name__ == "__main__"</h3><p>Блок срабатывает только при запуске файла напрямую, но не при импорте. Здесь удобно держать тесты и демо.</p>
+<pre><code># tools.py
+def hello(): return "hi"
+
+if __name__ == "__main__":
+    print(hello())   # при `python tools.py`
+# при `import tools` — ничего не печатается</code></pre></article>
+
+<article class="o"><h3>Специальные переменные</h3>
+<pre><code>__name__   # имя модуля; '__main__' при запуске
+__doc__    # докстринг модуля
+__file__   # путь к файлу
+__all__ = ["circle_area"]   # что отдаёт import *</code></pre></article>
+
+<article class="o"><h3>Докстринги и аннотации</h3><p>Строка в начале модуля и функций описывает назначение; её читает <code>help()</code>.</p>
+<pre><code>def add(a: int, b: int) -&gt; int:
+    """Складывает два числа."""
+    return a + b
+help(add)</code></pre></article>
+
+<article class="o"><h3>Перезагрузка модуля</h3><p>Повторный <code>import</code> не перечитывает файл. Для этого есть <code>reload</code> (удобно в интерактивной сессии).</p>
+<pre><code>import importlib, geometry
+importlib.reload(geometry)</code></pre></article>
+
+<article class="o"><h3>Запуск как скрипта и как модуля</h3>
+<pre><code>python geometry.py       # запуск файла
+python -m geometry       # запуск как модуля
+python -m pkg.sub        # модуль внутри пакета</code></pre></article>
+
+<article class="o"><h3>Правила и частые ошибки</h3><p>Имя файла — по правилам имён переменных: без пробелов и дефисов, не с цифры. Не называйте свой файл как стандартный модуль.</p>
+<pre><code>random.py    # плохо: перекроет стандартный random
+my-tools.py  # нельзя импортировать
+my_tools.py  # хорошо
+# циклический импорт (a ↔ b) → ImportError</code></pre></article>
+</div>
+
+<h2 id="pkg">Пакеты</h2>
+<p class="sub">Пакет — папка с модулями. Позволяет группировать код и импортировать через точку.</p>
+<div class="grid">
+<article class="p"><h3>Структура пакета</h3>
+<pre><code>project/
+├── main.py
+└── shop/
+    ├── __init__.py
+    ├── cart.py
+    └── pricing.py</code></pre></article>
+
+<article class="p"><h3>Импорт из пакета</h3>
+<pre><code># main.py
+import shop.cart
+from shop import pricing
+from shop.cart import add_item
+shop.cart.add_item("чай")</code></pre></article>
+
+<article class="p"><h3>__init__.py</h3><p>Выполняется при импорте пакета. Можно оставить пустым или вывести нужное наружу.</p>
+<pre><code># shop/__init__.py
+from .cart import add_item
+__all__ = ["add_item"]
+# теперь: from shop import add_item</code></pre></article>
+
+<article class="p"><h3>Относительные импорты</h3><p>Работают внутри пакета: <code>.</code> — текущая папка, <code>..</code> — на уровень выше.</p>
+<pre><code># shop/cart.py
+from .pricing import total
+from . import pricing
+from ..other import helper   # из соседнего пакета</code></pre></article>
+
+<article class="p wide"><h3>Мини-проект: свой модуль в деле</h3><p>Модуль <code>textutils.py</code> работает и как библиотека, и как скрипт.</p>
+<pre><code># textutils.py
+"""Утилиты для текста."""
+import re
+from collections import Counter
+
+def words(text):
+    return re.findall(r"\w+", text.lower())
+
+def top(text, n=3):
+    return Counter(words(text)).most_common(n)
+
+if __name__ == "__main__":
+    print(top("раз два два три три три"))   # [('три', 3), ('два', 2), ('раз', 1)]</code></pre>
+<pre><code># main.py
+from textutils import top
+print(top("a b a c a b", 2))   # [('a', 3), ('b', 2)]</code></pre></article>
+</div>
+</main>
+<footer>Совет: сначала ищите нужное в стандартной библиотеке, а <code>pip</code> подключайте, когда готового решения в ней нет.</footer>
+<script>
+document.querySelectorAll('pre code').forEach(function(c){
+var t=c.textContent;
+c.innerHTML=t.replace(/[&<>]/g,function(m){return {'&':'&amp;','<':'&lt;','>':'&gt;'}[m]})
+.replace(/(#.*$)|("""[^"]*"""|"[^"\n]*"|'[^'\n]*')|\b(import|from|as|def|return|class|with|try|except|if|else|for|in|and|or|not|lambda|True|False|None)\b|\b(\d+)\b/gm,function(m,c1,s,k){
+return '<i class="'+(c1?'c':s?'s':k?'k':'n')+'">'+m+'</i>'});
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>PyQt5 — шпаргалка</title>
+<style>
+:root{--bg:#EEF3F8;--card:#FFFFFF;--ink:#13203A;--mute:#5A6A85;--line:#D5DEEA;--a1:#0C7C86;--a2:#B9660A;--a3:#5B4BC4;--a4:#B8325A;--a5:#3A7D2C;--code:#0F1A30;--ct:#E3EAF6}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0B1220;--card:#131D31;--ink:#E6ECF7;--mute:#9AABC6;--line:#27344F;--a1:#4FD1C5;--a2:#F2B25C;--a3:#A99BFF;--a4:#FF8FB0;--a5:#8FD97C;--code:#080F1D}}
+:root[data-theme="dark"]{--bg:#0B1220;--card:#131D31;--ink:#E6ECF7;--mute:#9AABC6;--line:#27344F;--a1:#4FD1C5;--a2:#F2B25C;--a3:#A99BFF;--a4:#FF8FB0;--a5:#8FD97C;--code:#080F1D}
+*{box-sizing:border-box}
+html{scroll-padding-top:70px}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 system-ui,-apple-system,"Segoe UI",Arial,sans-serif}
+header{padding:48px 20px 28px;max-width:1180px;margin:0 auto}
+h1{font-size:clamp(30px,5vw,52px);line-height:1.05;margin:0 0 12px;font-weight:800;letter-spacing:-.02em}
+header p{margin:0;color:var(--mute);max-width:72ch}
+nav{position:sticky;top:0;z-index:5;background:color-mix(in srgb,var(--bg) 94%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);display:flex;gap:8px;padding:10px 20px;overflow-x:auto}
+nav a{color:var(--ink);text-decoration:none;font-weight:600;padding:6px 14px;border-radius:99px;border:1px solid var(--line);white-space:nowrap}
+nav a:hover,nav a:focus-visible{background:var(--ink);color:var(--bg);outline:none}
+main{max-width:1180px;margin:0 auto;padding:8px 20px 60px}
+h2{font-size:28px;margin:44px 0 6px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+h2 code{font:600 15px ui-monospace,SFMono-Regular,Consolas,monospace;background:var(--ink);color:var(--bg);padding:3px 10px;border-radius:6px}
+.sub{color:var(--mute);margin:0 0 18px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,340px),1fr));gap:16px}
+article{background:var(--card);border:1px solid var(--line);border-left:5px solid var(--c,var(--a1));border-radius:10px;padding:16px 18px;min-width:0}
+.s1{--c:var(--a1)}.s2{--c:var(--a2)}.s3{--c:var(--a3)}.s4{--c:var(--a4)}.s5{--c:var(--a5)}
+h3{margin:0 0 6px;font-size:17px}
+article p{margin:0 0 10px;color:var(--mute);font-size:14.5px}
+article ul{margin:0 0 10px;padding-left:20px;color:var(--mute);font-size:14.5px}
+pre{margin:0;background:var(--code);color:var(--ct);border-radius:8px;padding:12px 14px;overflow-x:auto;font:400 13px/1.55 ui-monospace,SFMono-Regular,Consolas,monospace}
+.wide{grid-column:1/-1}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;padding:7px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{color:var(--mute);font-weight:600}
+td code,p code,li code,.sub code,footer code,header code{font:500 13px ui-monospace,SFMono-Regular,Consolas,monospace;background:var(--bg);padding:1px 6px;border-radius:4px}
+.tw{overflow-x:auto}
+.badge{display:inline-block;font-size:12px;font-weight:700;padding:2px 8px;border-radius:99px;background:var(--bg);color:var(--mute);margin-left:4px}
+footer{color:var(--mute);font-size:13px;text-align:center;padding:0 20px 30px}
+.note{padding:10px 12px;border-radius:8px;background:var(--bg);border:1px dashed var(--line);color:var(--mute);font-size:14px}
+</style>
+</head>
+<body>
+<header>
+<h1>Разработка оконных приложений <span style="white-space:nowrap">PyQt5</span></h1>
+<p>Шпаргалка по созданию GUI на Python: заготовка окна, запуск приложения, разметка виджетов, популярные элементы интерфейса, сигналы и слоты, а также Qt Designer. Каждый раздел содержит короткий рабочий пример.</p>
+</header>
+
+<nav>
+<a href="#start">Старт</a>
+<a href="#window">Пустое окно</a>
+<a href="#layout">Разметка</a>
+<a href="#widgets">Виджеты</a>
+<a href="#signals">Сигналы</a>
+<a href="#designer">Qt Designer</a>
+<a href="#quick">Шпаргалка API</a>
+</nav>
+
+<main>
+
+<h2 id="start">1. Быстрый старт <code>PyQt5</code></h2>
+<p class="sub">PyQt5 предоставляет Python-привязки к Qt — набору инструментов для создания графических приложений.</p>
+<div class="grid">
+<article class="s1">
+<h3>Установка</h3>
+<pre><code>pip install PyQt5</code></pre>
+<p>После установки можно импортировать классы из <code>PyQt5.QtWidgets</code>.</p>
+</article>
+<article class="s1">
+<h3>Минимальный запуск</h3>
+<pre><code>import sys
+from PyQt5.QtWidgets import QApplication
+
+app = QApplication(sys.argv)
+app.exec_()</code></pre>
+<p><code>QApplication</code> управляет GUI-приложением и его главным циклом событий.</p>
+</article>
+<article class="s1 wide">
+<h3>Базовая схема любого приложения</h3>
+<pre><code>import sys
+from PyQt5.QtWidgets import QApplication, QWidget
+
+app = QApplication(sys.argv)
+
+window = QWidget()
+window.setWindowTitle("Моё приложение")
+window.resize(500, 300)
+window.show()
+
+sys.exit(app.exec_())</code></pre>
+</article>
+</div>
+
+<h2 id="window">2. Заготовка пустого окна <code>QWidget</code></h2>
+<p class="sub">Самый простой вариант — создать объект <code>QWidget</code>, настроить его и показать через <code>show()</code>.</p>
+<div class="grid">
+<article class="s2">
+<h3>Минимальное окно</h3>
+<pre><code>import sys
+from PyQt5.QtWidgets import QApplication, QWidget
+
+app = QApplication(sys.argv)
+
+window = QWidget()
+window.setWindowTitle("Пустое окно")
+window.resize(600, 400)
+window.show()
+
+sys.exit(app.exec_())</code></pre>
+</article>
+<article class="s2">
+<h3>Полезные методы окна</h3>
+<pre><code>window.setWindowTitle("Заголовок")
+window.resize(800, 500)
+window.setMinimumSize(400, 300)
+window.move(100, 100)
+window.show()
+window.hide()
+window.close()</code></pre>
+</article>
+<article class="s2">
+<h3>Окно через собственный класс</h3>
+<pre><code>class MainWindow(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("Моё окно")
+        self.resize(500, 300)
+
+app = QApplication(sys.argv)
+window = MainWindow()
+window.show()
+sys.exit(app.exec_())</code></pre>
+</article>
+</div>
+
+<h2 id="layout">3. Разметка виджетов — Layout</h2>
+<p class="sub">Layout автоматически размещает дочерние виджеты и помогает интерфейсу корректно изменяться при изменении размера окна.</p>
+<div class="grid">
+<article class="s3">
+<h3>QVBoxLayout — вертикально</h3>
+<pre><code>from PyQt5.QtWidgets import (
+    QWidget, QVBoxLayout, QPushButton
+)
+
+window = QWidget()
+layout = QVBoxLayout(window)
+
+layout.addWidget(QPushButton("Кнопка 1"))
+layout.addWidget(QPushButton("Кнопка 2"))
+
+window.show()</code></pre>
+</article>
+<article class="s3">
+<h3>QHBoxLayout — горизонтально</h3>
+<pre><code>from PyQt5.QtWidgets import (
+    QWidget, QHBoxLayout, QPushButton
+)
+
+window = QWidget()
+layout = QHBoxLayout(window)
+
+layout.addWidget(QPushButton("Да"))
+layout.addWidget(QPushButton("Нет"))
+
+window.show()</code></pre>
+</article>
+<article class="s3">
+<h3>QGridLayout — таблица</h3>
+<pre><code>from PyQt5.QtWidgets import (
+    QWidget, QGridLayout, QPushButton
+)
+
+window = QWidget()
+layout = QGridLayout(window)
+
+layout.addWidget(QPushButton("1"), 0, 0)
+layout.addWidget(QPushButton("2"), 0, 1)
+layout.addWidget(QPushButton("3"), 1, 0)
+
+window.show()</code></pre>
+</article>
+<article class="s3">
+<h3>Вложенные Layout</h3>
+<pre><code>main = QVBoxLayout(window)
+row = QHBoxLayout()
+
+row.addWidget(QPushButton("OK"))
+row.addWidget(QPushButton("Отмена"))
+
+main.addWidget(QLabel("Выберите действие"))
+main.addLayout(row)</code></pre>
+</article>
+<article class="s3 wide">
+<h3>Полезные операции Layout</h3>
+<div class="tw"><table>
+<tr><th>Команда</th><th>Назначение</th></tr>
+<tr><td><code>addWidget(w)</code></td><td>Добавить виджет</td></tr>
+<tr><td><code>addLayout(layout)</code></td><td>Добавить вложенный layout</td></tr>
+<tr><td><code>addStretch()</code></td><td>Добавить растягивающееся пустое место</td></tr>
+<tr><td><code>addSpacing(10)</code></td><td>Фиксированный промежуток</td></tr>
+<tr><td><code>setSpacing(10)</code></td><td>Расстояние между элементами</td></tr>
+<tr><td><code>setContentsMargins(10,10,10,10)</code></td><td>Внешние отступы layout</td></tr>
+</table></div>
+</article>
+</div>
+
+<h2 id="widgets">4. Популярные виджеты</h2>
+<p class="sub">Основные классы из <code>PyQt5.QtWidgets</code> и минимальные примеры их использования.</p>
+<div class="grid">
+<article class="s4">
+<h3>QLabel — текст</h3>
+<pre><code>label = QLabel("Привет, PyQt5!")
+layout.addWidget(label)
+
+label.setText("Новый текст")
+text = label.text()</code></pre>
+</article>
+<article class="s4">
+<h3>QPushButton — кнопка</h3>
+<pre><code>button = QPushButton("Нажми меня")
+layout.addWidget(button)
+
+button.clicked.connect(
+    lambda: label.setText("Нажато!")
+)</code></pre>
+</article>
+<article class="s4">
+<h3>QLineEdit — строка</h3>
+<pre><code>edit = QLineEdit()
+edit.setPlaceholderText("Введите имя")
+layout.addWidget(edit)
+
+name = edit.text()
+edit.clear()</code></pre>
+</article>
+<article class="s4">
+<h3>QTextEdit — многострочный текст</h3>
+<pre><code>text = QTextEdit()
+text.setPlainText("Первая строка")
+layout.addWidget(text)
+
+value = text.toPlainText()
+text.clear()</code></pre>
+</article>
+<article class="s4">
+<h3>QCheckBox — флажок</h3>
+<pre><code>check = QCheckBox("Согласен")
+layout.addWidget(check)
+
+if check.isChecked():
+    print("Да")</code></pre>
+</article>
+<article class="s4">
+<h3>QRadioButton — переключатель</h3>
+<pre><code>male = QRadioButton("Мужской")
+female = QRadioButton("Женский")
+
+layout.addWidget(male)
+layout.addWidget(female)
+
+if male.isChecked():
+    print("Выбран мужской")</code></pre>
+</article>
+<article class="s4">
+<h3>QComboBox — выпадающий список</h3>
+<pre><code>combo = QComboBox()
+combo.addItems(["Python", "C++", "Java"])
+layout.addWidget(combo)
+
+print(combo.currentText())</code></pre>
+</article>
+<article class="s4">
+<h3>QSpinBox — целое число</h3>
+<pre><code>spin = QSpinBox()
+spin.setRange(0, 100)
+spin.setValue(10)
+layout.addWidget(spin)
+
+print(spin.value())</code></pre>
+</article>
+<article class="s4">
+<h3>QSlider — ползунок</h3>
+<pre><code>slider = QSlider(Qt.Horizontal)
+slider.setRange(0, 100)
+layout.addWidget(slider)
+
+slider.valueChanged.connect(
+    lambda value: print(value)
+)</code></pre>
+</article>
+<article class="s4">
+<h3>QListWidget — список</h3>
+<pre><code>items = QListWidget()
+items.addItems(["Анна", "Борис", "Вика"])
+layout.addWidget(items)
+
+print(items.currentItem().text())</code></pre>
+</article>
+<article class="s4 wide">
+<h3>QMessageBox — сообщение</h3>
+<pre><code>from PyQt5.QtWidgets import QMessageBox
+
+QMessageBox.information(
+    window,
+    "Готово",
+    "Операция завершена!"
+)</code></pre>
+</article>
+</div>
+
+<h2 id="signals">5. Сигналы и обработчики</h2>
+<p class="sub">Qt использует механизм сигналов и слотов: виджет сообщает о событии, а функция-обработчик реагирует на него.</p>
+<div class="grid">
+<article class="s5">
+<h3>Кнопка → функция</h3>
+<pre><code>def say_hello():
+    print("Привет!")
+
+button.clicked.connect(say_hello)</code></pre>
+</article>
+<article class="s5">
+<h3>Передача значения</h3>
+<pre><code>def show_value(value):
+    label.setText(str(value))
+
+slider.valueChanged.connect(show_value)</code></pre>
+</article>
+<article class="s5">
+<h3>Сигнал textChanged</h3>
+<pre><code>def changed(text):
+    label.setText(text)
+
+edit.textChanged.connect(changed)</code></pre>
+</article>
+<article class="s5">
+<h3>Лямбда</h3>
+<pre><code>button.clicked.connect(
+    lambda: label.setText("OK")
+)</code></pre>
+</article>
+</div>
+
+<h2 id="designer">6. Qt Designer</h2>
+<p class="sub">Qt Designer позволяет визуально собирать интерфейс из готовых виджетов и сохранять его в файл <code>.ui</code>.</p>
+<div class="grid">
+<article class="s1">
+<h3>Запуск Qt Designer</h3>
+<pre><code>designer</code></pre>
+<p>Если команда доступна в PATH, Qt Designer запускается из терминала. В Windows также можно запустить файл <code>designer.exe</code> из установленного Qt.</p>
+</article>
+<article class="s1">
+<h3>Что делать в Designer</h3>
+<ul>
+<li>создать <b>Main Window</b> или <b>Widget</b>;</li>
+<li>перетащить виджеты на форму;</li>
+<li>назначить им <code>objectName</code>;</li>
+<li>установить Layout;</li>
+<li>сохранить форму как <code>window.ui</code>.</li>
+</ul>
+</article>
+<article class="s1">
+<h3>Конвертация .ui в .py</h3>
+<pre><code>pyuic5 window.ui -o ui_window.py</code>
+<p class="note">Для PyQt5 обычно используется утилита <code>pyuic5</code>. Она генерирует Python-код интерфейса из файла Designer.</p>
+</article>
+<article class="s1 wide">
+<h3>Использование сгенерированного класса</h3>
+<pre><code>import sys
+from PyQt5.QtWidgets import QApplication, QMainWindow
+from ui_window import Ui_MainWindow
+
+class MainWindow(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.ui = Ui_MainWindow()
+        self.ui.setupUi(self)
+
+        self.ui.pushButton.clicked.connect(
+            lambda: self.ui.label.setText("Привет!")
+        )
+
+app = QApplication(sys.argv)
+window = MainWindow()
+window.show()
+sys.exit(app.exec_())</code></pre>
+</article>
+</div>
+
+<h2 id="quick">7. Быстрая шпаргалка API</h2>
+<div class="grid">
+<article class="s2 wide">
+<h3>Часто используемые классы</h3>
+<div class="tw"><table>
+<tr><th>Класс</th><th>Для чего</th><th>Типичный метод / сигнал</th></tr>
+<tr><td><code>QApplication</code></td><td>Приложение и цикл событий</td><td><code>exec_()</code></td></tr>
+<tr><td><code>QWidget</code></td><td>Базовое окно/виджет</td><td><code>show()</code>, <code>close()</code></td></tr>
+<tr><td><code>QMainWindow</code></td><td>Главное окно приложения</td><td>menuBar, toolBar, statusBar</td></tr>
+<tr><td><code>QDialog</code></td><td>Диалоговое окно</td><td><code>exec_()</code></td></tr>
+<tr><td><code>QLabel</code></td><td>Надпись</td><td><code>setText()</code></td></tr>
+<tr><td><code>QPushButton</code></td><td>Кнопка</td><td><code>clicked</code></td></tr>
+<tr><td><code>QLineEdit</code></td><td>Однострочный ввод</td><td><code>text()</code>, <code>textChanged</code></td></tr>
+<tr><td><code>QTextEdit</code></td><td>Многострочный ввод</td><td><code>toPlainText()</code></td></tr>
+<tr><td><code>QCheckBox</code></td><td>Флажок</td><td><code>isChecked()</code></td></tr>
+<tr><td><code>QComboBox</code></td><td>Выпадающий список</td><td><code>currentText()</code></td></tr>
+<tr><td><code>QMessageBox</code></td><td>Диалог сообщения</td><td><code>information()</code></td></tr>
+</table></div>
+</article>
+
+<article class="s3">
+<h3>Импорты — минимум</h3>
+<pre><code>import sys
+
+from PyQt5.QtWidgets import (
+    QApplication,
+    QWidget,
+    QLabel,
+    QPushButton,
+    QLineEdit,
+    QVBoxLayout
+)</code></pre>
+</article>
+<article class="s3">
+<h3>Полный маленький пример</h3>
+<pre><code>import sys
+from PyQt5.QtWidgets import *
+
+app = QApplication(sys.argv)
+
+window = QWidget()
+window.setWindowTitle("Анкета")
+
+layout = QVBoxLayout(window)
+
+name = QLineEdit()
+name.setPlaceholderText("Ваше имя")
+
+button = QPushButton("Поздороваться")
+label = QLabel()
+
+layout.addWidget(name)
+layout.addWidget(button)
+layout.addWidget(label)
+
+button.clicked.connect(
+    lambda: label.setText(
+        "Привет, " + name.text() + "!"
+    )
+)
+
+window.show()
+sys.exit(app.exec_())</code></pre>
+</article>
+</div>
+
+<h2>8. Что запомнить</h2>
+<div class="grid">
+<article class="s5 wide">
+<h3>Логика PyQt5 в одной схеме</h3>
+<pre><code>QApplication
+      ↓
+Создание окна
+      ↓
+Создание виджетов
+      ↓
+Layout → размещение виджетов
+      ↓
+Signals → обработчики событий
+      ↓
+show()
+      ↓
+app.exec_() → цикл событий</code></pre>
+</article>
+<article class="s5">
+<h3>Главное правило</h3>
+<p>Не размещайте виджеты вручную через <code>move()</code>, если интерфейс можно построить с помощью Layout. Layout автоматически адаптирует интерфейс к изменению размеров окна.</p>
+</article>
+<article class="s5">
+<h3>Qt Designer</h3>
+<p><code>.ui</code> → визуальная форма → <code>pyuic5</code> → Python-код → подключение сигналов в своём классе.</p>
+</article>
+</div>
+
+</main>
+<footer>PyQt5 Cheatsheet • Оконные приложения • Python GUI</footer>
+</body>
+</html>

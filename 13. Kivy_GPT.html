@@ -1,0 +1,1002 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Мобильная разработка с Kivy — Cheatsheet</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Onest:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#EEF3F8;--card:#FFF;--text:#172033;--muted:#607087;--line:#D9E2EC;
+  --code:#0F1A30;--code-text:#E8EEF8;--teal:#0C7C86;--orange:#B9660A;
+  --purple:#5B4BC4;--pink:#B8325A;--green:#3A7D2C;--blue:#2873B8;
+  --red:#B42318;--shadow:0 8px 24px rgba(23,32,51,.07)
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Onest,Arial,sans-serif;line-height:1.55}
+.container{max-width:1180px;margin:auto;padding:0 20px}
+header{padding:42px 0 28px;background:linear-gradient(135deg,#e7f4f5,#f8fafc 55%,#eeeafb);border-bottom:1px solid var(--line)}
+h1{margin:0 0 10px;font-size:clamp(30px,5vw,48px);line-height:1.08}
+.subtitle{color:var(--muted);font-size:17px;max-width:860px}
+.badges{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.badge{background:#fff;border:1px solid var(--line);border-radius:999px;padding:6px 11px;font-size:13px;font-weight:600}
+nav{position:sticky;top:0;z-index:10;background:#172033;border-bottom:2px solid #0C7C86;box-shadow:0 4px 14px rgba(23,32,51,.20)}
+.nav-inner{display:flex;gap:9px;overflow-x:auto;padding:10px 20px}
+nav a{white-space:nowrap;text-decoration:none;color:#fff;background:#30415C;border:1px solid #526580;font-size:13px;font-weight:700;padding:8px 12px;border-radius:8px;transition:.15s ease}
+nav a:hover{background:#0C7C86;color:#fff;border-color:#39B7C0;transform:translateY(-1px)}
+main{padding:28px 0 48px}
+.section-title{margin:35px 0 15px;font-size:25px}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+.card{background:var(--card);border:1px solid var(--line);border-left:5px solid var(--teal);border-radius:12px;padding:20px;box-shadow:var(--shadow)}
+.s1{border-left-color:var(--teal)}.s2{border-left-color:var(--orange)}.s3{border-left-color:var(--purple)}
+.s4{border-left-color:var(--pink)}.s5{border-left-color:var(--green)}.s6{border-left-color:var(--blue)}.s7{border-left-color:var(--red)}
+.card h3{margin:0 0 8px;font-size:19px}.card p{margin:7px 0;color:#405067}
+code,.inline-code{font-family:"JetBrains Mono",monospace;background:#EEF2F6;border-radius:5px;padding:2px 5px;font-size:.9em}
+pre{margin:12px 0 0;background:var(--code);color:var(--code-text);padding:14px 16px;border-radius:9px;overflow:auto;font:13px/1.55 "JetBrains Mono",monospace}
+.tip{margin-top:12px;padding:10px 12px;background:#F5F8FB;border:1px solid var(--line);border-radius:8px;font-size:13px;color:#506078}
+.warn{margin-top:12px;padding:10px 12px;background:#FFF5F4;border:1px solid #F0C8C4;border-radius:8px;font-size:13px;color:#7A271A}
+table{width:100%;border-collapse:collapse;margin-top:10px;font-size:14px}
+th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{background:#F5F7FA;font-weight:700}
+.flow{display:grid;grid-template-columns:repeat(7,1fr);gap:7px;margin-top:12px}
+.step{background:#F5F8FB;border:1px solid var(--line);border-radius:9px;padding:12px 8px;text-align:center;font-size:12px;font-weight:700}
+footer{border-top:1px solid var(--line);padding:25px 0 40px;color:var(--muted);font-size:13px;text-align:center}
+footer a{color:var(--teal);font-weight:700}
+@media(max-width:900px){.flow{grid-template-columns:repeat(4,1fr)}}
+@media(max-width:800px){.grid{grid-template-columns:1fr}}
+@media(max-width:520px){.container{padding:0 14px}.card{padding:16px}.flow{grid-template-columns:1fr 1fr}}
+@media(prefers-color-scheme:dark){
+:root{--bg:#0C1321;--card:#121B2C;--text:#EAF0F8;--muted:#9AA9BD;--line:#26344A;--code:#080F1D;--code-text:#E8EEF8}
+header{background:linear-gradient(135deg,#0D252A,#101827 55%,#191532)}
+nav{background:#050A14;border-bottom-color:#23AEB8}
+nav a{background:#24344E;border-color:#526A8A;color:#fff}
+nav a:hover{background:#0C7C86;border-color:#55D5DC;color:#fff}
+code,.inline-code,.tip,.step,th{background:#182235}
+.card p{color:#AAB8CA}
+.warn{background:#321A1A;border-color:#68302A;color:#FFB4AB}
+}
+</style>
+</head>
+<body>
+
+<header>
+<div class="container">
+<h1>Мобильная разработка<br>с использованием Kivy</h1>
+<div class="subtitle">
+Практическая cheatsheet по созданию мобильных приложений на Python:
+App, Widget, Layout, события, свойства, KV-язык, экраны, изображения,
+проектная структура и сборка приложения в APK с помощью Buildozer.
+</div>
+<div class="badges">
+<span class="badge">Python</span><span class="badge">Kivy</span><span class="badge">KV</span>
+<span class="badge">Widgets</span><span class="badge">Layouts</span><span class="badge">ScreenManager</span>
+<span class="badge">Buildozer</span><span class="badge">Android APK</span>
+</div>
+</div>
+</header>
+
+<nav>
+<div class="nav-inner">
+<a href="#start">Старт</a>
+<a href="#app">App</a>
+<a href="#widgets">Widgets</a>
+<a href="#layouts">Layouts</a>
+<a href="#events">События</a>
+<a href="#properties">Properties</a>
+<a href="#kv">KV</a>
+<a href="#screens">Экраны</a>
+<a href="#graphics">Графика</a>
+<a href="#files">Файлы</a>
+<a href="#structure">Проект</a>
+<a href="#build">APK</a>
+<a href="#spec">buildozer.spec</a>
+<a href="#errors">Ошибки</a>
+</div>
+</nav>
+
+<main class="container">
+
+<h2 class="section-title" id="start">1. Что такое Kivy?</h2>
+<div class="grid">
+<section class="card s1">
+<h3>Kivy</h3>
+<p>Kivy — Python-фреймворк для создания приложений с графическим интерфейсом, включая приложения для Android, iOS и настольных платформ.</p>
+<pre>from kivy.app import App
+
+class MyApp(App):
+    pass
+
+MyApp().run()</pre>
+<div class="tip">Официальная документация описывает Kivy как кроссплатформенный framework для приложений с интерфейсом и touch-взаимодействием.</div>
+</section>
+
+<section class="card s2">
+<h3>Установка</h3>
+<pre>python -m pip install "kivy[base]"</pre>
+<p>Для учебного проекта можно создать виртуальное окружение:</p>
+<pre>python -m venv .venv
+
+# Windows
+.venv\Scripts\activate
+
+# Linux / macOS
+source .venv/bin/activate</pre>
+</section>
+</div>
+
+<h2 class="section-title" id="app">2. Пустое приложение</h2>
+<div class="grid">
+<section class="card s3">
+<h3>Минимальный <code>main.py</code></h3>
+<pre>from kivy.app import App
+
+class MyApp(App):
+
+    def build(self):
+        return None
+
+MyApp().run()</pre>
+</section>
+
+<section class="card s3">
+<h3>Окно с Label</h3>
+<pre>from kivy.app import App
+from kivy.uix.label import Label
+
+class MyApp(App):
+
+    def build(self):
+        return Label(text="Привет, Kivy!")
+
+MyApp().run()</pre>
+</section>
+
+<section class="card s3">
+<h3>Класс приложения</h3>
+<p>Обычно создают собственный класс, наследующий <code>App</code>, а интерфейс возвращают из <code>build()</code>.</p>
+<pre>class MyApp(App):
+
+    def build(self):
+        return Label(
+            text="Моё приложение"
+        )</pre>
+<div class="tip"><code>App.run()</code> запускает жизненный цикл приложения и главный цикл Kivy.</div>
+</section>
+
+<section class="card s3">
+<h3>Точка входа</h3>
+<pre>if __name__ == "__main__":
+    MyApp().run()</pre>
+</section>
+</div>
+
+<h2 class="section-title" id="widgets">3. Основные виджеты</h2>
+<div class="grid">
+<section class="card s1">
+<h3>Label</h3>
+<pre>from kivy.uix.label import Label
+
+label = Label(
+    text="Привет!",
+    font_size=30
+)</pre>
+</section>
+
+<section class="card s1">
+<h3>Button</h3>
+<pre>from kivy.uix.button import Button
+
+button = Button(
+    text="Нажми меня"
+)</pre>
+</section>
+
+<section class="card s1">
+<h3>TextInput</h3>
+<pre>from kivy.uix.textinput import TextInput
+
+input_box = TextInput(
+    hint_text="Введите имя"
+)</pre>
+</section>
+
+<section class="card s1">
+<h3>CheckBox</h3>
+<pre>from kivy.uix.checkbox import CheckBox
+
+check = CheckBox(
+    active=True
+)</pre>
+</section>
+
+<section class="card s1">
+<h3>Slider</h3>
+<pre>from kivy.uix.slider import Slider
+
+slider = Slider(
+    min=0,
+    max=100,
+    value=50
+)</pre>
+</section>
+
+<section class="card s1">
+<h3>Switch</h3>
+<pre>from kivy.uix.switch import Switch
+
+switch = Switch(active=True)</pre>
+</section>
+
+<section class="card s1">
+<h3>Image</h3>
+<pre>from kivy.uix.image import Image
+
+image = Image(
+    source="cat.png"
+)</pre>
+</section>
+
+<section class="card s1">
+<h3>ProgressBar</h3>
+<pre>from kivy.uix.progressbar import ProgressBar
+
+progress = ProgressBar(
+    max=100,
+    value=40
+)</pre>
+</section>
+</div>
+
+<h2 class="section-title" id="layouts">4. Разметка интерфейса — Layouts</h2>
+<div class="grid">
+<section class="card s2">
+<h3>BoxLayout</h3>
+<p>Располагает дочерние виджеты последовательно по вертикали или горизонтали.</p>
+<pre>from kivy.uix.boxlayout import BoxLayout
+
+layout = BoxLayout(
+    orientation="vertical",
+    spacing=10,
+    padding=10
+)</pre>
+</section>
+
+<section class="card s2">
+<h3>Добавление виджетов</h3>
+<pre>layout.add_widget(
+    Label(text="Имя")
+)
+
+layout.add_widget(
+    Button(text="OK")
+)</pre>
+</section>
+
+<section class="card s2">
+<h3>GridLayout</h3>
+<pre>from kivy.uix.gridlayout import GridLayout
+
+layout = GridLayout(
+    cols=2,
+    spacing=5
+)
+
+layout.add_widget(Label(text="Имя"))
+layout.add_widget(TextInput())</pre>
+</section>
+
+<section class="card s2">
+<h3>AnchorLayout</h3>
+<pre>from kivy.uix.anchorlayout import AnchorLayout
+
+layout = AnchorLayout(
+    anchor_x="center",
+    anchor_y="center"
+)</pre>
+</section>
+
+<section class="card s2">
+<h3>FloatLayout</h3>
+<pre>from kivy.uix.floatlayout import FloatLayout
+
+layout = FloatLayout()
+
+button = Button(
+    text="OK",
+    size_hint=(.4, .2),
+    pos_hint={"center_x": .5,
+              "center_y": .5}
+)
+
+layout.add_widget(button)</pre>
+</section>
+
+<section class="card s2">
+<h3>Размер и позиция</h3>
+<pre>widget.size = (200, 80)
+widget.pos = (20, 30)
+
+# относительные значения:
+widget.size_hint = (.5, .2)
+widget.pos_hint = {
+    "center_x": .5
+}</pre>
+</section>
+</div>
+
+<h2 class="section-title" id="events">5. События и обработчики</h2>
+<div class="grid">
+<section class="card s3">
+<h3>Button → on_press</h3>
+<pre>def hello(instance):
+    print("Привет!")
+
+button.bind(
+    on_press=hello
+)</pre>
+</section>
+
+<section class="card s3">
+<h3>Button → on_release</h3>
+<pre>button.bind(
+    on_release=lambda x:
+        print("Нажатие завершено")
+)</pre>
+</section>
+
+<section class="card s3">
+<h3>Полный пример</h3>
+<pre>from kivy.app import App
+from kivy.uix.button import Button
+
+class MyApp(App):
+
+    def build(self):
+        button = Button(text="Нажми")
+
+        button.bind(
+            on_press=self.clicked
+        )
+
+        return button
+
+    def clicked(self, instance):
+        instance.text = "Готово!"
+
+MyApp().run()</pre>
+</section>
+
+<section class="card s3">
+<h3>Событие TextInput</h3>
+<pre>def changed(instance, value):
+    print("Текст:", value)
+
+text_input.bind(
+    text=changed
+)</pre>
+<div class="tip">У Kivy свойства могут быть связаны с callback-функциями через <code>bind()</code>.</div>
+</section>
+</div>
+
+<h2 class="section-title" id="properties">6. Свойства Kivy</h2>
+<div class="grid">
+<section class="card s4">
+<h3>StringProperty</h3>
+<pre>from kivy.properties import StringProperty
+
+class MyWidget(Widget):
+    title = StringProperty("Hello")
+
+widget.title = "Привет"</pre>
+</section>
+
+<section class="card s4">
+<h3>NumericProperty</h3>
+<pre>from kivy.properties import NumericProperty
+
+class Counter(Widget):
+    value = NumericProperty(0)
+
+counter.value += 1</pre>
+</section>
+
+<section class="card s4">
+<h3>BooleanProperty</h3>
+<pre>from kivy.properties import BooleanProperty
+
+class MyWidget(Widget):
+    enabled = BooleanProperty(True)</pre>
+</section>
+
+<section class="card s4">
+<h3>ObjectProperty</h3>
+<pre>from kivy.properties import ObjectProperty
+
+class MainWidget(Widget):
+    button = ObjectProperty(None)</pre>
+</section>
+
+<section class="card s4">
+<h3>Связь свойства</h3>
+<pre>def changed(instance, value):
+    print(value)
+
+counter.bind(
+    value=changed
+)
+
+counter.value = 10</pre>
+</section>
+
+<section class="card s4">
+<h3>Зачем нужны Properties?</h3>
+<p>Они позволяют Kivy отслеживать изменения данных и связывать их с интерфейсом, в том числе с KV-разметкой.</p>
+<pre>value = NumericProperty(0)
+
+# изменение:
+value = 10
+
+# связанные элементы
+# могут отреагировать автоматически</pre>
+</section>
+</div>
+
+<h2 class="section-title" id="kv">7. KV-язык — описание интерфейса отдельно от Python</h2>
+<div class="grid">
+<section class="card s5">
+<h3>main.py</h3>
+<pre>from kivy.app import App
+from kivy.uix.boxlayout import BoxLayout
+
+class MainLayout(BoxLayout):
+    pass
+
+class MyApp(App):
+    pass
+
+MyApp().run()</pre>
+</section>
+
+<section class="card s5">
+<h3>my.kv</h3>
+<pre>&lt;MainLayout&gt;:
+    orientation: "vertical"
+
+    Label:
+        text: "Привет, Kivy!"
+
+    Button:
+        text: "OK"</pre>
+<div class="tip">Если класс приложения называется <code>MyApp</code>, Kivy может автоматически искать файл <code>my.kv</code>.</div>
+</section>
+
+<section class="card s5">
+<h3>on_release в KV</h3>
+<pre>&lt;MainLayout&gt;:
+    Button:
+        text: "Нажми"
+        on_release:
+            app.button_clicked()</pre>
+</section>
+
+<section class="card s5">
+<h3>Метод App</h3>
+<pre>class MyApp(App):
+
+    def button_clicked(self):
+        print("Кнопка нажата")</pre>
+</section>
+
+<section class="card s5">
+<h3>id в KV</h3>
+<pre>&lt;MainLayout&gt;:
+    TextInput:
+        id: name_input
+
+    Button:
+        text: "Привет"
+        on_release:
+            print(name_input.text)</pre>
+</section>
+
+<section class="card s5">
+<h3>Значение свойства в KV</h3>
+<pre>&lt;Label&gt;:
+    font_size: "24sp"
+    color: 0.1, 0.5, 0.8, 1</pre>
+<div class="tip">KV особенно удобен для отделения построения интерфейса от логики Python.</div>
+</section>
+</div>
+
+<h2 class="section-title" id="screens">8. Несколько экранов — ScreenManager</h2>
+<div class="grid">
+<section class="card s6">
+<h3>Создание экранов</h3>
+<pre>from kivy.uix.screenmanager import (
+    Screen, ScreenManager
+)
+
+class MainScreen(Screen):
+    pass
+
+class SettingsScreen(Screen):
+    pass</pre>
+</section>
+
+<section class="card s6">
+<h3>ScreenManager</h3>
+<pre>sm = ScreenManager()
+
+sm.add_widget(
+    MainScreen(name="main")
+)
+
+sm.add_widget(
+    SettingsScreen(name="settings")
+)</pre>
+</section>
+
+<section class="card s6">
+<h3>Переход</h3>
+<pre>sm.current = "settings"</pre>
+</section>
+
+<section class="card s6">
+<h3>Переход из KV</h3>
+<pre>Button:
+    text: "Настройки"
+    on_release:
+        root.manager.current = "settings"</pre>
+</section>
+</div>
+
+<h2 class="section-title" id="graphics">9. Изображения и простая графика</h2>
+<div class="grid">
+<section class="card s1">
+<h3>Изображение</h3>
+<pre>Image:
+    source: "images/logo.png"
+    allow_stretch: True</pre>
+</section>
+
+<section class="card s1">
+<h3>Canvas — Rectangle</h3>
+<pre>from kivy.graphics import Color, Rectangle
+
+with self.canvas:
+    Color(0.2, 0.6, 0.9, 1)
+    Rectangle(
+        pos=self.pos,
+        size=self.size
+    )</pre>
+</section>
+
+<section class="card s1">
+<h3>Canvas — Ellipse</h3>
+<pre>from kivy.graphics import Ellipse
+
+with self.canvas:
+    Ellipse(
+        pos=(50, 50),
+        size=(100, 100)
+    )</pre>
+</section>
+
+<section class="card s1">
+<h3>Ресурс в проекте</h3>
+<pre>assets/
+    logo.png
+    background.jpg
+    icon.png</pre>
+<div class="tip">При упаковке ресурсы должны попасть в APK; это учитывается в настройках <code>source.include_exts</code> Buildozer.</div>
+</section>
+</div>
+
+<h2 class="section-title" id="files">10. Работа с файлами приложения</h2>
+<div class="grid">
+<section class="card s2">
+<h3>Чтение файла</h3>
+<pre>from pathlib import Path
+
+path = Path("data.txt")
+
+if path.exists():
+    text = path.read_text(
+        encoding="utf-8"
+    )
+    print(text)</pre>
+</section>
+
+<section class="card s2">
+<h3>Запись файла</h3>
+<pre>from pathlib import Path
+
+Path("data.txt").write_text(
+    "Привет!",
+    encoding="utf-8"
+)</pre>
+</section>
+
+<section class="card s2">
+<h3>Хранение данных</h3>
+<pre>import json
+
+data = {
+    "theme": "dark",
+    "volume": 80
+}
+
+with open("settings.json", "w",
+          encoding="utf-8") as file:
+    json.dump(
+        data, file,
+        ensure_ascii=False,
+        indent=4
+    )</pre>
+</section>
+
+<section class="card s2">
+<h3>Важно для Android</h3>
+<p>Для мобильного приложения пути и доступ к файлам нужно проектировать с учётом Android-модели хранения и разрешений. Не стоит бездумно использовать произвольные абсолютные пути вроде <code>C:\...</code>.</p>
+</section>
+</div>
+
+<h2 class="section-title" id="structure">11. Рекомендуемая структура проекта</h2>
+<section class="card s3">
+<pre>my_kivy_app/
+│
+├── main.py
+├── my.kv
+├── buildozer.spec
+├── .gitignore
+│
+├── assets/
+│   ├── icon.png
+│   └── logo.png
+│
+└── screens/
+    ├── main_screen.py
+    └── settings_screen.py</pre>
+<div class="tip">Для маленького учебного приложения достаточно <code>main.py</code> + <code>.kv</code>. При росте проекта код интерфейса и логику удобно разделять по модулям.</div>
+</section>
+
+<h2 class="section-title" id="build">12. Сборка Kivy-приложения в APK</h2>
+<section class="card s4">
+<h3>Что используется?</h3>
+<p><b>Buildozer</b> автоматизирует упаковку приложения, а Android-сборка использует toolchain <b>python-for-android</b>. В официальной документации Buildozer для Android описана сборка через <code>buildozer.spec</code>.</p>
+<pre>Python
+   ↓
+Kivy
+   ↓
+Buildozer
+   ↓
+python-for-android
+   ↓
+Android SDK / NDK
+   ↓
+APK / AAB</pre>
+<div class="tip">Buildozer для Android запускается на Linux или macOS; на Windows обычно используют WSL2 с Linux.</div>
+</section>
+
+<h2 class="section-title">13. Windows: подготовка WSL2</h2>
+<div class="grid">
+<section class="card s5">
+<h3>Почему WSL2?</h3>
+<p>Актуальная документация Buildozer указывает, что Windows требует WSL для использования Linux-инструментария Android-сборки. Для проекта рекомендуется работать внутри файловой системы WSL, а не собирать непосредственно из <code>/mnt/c</code>.</p>
+<pre># в Ubuntu / WSL:
+pwd
+
+# пример каталога проекта:
+~/projects/my_kivy_app</pre>
+</section>
+
+<section class="card s5">
+<h3>Установка WSL</h3>
+<pre># PowerShell от администратора
+wsl --install</pre>
+<p>После установки запустите Ubuntu и создайте проект внутри Linux-файловой системы.</p>
+</section>
+
+<section class="card s5">
+<h3>Ubuntu — системные пакеты</h3>
+<pre>sudo apt update
+
+sudo apt install -y \
+git zip unzip openjdk-17-jdk \
+python3-pip python3-virtualenv \
+autoconf libtool pkg-config \
+zlib1g-dev libncurses5-dev \
+libncursesw5-dev libtinfo6 \
+cmake libffi-dev libssl-dev \
+automake autopoint gettext</pre>
+<div class="tip">Набор пакетов зависит от версии Ubuntu; актуальная документация Buildozer содержит отдельные инструкции для Ubuntu 22.04, 24.04 и 26.04.</div>
+</section>
+
+<section class="card s5">
+<h3>Установка Buildozer</h3>
+<pre>python3 -m pip install --user \
+--upgrade buildozer</pre>
+<p>Для конкретной версии Python/Cython следует ориентироваться на текущую инструкцию Buildozer.</p>
+</section>
+</div>
+
+<h2 class="section-title">14. Создание buildozer.spec</h2>
+<section class="card s6">
+<pre>cd ~/projects/my_kivy_app
+
+buildozer init</pre>
+<p>В папке проекта появится файл <code>buildozer.spec</code>. Его нужно отредактировать перед первой сборкой.</p>
+</section>
+
+<h2 class="section-title" id="spec">15. Основные параметры buildozer.spec</h2>
+<section class="card s6">
+<pre>[app]
+
+title = My Kivy App
+package.name = mykivyapp
+package.domain = org.example
+
+source.dir = .
+source.include_exts = py,kv,png,jpg,jpeg,json
+
+version = 1.0
+
+requirements = python3,kivy
+
+orientation = portrait
+
+fullscreen = 0
+
+# иконка:
+# icon.filename = %(source.dir)s/assets/icon.png</pre>
+<table>
+<tr><th>Параметр</th><th>Назначение</th></tr>
+<tr><td><code>title</code></td><td>Название приложения</td></tr>
+<tr><td><code>package.name</code></td><td>Имя Android-пакета</td></tr>
+<tr><td><code>package.domain</code></td><td>Доменная часть идентификатора</td></tr>
+<tr><td><code>source.dir</code></td><td>Папка исходников</td></tr>
+<tr><td><code>source.include_exts</code></td><td>Расширения файлов, включаемых в пакет</td></tr>
+<tr><td><code>requirements</code></td><td>Python-зависимости приложения</td></tr>
+<tr><td><code>orientation</code></td><td>Ориентация экрана</td></tr>
+<tr><td><code>version</code></td><td>Версия приложения</td></tr>
+<tr><td><code>icon.filename</code></td><td>Путь к иконке</td></tr>
+</table>
+<div class="tip">Buildozer использует <code>requirements</code> для определения зависимостей. Для пакетов с нативными расширениями может потребоваться соответствующий recipe python-for-android.</div>
+</section>
+
+<h2 class="section-title">16. Версия приложения</h2>
+<section class="card s1">
+<p>Buildozer умеет извлекать версию из <code>main.py</code>, если в нём есть переменная <code>__version__</code>.</p>
+<pre>__version__ = "1.0.0"
+
+from kivy.app import App
+
+class MyApp(App):
+    pass
+
+MyApp().run()</pre>
+</section>
+
+<h2 class="section-title">17. Первая debug-сборка APK</h2>
+<section class="card s4">
+<pre>cd ~/projects/my_kivy_app
+
+buildozer -v android debug</pre>
+<p>При первой сборке Buildozer скачивает необходимые Android-инструменты и зависимости, поэтому процесс может быть долгим.</p>
+<div class="tip">После успешной сборки результат появляется в каталоге <code>bin/</code>; в зависимости от конфигурации это может быть APK или AAB.</div>
+</section>
+
+<h2 class="section-title">18. Установка APK на телефон</h2>
+<div class="grid">
+<section class="card s2">
+<h3>Через ADB</h3>
+<pre>adb install -r \
+bin/mykivyapp-1.0-arm64-v8a-debug.apk</pre>
+<p>Конкретное имя файла зависит от результата сборки.</p>
+</section>
+
+<section class="card s2">
+<h3>Через Buildozer</h3>
+<pre>buildozer android deploy run logcat</pre>
+<p>Команда позволяет развернуть приложение на подключённом устройстве, запустить его и получить logcat после предварительной компиляции.</p>
+</section>
+
+<section class="card s2">
+<h3>APK вручную</h3>
+<p>Можно скопировать APK из <code>bin/</code> на Android-смартфон и установить его обычным способом, если настройки безопасности устройства это позволяют.</p>
+</section>
+
+<section class="card s2">
+<h3>ADB-проверка устройства</h3>
+<pre>adb devices</pre>
+<div class="tip">Если устройство не отображается, сначала проверьте USB debugging и драйверы/ADB.</div>
+</section>
+</div>
+
+<h2 class="section-title">19. Release-сборка</h2>
+<section class="card s7">
+<pre>buildozer android release</pre>
+<p>Release-сборка предназначена для подготовки релизного пакета. Для публикации в магазинах потребуется корректно настроенная подпись и соответствующая конфигурация Android-пакета.</p>
+<div class="warn"><b>Не путайте debug APK и релизный пакет:</b> debug удобен для разработки и тестирования; публикационный пакет требует дополнительных шагов с подписью и требованиями магазина.</div>
+</section>
+
+<h2 class="section-title">20. Зависимости в APK</h2>
+<section class="card s3">
+<pre>[app]
+
+requirements = python3,kivy,requests</pre>
+<p>Если приложение использует библиотеку, она должна быть указана в <code>requirements</code>, если она должна попасть в Android-пакет.</p>
+<pre># пример Python:
+import requests
+
+response = requests.get(
+    "https://example.com"
+)</pre>
+<div class="warn">Не каждая Python-библиотека автоматически совместима с Android. Пакеты с нативными расширениями могут требовать recipe python-for-android.</div>
+</section>
+
+<h2 class="section-title" id="errors">21. Типичные проблемы при сборке</h2>
+<div class="grid">
+<section class="card s7">
+<h3>Buildozer не запускается в Windows</h3>
+<p>Проверьте, что используется WSL2 и Linux-среда для Android-сборки.</p>
+<pre>wsl --status</pre>
+</section>
+
+<section class="card s7">
+<h3>Сборка очень медленная</h3>
+<p>Первая сборка скачивает SDK, NDK и другие компоненты. При WSL рекомендуется держать проект в файловой системе Linux, например в <code>~/projects/</code>, а не в <code>/mnt/c/</code>.</p>
+</section>
+
+<section class="card s7">
+<h3>Модуль не собирается</h3>
+<p>Проверьте <code>requirements</code> и наличие поддержки нужного пакета в python-for-android.</p>
+<pre>requirements = python3,kivy,my_package</pre>
+</section>
+
+<section class="card s7">
+<h3>APK не содержит картинку</h3>
+<p>Проверьте расширения в <code>source.include_exts</code>.</p>
+<pre>source.include_exts = py,kv,png,jpg,jpeg</pre>
+</section>
+
+<section class="card s7">
+<h3>Ошибка AIDL / Android SDK</h3>
+<p>Повторите запуск Buildozer и внимательно прочитайте сообщение об отсутствующем Android-инструменте. При проблемах с SDK документация Buildozer рекомендует проверить каталог <code>~/.buildozer</code> и заново получить необходимые компоненты.</p>
+</section>
+
+<section class="card s7">
+<h3>Смотреть полный лог</h3>
+<pre>buildozer -v android debug</pre>
+<p>Ключ <code>-v</code> полезен при диагностике проблем сборки.</p>
+</section>
+</div>
+
+<h2 class="section-title">22. Мини-проект: счётчик</h2>
+<section class="card s1">
+<pre># main.py
+from kivy.app import App
+from kivy.uix.boxlayout import BoxLayout
+from kivy.properties import NumericProperty
+
+class MainLayout(BoxLayout):
+
+    counter = NumericProperty(0)
+
+    def increment(self):
+        self.counter += 1
+
+    def decrement(self):
+        self.counter -= 1
+
+class MyApp(App):
+    pass
+
+MyApp().run()</pre>
+<pre># my.kv
+&lt;MainLayout&gt;:
+    orientation: "vertical"
+    spacing: 10
+    padding: 20
+
+    Label:
+        text: str(root.counter)
+        font_size: "48sp"
+
+    BoxLayout:
+        Button:
+            text: "-1"
+            on_release: root.decrement()
+
+        Button:
+            text: "+1"
+            on_release: root.increment()</pre>
+</section>
+
+<h2 class="section-title">23. Полный путь от Python до APK</h2>
+<section class="card s5">
+<div class="flow">
+<div class="step">1<br>Python</div>
+<div class="step">2<br>Kivy UI</div>
+<div class="step">3<br>KV</div>
+<div class="step">4<br>Тест на ПК</div>
+<div class="step">5<br>buildozer.spec</div>
+<div class="step">6<br>Build</div>
+<div class="step">7<br>APK</div>
+</div>
+<pre>python main.py
+       ↓
+работает?
+       ↓
+buildozer init
+       ↓
+настроить buildozer.spec
+       ↓
+buildozer -v android debug
+       ↓
+bin/*.apk</pre>
+</section>
+
+<h2 class="section-title">24. Быстрая таблица Kivy API</h2>
+<section class="card s6">
+<table>
+<tr><th>Элемент</th><th>Назначение</th><th>Пример</th></tr>
+<tr><td><code>App</code></td><td>Основной класс приложения</td><td><code>class MyApp(App)</code></td></tr>
+<tr><td><code>Widget</code></td><td>Базовый графический элемент</td><td><code>class MyWidget(Widget)</code></td></tr>
+<tr><td><code>Label</code></td><td>Текст</td><td><code>Label(text="Hi")</code></td></tr>
+<tr><td><code>Button</code></td><td>Кнопка</td><td><code>Button(text="OK")</code></td></tr>
+<tr><td><code>TextInput</code></td><td>Ввод текста</td><td><code>TextInput()</code></td></tr>
+<tr><td><code>BoxLayout</code></td><td>Линейная разметка</td><td><code>orientation="vertical"</code></td></tr>
+<tr><td><code>GridLayout</code></td><td>Сетка</td><td><code>cols=2</code></td></tr>
+<tr><td><code>FloatLayout</code></td><td>Относительное позиционирование</td><td><code>pos_hint={...}</code></td></tr>
+<tr><td><code>ScreenManager</code></td><td>Управление экранами</td><td><code>sm.current="main"</code></td></tr>
+<tr><td><code>StringProperty</code></td><td>Наблюдаемая строка</td><td><code>title = StringProperty()</code></td></tr>
+<tr><td><code>NumericProperty</code></td><td>Наблюдаемое число</td><td><code>value = NumericProperty(0)</code></td></tr>
+<tr><td><code>bind()</code></td><td>Подписка на изменение свойства/событие</td><td><code>widget.bind(...)</code></td></tr>
+<tr><td><code>build()</code></td><td>Создание дерева интерфейса</td><td><code>return root</code></td></tr>
+<tr><td><code>run()</code></td><td>Запуск приложения</td><td><code>MyApp().run()</code></td></tr>
+</table>
+</section>
+
+<h2 class="section-title">25. Главное, что нужно запомнить</h2>
+<section class="card s4">
+<pre>APP
+ ↓
+ROOT WIDGET
+ ↓
+LAYOUT
+ ↓
+WIDGETS
+ ↓
+EVENTS / PROPERTIES
+ ↓
+KV
+ ↓
+TEST
+ ↓
+BUILDOZER
+ ↓
+APK</pre>
+<div class="tip">
+Для начала разработки достаточно знать Python, базовые виджеты и Layouts.
+После этого изучайте KV-язык, Properties, события и ScreenManager.
+Когда приложение работает на компьютере — переходите к Buildozer и Android-сборке.
+</div>
+</section>
+
+</main>
+
+<footer>
+<div class="container">
+Kivy Mobile Development Cheatsheet ·
+<a href="https://kivy.org/doc/master/">Kivy Documentation</a> ·
+<a href="https://buildozer.readthedocs.io/en/latest/">Buildozer Documentation</a> ·
+<a href="https://python-for-android.readthedocs.io/">python-for-android</a>
+</div>
+</footer>
+
+</body>
+</html>

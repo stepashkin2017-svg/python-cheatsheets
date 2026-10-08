@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Python turtle — шпаргалка</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;700;800&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+:root{--bg:#EEF3F8;--card:#FFFFFF;--ink:#13203A;--mute:#5A6A85;--line:#D5DEEA;--a1:#0C7C86;--a2:#B9660A;--a3:#5B4BC4;--a4:#B8325A;--a5:#3A7D2C;--code:#0F1A30;--ct:#E3EAF6;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0B1220;--card:#131D31;--ink:#E6ECF7;--mute:#9AABC6;--line:#27344F;--a1:#4FD1C5;--a2:#F2B25C;--a3:#A99BFF;--a4:#FF8FB0;--a5:#8FD97C;--code:#080F1D}}
+:root[data-theme="dark"]{--bg:#0B1220;--card:#131D31;--ink:#E6ECF7;--mute:#9AABC6;--line:#27344F;--a1:#4FD1C5;--a2:#F2B25C;--a3:#A99BFF;--a4:#FF8FB0;--a5:#8FD97C;--code:#080F1D}
+html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 60px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 Onest,system-ui,Arial,sans-serif}
+header{padding:48px 20px 28px;max-width:1180px;margin:0 auto}
+h1{font-size:clamp(30px,5vw,52px);line-height:1.05;margin:0 0 12px;font-weight:800;letter-spacing:-.02em}
+header p{margin:0;color:var(--mute);max-width:64ch}
+nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);border-bottom:1px solid var(--line);display:flex;gap:8px;padding:10px 20px;overflow-x:auto}
+nav a{color:var(--ink);text-decoration:none;font-weight:600;padding:6px 14px;border-radius:99px;border:1px solid var(--line);white-space:nowrap}
+nav a:hover,nav a:focus-visible{background:var(--ink);color:var(--bg);outline:none}
+main{max-width:1180px;margin:0 auto;padding:8px 20px 60px}
+h2{font-size:28px;margin:44px 0 6px}
+.sub{color:var(--mute);margin:0 0 18px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,340px),1fr));gap:16px}
+article{background:var(--card);border:1px solid var(--line);border-left:5px solid var(--c,var(--a1));border-radius:10px;padding:16px 18px;min-width:0}
+.s1{--c:var(--a1)}.s2{--c:var(--a2)}.s3{--c:var(--a3)}.s4{--c:var(--a4)}.s5{--c:var(--a5)}
+h3{margin:0 0 6px;font-size:17px}
+article p{margin:0 0 10px;color:var(--mute);font-size:14.5px}
+pre{margin:0;background:var(--code);color:var(--ct);border-radius:8px;padding:12px 14px;overflow-x:auto;font:400 13px/1.55 'JetBrains Mono',ui-monospace,Consolas,monospace}
+pre+pre{margin-top:8px}
+i.k{color:#FFB454;font-style:normal;font-weight:600}i.s{color:#8EE6A0;font-style:normal}i.c{color:#7F90B0;font-style:italic}i.n{color:#7FC4FF;font-style:normal}
+.wide{grid-column:1/-1}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;padding:7px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{color:var(--mute);font-weight:600}
+td code,p code,.sub code,footer code,header code{font:500 13px 'JetBrains Mono',monospace;background:var(--bg);padding:1px 6px;border-radius:4px}
+.tw{overflow-x:auto}
+footer{color:var(--mute);font-size:13px;text-align:center;padding:0 20px 30px}
+</style>
+</head>
+<body>
+<header>
+<h1>Модуль turtle</h1>
+<p>От линий и фигур до анимации и обработки событий. Примеры запускаются на вашем компьютере (нужен установленный <code>tkinter</code>, он есть в стандартной сборке Python).</p>
+</header>
+<nav><a href="#start">Старт</a><a href="#move">Движение</a><a href="#pen">Перо и цвет</a><a href="#shapes">Фигуры и текст</a><a href="#screen">Экран</a><a href="#events">События</a><a href="#multi">Несколько черепах</a><a href="#proj">Мини-проекты</a></nav>
+<main>
+
+<h2 id="start">Старт</h2>
+<p class="sub">Черепаха — это курсор, который двигается по холсту и рисует за собой линию. Есть два стиля: функции модуля и объекты.</p>
+<div class="grid">
+<article class="s1"><h3>Минимальная программа</h3>
+<pre><code>import turtle
+
+t = turtle.Turtle()    # создаём черепаху
+t.forward(100)         # вперёд на 100 пикселей
+turtle.done()          # окно остаётся открытым</code></pre></article>
+
+<article class="s1"><h3>Объектный стиль</h3><p>Рекомендуется: отдельный объект экрана и одна или несколько черепах.</p>
+<pre><code>import turtle
+screen = turtle.Screen()
+t = turtle.Turtle()
+t.fd(80)
+screen.mainloop()</code></pre></article>
+
+<article class="s1"><h3>Процедурный стиль</h3><p>Команды модуля работают с «безымянной» черепахой.</p>
+<pre><code>from turtle import *
+forward(100)
+left(90)
+forward(50)
+done()</code></pre></article>
+
+<article class="s1"><h3>Завершение</h3>
+<pre><code>turtle.done()           # ждать закрытия окна
+screen.mainloop()       # то же для объекта экрана
+screen.exitonclick()    # закрыть по клику
+screen.bye()            # закрыть окно программно</code></pre></article>
+</div>
+
+<h2 id="move">Движение и положение</h2>
+<p class="sub">Начало координат — центр окна <code>(0, 0)</code>. Ось X вправо, Y вверх. Угол 0° — направо, положительный поворот — против часовой стрелки.</p>
+<div class="grid">
+<article class="s2"><h3>Вперёд, назад, повороты</h3>
+<pre><code>t.forward(100)   # fd — вперёд
+t.backward(50)   # bk — назад
+t.left(90)       # lt — влево на 90°
+t.right(45)      # rt — вправо на 45°</code></pre></article>
+
+<article class="s2"><h3>Перейти в точку</h3>
+<pre><code>t.goto(100, 50)    # в координаты (x, y)
+t.setx(-30)        # только x
+t.sety(40)         # только y
+t.home()           # в (0, 0), курс вправо</code></pre></article>
+
+<article class="s2"><h3>Направление</h3>
+<pre><code>t.setheading(90)   # seth — смотреть вверх
+t.heading()        # текущий угол
+t.towards(100, 0)  # угол на точку</code></pre></article>
+
+<article class="s2"><h3>Где я</h3>
+<pre><code>t.pos()            # (x, y)
+t.xcor(), t.ycor() # по отдельности
+t.distance(0, 0)   # расстояние до точки
+t.distance(other)  # до другой черепахи</code></pre></article>
+
+<article class="s2"><h3>Отмена и очистка</h3>
+<pre><code>t.undo()      # отменить последнее действие
+t.clear()     # стереть рисунок, остаться на месте
+t.reset()     # стереть и вернуть всё по умолчанию
+screen.clear()   # очистить весь экран</code></pre></article>
+
+<article class="s2"><h3>Скорость</h3><p>От 1 (медленно) до 10 (быстро), 0 — без анимации.</p>
+<pre><code>t.speed(0)         # мгновенно
+t.speed("fast")    # слова: slowest, slow, normal, fast, fastest
+t.speed()          # узнать текущую</code></pre></article>
+</div>
+
+<h2 id="pen">Перо и цвет</h2>
+<div class="grid">
+<article class="s3"><h3>Поднять и опустить перо</h3><p>Без опущенного пера черепаха двигается, но не рисует.</p>
+<pre><code>t.penup()      # pu — не рисовать
+t.goto(-100, 0)
+t.pendown()    # pd — рисовать
+t.isdown()     # True/False</code></pre></article>
+
+<article class="s3"><h3>Толщина линии</h3>
+<pre><code>t.pensize(5)     # то же что width(5)
+t.pensize()      # узнать</code></pre></article>
+
+<article class="s3"><h3>Цвета</h3><p>Имя, hex-строка или RGB-кортеж. Для чисел 0–255 включите <code>colormode(255)</code>.</p>
+<pre><code>t.pencolor("red")          # цвет линии
+t.fillcolor("#ffcc00")     # цвет заливки
+t.color("blue", "yellow")  # линия, заливка
+turtle.colormode(255)
+t.pencolor((30, 144, 255))
+screen.bgcolor("black")    # фон</code></pre></article>
+
+<article class="s3"><h3>Заливка фигуры</h3><p>Всё, что нарисовано между <code>begin_fill</code> и <code>end_fill</code>, заливается.</p>
+<pre><code>t.color("green", "lightgreen")
+t.begin_fill()
+for _ in range(3):
+    t.fd(100)
+    t.lt(120)
+t.end_fill()</code></pre></article>
+
+<article class="s3"><h3>Видимость черепахи</h3>
+<pre><code>t.hideturtle()   # ht — спрятать курсор
+t.showturtle()   # st — показать
+t.isvisible()    # True/False</code></pre></article>
+
+<article class="s3"><h3>Случайные цвета</h3>
+<pre><code>import random
+turtle.colormode(255)
+t.pencolor(random.randint(0, 255),
+           random.randint(0, 255),
+           random.randint(0, 255))</code></pre></article>
+</div>
+
+<h2 id="shapes">Графические примитивы и текст</h2>
+<div class="grid">
+<article class="s4"><h3>Отрезок и ломаная</h3>
+<pre><code>t.goto(0, 0)
+t.pendown()
+t.goto(100, 100)   # линия в точку
+t.goto(150, 0)     # продолжение</code></pre></article>
+
+<article class="s4"><h3>Квадрат и многоугольник</h3><p>Для правильного <code>n</code>-угольника угол поворота равен <code>360 / n</code>.</p>
+<pre><code>for _ in range(4):        # квадрат
+    t.fd(100); t.lt(90)
+
+n = 6                     # шестиугольник
+for _ in range(n):
+    t.fd(60); t.lt(360 / n)</code></pre></article>
+
+<article class="s4"><h3>Звезда</h3>
+<pre><code>for _ in range(5):
+    t.fd(150)
+    t.rt(144)    # пятиконечная
+# 8-конечная: угол 135, 8 повторов</code></pre></article>
+
+<article class="s4"><h3>Окружность, дуга, многоугольник</h3><p><code>circle(радиус, угол, шаги)</code>. Радиус положительный — центр слева от черепахи.</p>
+<pre><code>t.circle(50)           # окружность
+t.circle(50, 180)      # полуокружность
+t.circle(50, steps=5)  # пятиугольник
+t.circle(-50)          # в другую сторону</code></pre></article>
+
+<article class="s4"><h3>Точка</h3>
+<pre><code>t.dot(20, "red")   # круг диаметром 20</code></pre>
+<pre><code>for x in range(-100, 101, 50):
+    t.penup(); t.goto(x, 0)
+    t.dot(15, "orange")</code></pre></article>
+
+<article class="s4"><h3>Штамп</h3><p>Оставляет отпечаток формы черепахи на холсте.</p>
+<pre><code>t.shape("turtle")
+t.stamp()          # вернёт id отпечатка
+t.fd(40)
+t.clearstamps()    # стереть все штампы</code></pre></article>
+
+<article class="s4"><h3>Спираль</h3>
+<pre><code>t.speed(0)
+for i in range(80):
+    t.fd(i * 3)
+    t.rt(91)</code></pre></article>
+
+<article class="s4"><h3>Текст</h3><p><code>write(текст, move, align, font)</code>. Выравнивание: <code>"left"</code>, <code>"center"</code>, <code>"right"</code>.</p>
+<pre><code>t.penup(); t.goto(0, 100)
+t.write("Привет, turtle!", align="center",
+        font=("Arial", 18, "bold"))</code></pre></article>
+
+<article class="s4 wide"><h3>Шпаргалка команд</h3><div class="tw"><table>
+<tr><th>Команда</th><th>Сокращение</th><th>Действие</th></tr>
+<tr><td><code>forward(d)</code> / <code>backward(d)</code></td><td><code>fd</code> / <code>bk</code></td><td>Двигаться вперёд / назад</td></tr>
+<tr><td><code>left(a)</code> / <code>right(a)</code></td><td><code>lt</code> / <code>rt</code></td><td>Повернуть</td></tr>
+<tr><td><code>penup()</code> / <code>pendown()</code></td><td><code>pu</code> / <code>pd</code></td><td>Поднять / опустить перо</td></tr>
+<tr><td><code>pensize(n)</code></td><td><code>width</code></td><td>Толщина линии</td></tr>
+<tr><td><code>setheading(a)</code></td><td><code>seth</code></td><td>Задать направление</td></tr>
+<tr><td><code>goto(x, y)</code></td><td><code>setpos</code></td><td>Переместиться в точку</td></tr>
+<tr><td><code>hideturtle()</code> / <code>showturtle()</code></td><td><code>ht</code> / <code>st</code></td><td>Спрятать / показать</td></tr>
+</table></div></article>
+</div>
+
+<h2 id="screen">Экран и анимация</h2>
+<div class="grid">
+<article class="s5"><h3>Окно</h3>
+<pre><code>screen = turtle.Screen()
+screen.setup(800, 600)        # размер окна
+screen.title("Мой рисунок")
+screen.bgcolor("#101820")
+screen.bgpic("map.gif")       # фоновая картинка (gif)</code></pre></article>
+
+<article class="s5"><h3>Свои координаты</h3><p>Задаёт область: левый нижний и правый верхний углы.</p>
+<pre><code>screen.setworldcoordinates(0, 0, 100, 100)
+# теперь (0,0) — левый нижний угол</code></pre></article>
+
+<article class="s5"><h3>Ввод через диалог</h3>
+<pre><code>name = screen.textinput("Имя", "Как вас зовут?")
+n = screen.numinput("Углы", "Сколько?", 5,
+                    minval=3, maxval=20)</code></pre></article>
+
+<article class="s5"><h3>Быстрая отрисовка: tracer и update</h3><p><code>tracer(0)</code> отключает автоперерисовку, <code>update()</code> показывает кадр целиком. Так делают плавную анимацию.</p>
+<pre><code>screen.tracer(0)
+# ... много команд рисования ...
+screen.update()</code></pre></article>
+
+<article class="s5"><h3>Размеры окна</h3>
+<pre><code>screen.window_width()    # ширина
+screen.window_height()   # высота</code></pre></article>
+
+<article class="s5"><h3>Анимация по таймеру</h3><p><code>ontimer(функция, мс)</code> вызывает функцию через заданное время. Если вызвать себя снова — получится цикл кадров.</p>
+<pre><code>def tick():
+    t.fd(3)
+    t.rt(2)
+    screen.update()
+    screen.ontimer(tick, 30)   # ~33 кадра/с
+screen.tracer(0)
+tick()
+screen.mainloop()</code></pre></article>
+</div>
+
+<h2 id="events">Обработка событий</h2>
+<p class="sub">Сначала включите приём событий: <code>screen.listen()</code>. Обработчик передаётся <b>без скобок</b>. Цикл событий запускает <code>mainloop()</code>.</p>
+<div class="grid">
+<article class="s1"><h3>Нажатие клавиши</h3><p><code>onkey</code> сработает при отпускании, <code>onkeypress</code> — при нажатии (и повторяется при удержании).</p>
+<pre><code>def go_up():
+    t.sety(t.ycor() + 20)
+
+screen.listen()
+screen.onkey(go_up, "Up")
+screen.onkeypress(go_up, "w")
+screen.mainloop()</code></pre></article>
+
+<article class="s1"><h3>Имена клавиш</h3>
+<pre><code>"Up" "Down" "Left" "Right"
+"space" "Return" "Escape" "BackSpace"
+"a" "b" … "1" "2" …      # символы
+"F1" … "F12"
+screen.onkeyrelease(f, "a")  # отпускание</code></pre></article>
+
+<article class="s1"><h3>Клик по экрану</h3><p>Обработчик получает координаты <code>x, y</code>. Третий аргумент <code>btn</code>: 1 — левая, 2 — средняя, 3 — правая кнопка.</p>
+<pre><code>def draw(x, y):
+    t.goto(x, y)
+
+screen.onscreenclick(draw)
+screen.onscreenclick(lambda x, y: t.dot(10, "red"), 3)</code></pre></article>
+
+<article class="s1"><h3>Клик по черепахе</h3>
+<pre><code>def hit(x, y):
+    t.color("red")
+
+t.onclick(hit)</code></pre></article>
+
+<article class="s1"><h3>Перетаскивание</h3><p>Классический приём: <code>goto</code> как обработчик.</p>
+<pre><code>t.ondrag(t.goto)    # тащим черепаху мышью
+t.onrelease(lambda x, y: print("отпущена"))</code></pre></article>
+
+<article class="s1"><h3>Таймер</h3>
+<pre><code>screen.ontimer(f, 1000)   # один раз через 1 с
+# периодически — вызовите ontimer внутри f</code></pre></article>
+
+<article class="s1"><h3>Выход по клавише</h3>
+<pre><code>screen.listen()
+screen.onkey(screen.bye, "Escape")</code></pre></article>
+
+<article class="s1"><h3>Состояние через global</h3><p>Обработчики не получают аргументов клавиш, поэтому общие данные хранят в переменных.</p>
+<pre><code>score = 0
+def add():
+    global score
+    score += 1
+    t.clear()
+    t.write(score, font=("Arial", 20, "normal"))
+screen.onkey(add, "space")</code></pre></article>
+</div>
+
+<h2 id="multi">Несколько черепах и формы</h2>
+<div class="grid">
+<article class="s2"><h3>Форма и размер</h3><p>Встроенные формы: <code>"arrow"</code>, <code>"turtle"</code>, <code>"circle"</code>, <code>"square"</code>, <code>"triangle"</code>, <code>"classic"</code>.</p>
+<pre><code>t.shape("turtle")
+t.shapesize(2, 3)          # растянуть: ширина, длина
+t.shapesize(outline=4)     # толщина контура
+t.turtlesize(1)            # синоним</code></pre></article>
+
+<article class="s2"><h3>Несколько черепах</h3>
+<pre><code>a = turtle.Turtle(); a.color("red")
+b = turtle.Turtle(); b.color("blue")
+b.penup(); b.goto(0, 80); b.pendown()
+a.fd(100); b.fd(100)</code></pre></article>
+
+<article class="s2"><h3>Своя форма</h3><p>Изображение в формате <code>.gif</code> или многоугольник по точкам.</p>
+<pre><code>screen.register_shape("hero.gif")
+t.shape("hero.gif")
+
+screen.register_shape("rocket", ((0, 20), (8, -10), (-8, -10)))
+t.shape("rocket")</code></pre></article>
+
+<article class="s2"><h3>Копирование</h3>
+<pre><code>c = t.clone()      # копия с теми же настройками
+c.rt(90)</code></pre></article>
+
+<article class="s2"><h3>Столкновения</h3><p>Расстояние между центрами — простейший способ проверки.</p>
+<pre><code>if player.distance(enemy) &lt; 20:
+    print("столкновение!")</code></pre></article>
+</div>
+
+<h2 id="proj">Мини-проекты</h2>
+<div class="grid">
+<article class="s3 wide"><h3>Рисовалка: мышь и клавиши</h3><p>Тащим черепаху мышью, цвет и толщина меняются клавишами.</p>
+<pre><code>import turtle
+
+screen = turtle.Screen()
+screen.setup(800, 600)
+t = turtle.Turtle()
+t.speed(0); t.pensize(3)
+
+colors = {"r": "red", "g": "green", "b": "blue", "k": "black"}
+
+def set_color(c):
+    return lambda: t.pencolor(c)         # фабрика обработчиков
+
+def thicker(): t.pensize(t.pensize() + 1)
+def thinner(): t.pensize(max(1, t.pensize() - 1))
+def clear():   t.clear()
+
+t.ondrag(t.goto)                         # рисуем перетаскиванием
+for key, c in colors.items():
+    screen.onkey(set_color(c), key)
+screen.onkey(thicker, "plus")
+screen.onkey(thinner, "minus")
+screen.onkey(clear, "c")
+screen.listen()
+screen.mainloop()</code></pre></article>
+
+<article class="s4 wide"><h3>Игра: поймай цель</h3><p>Игрок движется стрелками, цель появляется в случайном месте, очки растут при касании.</p>
+<pre><code>import turtle, random
+
+screen = turtle.Screen()
+screen.setup(600, 600); screen.tracer(0)
+
+player = turtle.Turtle("turtle"); player.penup(); player.color("green")
+target = turtle.Turtle("circle"); target.penup(); target.color("red")
+target.goto(random.randint(-250, 250), random.randint(-250, 250))
+pen = turtle.Turtle(visible=False); pen.penup(); pen.goto(0, 260)
+
+score = 0
+def show():
+    pen.clear()
+    pen.write(f"Очки: {score}", align="center", font=("Arial", 16, "bold"))
+
+def move(dx, dy):
+    return lambda: player.goto(player.xcor() + dx, player.ycor() + dy)
+
+screen.listen()
+screen.onkeypress(move(0, 20), "Up")
+screen.onkeypress(move(0, -20), "Down")
+screen.onkeypress(move(-20, 0), "Left")
+screen.onkeypress(move(20, 0), "Right")
+
+def loop():
+    global score
+    if player.distance(target) &lt; 20:        # столкновение
+        score += 1
+        target.goto(random.randint(-250, 250), random.randint(-250, 250))
+        show()
+    screen.update()
+    screen.ontimer(loop, 30)
+
+show(); loop()
+screen.mainloop()</code></pre></article>
+
+<article class="s5 wide"><h3>Часы: анимация по таймеру</h3>
+<pre><code>import turtle, time
+
+screen = turtle.Screen(); screen.tracer(0); screen.bgcolor("black")
+t = turtle.Turtle(visible=False); t.penup(); t.color("white")
+
+def tick():
+    t.clear()
+    t.write(time.strftime("%H:%M:%S"), align="center", font=("Courier", 40, "bold"))
+    screen.update()
+    screen.ontimer(tick, 1000)
+
+tick()
+screen.mainloop()</code></pre></article>
+</div>
+</main>
+<footer>Совет: для быстрых рисунков ставьте <code>speed(0)</code> или <code>tracer(0)</code> и вызывайте <code>update()</code> в конце.</footer>
+<script>
+document.querySelectorAll('pre code').forEach(function(c){
+var t=c.textContent;
+c.innerHTML=t.replace(/[&<>]/g,function(m){return {'&':'&amp;','<':'&lt;','>':'&gt;'}[m]})
+.replace(/(#.*$)|("[^"\n]*"|'[^'\n]*')|\b(import|from|def|return|global|lambda|if|else|for|in|and|or|not|max|True|False|None)\b|\b(\d+)\b/gm,function(m,c1,s,k){
+return '<i class="'+(c1?'c':s?'s':k?'k':'n')+'">'+m+'</i>'});
+});
+</script>
+</body>
+</html>

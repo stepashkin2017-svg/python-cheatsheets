@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Pillow (PIL) — шпаргалка</title>
+<style>
+:root{--bg:#EEF3F8;--card:#FFFFFF;--ink:#13203A;--mute:#5A6A85;--line:#D5DEEA;--a1:#0C7C86;--a2:#B9660A;--a3:#5B4BC4;--a4:#B8325A;--a5:#3A7D2C;--code:#0F1A30;--ct:#E3EAF6}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0B1220;--card:#131D31;--ink:#E6ECF7;--mute:#9AABC6;--line:#27344F;--a1:#4FD1C5;--a2:#F2B25C;--a3:#A99BFF;--a4:#FF8FB0;--a5:#8FD97C;--code:#080F1D}}
+:root[data-theme="dark"]{--bg:#0B1220;--card:#131D31;--ink:#E6ECF7;--mute:#9AABC6;--line:#27344F;--a1:#4FD1C5;--a2:#F2B25C;--a3:#A99BFF;--a4:#FF8FB0;--a5:#8FD97C;--code:#080F1D}
+*{box-sizing:border-box}
+html{scroll-padding-top:70px}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 system-ui,-apple-system,"Segoe UI",Arial,sans-serif}
+header{padding:48px 20px 28px;max-width:1180px;margin:0 auto}
+h1{font-size:clamp(30px,5vw,52px);line-height:1.05;margin:0 0 12px;font-weight:800;letter-spacing:-.02em}
+header p{margin:0;color:var(--mute);max-width:72ch}
+nav{position:sticky;top:0;z-index:5;background:color-mix(in srgb,var(--bg) 94%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);display:flex;gap:8px;padding:10px 20px;overflow-x:auto}
+nav a{color:var(--ink);text-decoration:none;font-weight:600;padding:6px 14px;border-radius:99px;border:1px solid var(--line);white-space:nowrap}
+nav a:hover,nav a:focus-visible{background:var(--ink);color:var(--bg);outline:none}
+main{max-width:1180px;margin:0 auto;padding:8px 20px 60px}
+h2{font-size:28px;margin:44px 0 6px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+h2 code{font:600 15px ui-monospace,SFMono-Regular,Consolas,monospace;background:var(--ink);color:var(--bg);padding:3px 10px;border-radius:6px}
+.sub{color:var(--mute);margin:0 0 18px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,340px),1fr));gap:16px}
+article{background:var(--card);border:1px solid var(--line);border-left:5px solid var(--c,var(--a1));border-radius:10px;padding:16px 18px;min-width:0}
+.s1{--c:var(--a1)}.s2{--c:var(--a2)}.s3{--c:var(--a3)}.s4{--c:var(--a4)}.s5{--c:var(--a5)}
+h3{margin:0 0 6px;font-size:17px}
+article p{margin:0 0 10px;color:var(--mute);font-size:14.5px}
+article ul{margin:0 0 10px;padding-left:20px;color:var(--mute);font-size:14.5px}
+pre{margin:0;background:var(--code);color:var(--ct);border-radius:8px;padding:12px 14px;overflow-x:auto;font:400 13px/1.55 ui-monospace,SFMono-Regular,Consolas,monospace}
+.wide{grid-column:1/-1}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;padding:7px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{color:var(--mute);font-weight:600}
+td code,p code,li code,.sub code,footer code,header code{font:500 13px ui-monospace,SFMono-Regular,Consolas,monospace;background:var(--bg);padding:1px 6px;border-radius:4px}
+.tw{overflow-x:auto}
+.note{padding:10px 12px;border-radius:8px;background:var(--bg);border:1px dashed var(--line);color:var(--mute);font-size:14px}
+footer{color:var(--mute);font-size:13px;text-align:center;padding:0 20px 30px}
+</style>
+</head>
+<body>
+<header>
+<h1>Разработка приложений <span style="white-space:nowrap">Pillow (PIL)</span></h1>
+<p>Шпаргалка по работе с изображениями в Python: открытие и сохранение, размеры, обрезка, поворот, цвета, пиксели, рисование, текст, фильтры, прозрачность, создание изображений и практический мини-проект.</p>
+</header>
+
+<nav>
+<a href="#start">Старт</a>
+<a href="#open">Открытие</a>
+<a href="#transform">Размер и геометрия</a>
+<a href="#color">Цвет и режимы</a>
+<a href="#draw">Рисование</a>
+<a href="#filter">Фильтры</a>
+<a href="#alpha">Прозрачность</a>
+<a href="#save">Сохранение</a>
+<a href="#project">Проект</a>
+</nav>
+
+<main>
+
+<h2 id="start">1. Быстрый старт <code>Pillow</code></h2>
+<p class="sub">Pillow — современная библиотека Python для открытия, обработки и сохранения изображений. Импорт выполняется через пакет <code>PIL</code>.</p>
+<div class="grid">
+<article class="s1">
+<h3>Установка</h3>
+<pre><code>pip install Pillow</code></pre>
+</article>
+<article class="s1">
+<h3>Импорт</h3>
+<pre><code>from PIL import Image
+
+img = Image.open("photo.jpg")</code></pre>
+<p>Название библиотеки — Pillow, но основной импорт: <code>from PIL ...</code>.</p>
+</article>
+<article class="s1 wide">
+<h3>Минимальное приложение</h3>
+<pre><code>from PIL import Image
+
+img = Image.open("photo.jpg")
+img = img.resize((800, 600))
+img.save("result.jpg")
+
+print("Готово!")</code></pre>
+</article>
+</div>
+
+<h2 id="open">2. Открытие изображения <code>Image.open()</code></h2>
+<p class="sub">Pillow определяет формат файла автоматически по его содержимому и предоставляет объект <code>Image</code>.</p>
+<div class="grid">
+<article class="s2">
+<h3>Открыть файл</h3>
+<pre><code>from PIL import Image
+
+img = Image.open("photo.jpg")
+print(img)</code></pre>
+</article>
+<article class="s2">
+<h3>Информация об изображении</h3>
+<pre><code>print(img.size)    # (ширина, высота)
+print(img.width)
+print(img.height)
+print(img.mode)    # например RGB
+print(img.format)  # JPEG</code></pre>
+</article>
+<article class="s2">
+<h3>Показать изображение</h3>
+<pre><code>img.show()</code></pre>
+<p>Откроет изображение в стандартном просмотрщике ОС.</p>
+</article>
+<article class="s2">
+<h3>Безопасная проверка файла</h3>
+<pre><code>try:
+    img = Image.open("photo.jpg")
+    img.load()
+except FileNotFoundError:
+    print("Файл не найден")
+except Exception as e:
+    print("Ошибка:", e)</code></pre>
+</article>
+</div>
+
+<h2 id="transform">3. Размер, обрезка и геометрия</h2>
+<p class="sub">Операции <code>resize()</code>, <code>crop()</code>, <code>rotate()</code>, <code>transpose()</code> возвращают обработанное изображение.</p>
+<div class="grid">
+<article class="s3">
+<h3>Изменение размера</h3>
+<pre><code>small = img.resize((400, 300))
+small.save("small.jpg")</code></pre>
+</article>
+<article class="s3">
+<h3>Сохранить пропорции</h3>
+<pre><code>from PIL import Image
+
+img.thumbnail((800, 800))
+# изменяет img на месте
+img.save("thumb.jpg")</code></pre>
+<p><code>thumbnail()</code> уменьшает изображение с сохранением пропорций.</p>
+</article>
+<article class="s3">
+<h3>Обрезка <code>crop()</code></h3>
+<pre><code># (left, top, right, bottom)
+part = img.crop((100, 50, 500, 350))
+part.save("crop.jpg")</code></pre>
+</article>
+<article class="s3">
+<h3>Поворот</h3>
+<pre><code>rotated = img.rotate(90)
+rotated.save("rotated.jpg")</code></pre>
+</article>
+<article class="s3">
+<h3>Отражение</h3>
+<pre><code>from PIL import Image
+
+mirror = img.transpose(
+    Image.Transpose.FLIP_LEFT_RIGHT
+)</code></pre>
+</article>
+<article class="s3">
+<h3>Другие преобразования</h3>
+<pre><code>img.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
+
+img.rotate(45, expand=True)</code></pre>
+<p><code>expand=True</code> увеличивает холст, чтобы повёрнутое изображение полностью поместилось.</p>
+</article>
+</div>
+
+<h2 id="color">4. Цветовые режимы и преобразования</h2>
+<p class="sub">Режим изображения определяет способ хранения пикселей: <code>RGB</code>, <code>RGBA</code>, <code>L</code>, <code>1</code> и другие.</p>
+<div class="grid">
+<article class="s4">
+<h3>RGB → оттенки серого</h3>
+<pre><code>gray = img.convert("L")
+gray.save("gray.jpg")</code></pre>
+</article>
+<article class="s4">
+<h3>RGB → RGBA</h3>
+<pre><code>rgba = img.convert("RGBA")
+print(rgba.mode)  # RGBA</code></pre>
+<p>Канал <code>A</code> — альфа-канал прозрачности.</p>
+</article>
+<article class="s4">
+<h3>Чёрно-белое</h3>
+<pre><code>bw = img.convert("L").point(
+    lambda p: 255 if p > 128 else 0
+)
+bw.save("bw.png")</code></pre>
+</article>
+<article class="s4">
+<h3>Проверка режима</h3>
+<pre><code>print(img.mode)
+
+if img.mode != "RGB":
+    img = img.convert("RGB")</code></pre>
+</article>
+</div>
+
+<h2 id="pixels">5. Пиксели</h2>
+<p class="sub">Пиксель можно получить через <code>getpixel()</code> и изменить через <code>putpixel()</code>. Для RGB обычно используются кортежи <code>(R, G, B)</code>.</p>
+<div class="grid">
+<article class="s5">
+<h3>Получить пиксель</h3>
+<pre><code>img = Image.open("photo.jpg").convert("RGB")
+
+pixel = img.getpixel((10, 20))
+print(pixel)
+# например: (120, 80, 200)</code></pre>
+</article>
+<article class="s5">
+<h3>Изменить пиксель</h3>
+<pre><code>img.putpixel((10, 20), (255, 0, 0))</code></pre>
+<p>Точка <code>(10, 20)</code> станет красной.</p>
+</article>
+<article class="s5">
+<h3>Изменить область</h3>
+<pre><code>for y in range(100):
+    for x in range(100):
+        img.putpixel(
+            (x, y), (255, 0, 0)
+        )</code></pre>
+<p>Пример закрашивает квадрат 100×100 пикселей.</p>
+</article>
+</div>
+
+<h2 id="draw">6. Рисование: <code>ImageDraw</code></h2>
+<p class="sub">Модуль <code>PIL.ImageDraw</code> позволяет рисовать линии, прямоугольники, эллипсы, многоугольники и текст.</p>
+<div class="grid">
+<article class="s1">
+<h3>Подготовка</h3>
+<pre><code>from PIL import Image, ImageDraw
+
+img = Image.new("RGB", (600, 400), "white")
+draw = ImageDraw.Draw(img)</code></pre>
+</article>
+<article class="s1">
+<h3>Линия</h3>
+<pre><code>draw.line(
+    (20, 20, 500, 100),
+    fill="red",
+    width=5
+)</code></pre>
+</article>
+<article class="s1">
+<h3>Прямоугольник</h3>
+<pre><code>draw.rectangle(
+    (50, 50, 250, 180),
+    fill="skyblue",
+    outline="blue",
+    width=3
+)</code></pre>
+</article>
+<article class="s1">
+<h3>Эллипс</h3>
+<pre><code>draw.ellipse(
+    (300, 50, 500, 200),
+    fill="yellow",
+    outline="black",
+    width=3
+)</code></pre>
+</article>
+<article class="s1">
+<h3>Многоугольник</h3>
+<pre><code>draw.polygon(
+    [(100, 300), (200, 220), (300, 300)],
+    fill="green"
+)</code></pre>
+</article>
+<article class="s1">
+<h3>Текст</h3>
+<pre><code>draw.text(
+    (30, 330),
+    "Привет, Pillow!",
+    fill="black"
+)</code></pre>
+</article>
+</div>
+
+<h2 id="text">7. Текст и шрифты</h2>
+<p class="sub">Для шрифтов TrueType/OpenType удобно использовать <code>ImageFont.truetype()</code>.</p>
+<div class="grid">
+<article class="s2">
+<h3>Подключить шрифт</h3>
+<pre><code>from PIL import ImageFont
+
+font = ImageFont.truetype(
+    "arial.ttf",
+    32
+)
+
+draw.text(
+    (20, 20),
+    "Привет!",
+    font=font,
+    fill="black"
+)</code></pre>
+</article>
+<article class="s2">
+<h3>Размер текста</h3>
+<pre><code>bbox = draw.textbbox(
+    (0, 0),
+    "Привет!",
+    font=font
+)
+
+width = bbox[2] - bbox[0]
+height = bbox[3] - bbox[1]
+
+print(width, height)</code></pre>
+</article>
+<article class="s2">
+<h3>Выравнивание</h3>
+<pre><code>draw.text(
+    (300, 200),
+    "Центр",
+    font=font,
+    anchor="mm",
+    fill="black"
+)</code></pre>
+<p><code>anchor="mm"</code> задаёт центральную точку текста.</p>
+</article>
+</div>
+
+<h2 id="filter">8. Фильтры и улучшение изображения</h2>
+<p class="sub">Модуль <code>PIL.ImageFilter</code> содержит готовые фильтры: размытие, резкость, контуры и другие.</p>
+<div class="grid">
+<article class="s3">
+<h3>Размытие</h3>
+<pre><code>from PIL import ImageFilter
+
+blur = img.filter(
+    ImageFilter.BLUR
+)</code></pre>
+</article>
+<article class="s3">
+<h3>Gaussian Blur</h3>
+<pre><code>blur = img.filter(
+    ImageFilter.GaussianBlur(5)
+)</code></pre>
+</article>
+<article class="s3">
+<h3>Резкость</h3>
+<pre><code>sharp = img.filter(
+    ImageFilter.SHARPEN
+)</code></pre>
+</article>
+<article class="s3">
+<h3>Контуры</h3>
+<pre><code>edges = img.filter(
+    ImageFilter.FIND_EDGES
+)</code></pre>
+</article>
+<article class="s3">
+<h3>DETAIL</h3>
+<pre><code>detail = img.filter(
+    ImageFilter.DETAIL
+)</code></pre>
+</article>
+<article class="s3">
+<h3>Контраст и яркость</h3>
+<pre><code>from PIL import ImageEnhance
+
+bright = ImageEnhance.Brightness(
+    img
+).enhance(1.5)
+
+contrast = ImageEnhance.Contrast(
+    img
+).enhance(1.5)</code></pre>
+</article>
+</div>
+
+<h2 id="alpha">9. Прозрачность и альфа-канал</h2>
+<p class="sub">Формат <code>RGBA</code> содержит четыре канала: красный, зелёный, синий и альфа-канал.</p>
+<div class="grid">
+<article class="s4">
+<h3>Создать прозрачное изображение</h3>
+<pre><code>img = Image.new(
+    "RGBA",
+    (500, 300),
+    (255, 255, 255, 0)
+)</code></pre>
+<p>Последнее значение <code>0</code> — полностью прозрачно, <code>255</code> — непрозрачно.</p>
+</article>
+<article class="s4">
+<h3>Полупрозрачная фигура</h3>
+<pre><code>draw = ImageDraw.Draw(img)
+
+draw.rectangle(
+    (50, 50, 300, 200),
+    fill=(255, 0, 0, 128)
+)</code></pre>
+</article>
+<article class="s4">
+<h3>Наложение изображений</h3>
+<pre><code>background = Image.open("bg.png").convert("RGBA")
+foreground = Image.open("logo.png").convert("RGBA")
+
+background.alpha_composite(
+    foreground,
+    (50, 50)
+)</code></pre>
+</article>
+</div>
+
+<h2 id="save">10. Сохранение и конвертация</h2>
+<p class="sub">Метод <code>save()</code> записывает изображение в файл. Формат можно задать расширением или параметром <code>format</code>.</p>
+<div class="grid">
+<article class="s5">
+<h3>JPEG</h3>
+<pre><code>img.save(
+    "result.jpg",
+    quality=90
+)</code></pre>
+</article>
+<article class="s5">
+<h3>PNG</h3>
+<pre><code>img.save(
+    "result.png"
+)</code></pre>
+<p>PNG особенно удобен для изображений с прозрачностью.</p>
+</article>
+<article class="s5">
+<h3>WEBP</h3>
+<pre><code>img.save(
+    "result.webp",
+    quality=85
+)</code></pre>
+</article>
+<article class="s5">
+<h3>Конвертация JPEG → PNG</h3>
+<pre><code>img = Image.open("photo.jpg")
+img.save("photo.png")</code></pre>
+<p>Для JPEG с прозрачностью сначала нужен подходящий режим, например <code>RGBA</code> для PNG.</p>
+</article>
+<article class="s5">
+<h3>Сохранить копию</h3>
+<pre><code>copy = img.copy()
+copy.save("copy.png")</code></pre>
+</article>
+</div>
+
+<h2 id="files">11. Папки и пакетная обработка</h2>
+<p class="sub">Pillow удобно использовать вместе с <code>pathlib</code> для обработки большого количества изображений.</p>
+<div class="grid">
+<article class="s1">
+<h3>Все JPG в папке</h3>
+<pre><code>from pathlib import Path
+
+folder = Path("photos")
+
+for path in folder.glob("*.jpg"):
+    img = Image.open(path)
+    print(path.name, img.size)</code></pre>
+</article>
+<article class="s1">
+<h3>Создать миниатюры</h3>
+<pre><code>from pathlib import Path
+from PIL import Image
+
+for path in Path("photos").glob("*.jpg"):
+    img = Image.open(path)
+    img.thumbnail((300, 300))
+
+    out = Path("thumbs") / path.name
+    img.save(out)</code></pre>
+</article>
+</div>
+
+<h2 id="project">12. Мини-проект: генератор картинки с надписью</h2>
+<p class="sub">Пример объединяет создание изображения, рисование, шрифт и сохранение результата.</p>
+<div class="grid">
+<article class="s3 wide">
+<h3>Готовый пример</h3>
+<pre><code>from PIL import Image, ImageDraw, ImageFont
+
+# 1. Создаём холст
+img = Image.new(
+    "RGB",
+    (800, 450),
+    "#EEF3F8"
+)
+
+# 2. Создаём объект рисования
+draw = ImageDraw.Draw(img)
+
+# 3. Подключаем шрифт
+font = ImageFont.truetype(
+    "arial.ttf",
+    48
+)
+
+# 4. Рисуем заголовок
+draw.text(
+    (400, 150),
+    "Pillow",
+    font=font,
+    anchor="mm",
+    fill="#13203A"
+)
+
+# 5. Рисуем прямоугольник
+draw.rounded_rectangle(
+    (220, 220, 580, 320),
+    radius=20,
+    fill="#0C7C86"
+)
+
+# 6. Второй текст
+small_font = ImageFont.truetype(
+    "arial.ttf",
+    28
+)
+
+draw.text(
+    (400, 270),
+    "Изображения в Python",
+    font=small_font,
+    anchor="mm",
+    fill="white"
+)
+
+# 7. Сохраняем
+img.save("pillow_result.png")
+
+print("Готово!")</code></pre>
+</article>
+</div>
+
+<h2 id="quick">13. Быстрая шпаргалка API</h2>
+<div class="grid">
+<article class="s2 wide">
+<h3>Главные методы</h3>
+<div class="tw"><table>
+<tr><th>Команда</th><th>Назначение</th><th>Пример</th></tr>
+<tr><td><code>Image.open()</code></td><td>Открыть изображение</td><td><code>Image.open("a.jpg")</code></td></tr>
+<tr><td><code>Image.new()</code></td><td>Создать изображение</td><td><code>Image.new("RGB",(800,600))</code></td></tr>
+<tr><td><code>resize()</code></td><td>Изменить размер</td><td><code>img.resize((400,300))</code></td></tr>
+<tr><td><code>thumbnail()</code></td><td>Создать миниатюру</td><td><code>img.thumbnail((300,300))</code></td></tr>
+<tr><td><code>crop()</code></td><td>Обрезать</td><td><code>img.crop((0,0,300,200))</code></td></tr>
+<tr><td><code>rotate()</code></td><td>Повернуть</td><td><code>img.rotate(90)</code></td></tr>
+<tr><td><code>convert()</code></td><td>Изменить режим</td><td><code>img.convert("L")</code></td></tr>
+<tr><td><code>getpixel()</code></td><td>Получить пиксель</td><td><code>img.getpixel((x,y))</code></td></tr>
+<tr><td><code>putpixel()</code></td><td>Изменить пиксель</td><td><code>img.putpixel((x,y),color)</code></td></tr>
+<tr><td><code>filter()</code></td><td>Применить фильтр</td><td><code>img.filter(ImageFilter.BLUR)</code></td></tr>
+<tr><td><code>save()</code></td><td>Сохранить</td><td><code>img.save("result.png")</code></td></tr>
+<tr><td><code>show()</code></td><td>Показать</td><td><code>img.show()</code></td></tr>
+</table></div>
+</article>
+
+<article class="s3">
+<h3>Основные модули</h3>
+<pre><code>from PIL import Image
+from PIL import ImageDraw
+from PIL import ImageFont
+from PIL import ImageFilter
+from PIL import ImageEnhance
+from PIL import ImageOps</code></pre>
+</article>
+
+<article class="s3">
+<h3>Полезные режимы</h3>
+<pre><code>"1"      # 1-битное
+"L"      # оттенки серого
+"RGB"    # красный, зелёный, синий
+"RGBA"   # RGB + прозрачность
+"P"      # палитровое</code></pre>
+</article>
+</div>
+
+<h2>14. Что запомнить</h2>
+<div class="grid">
+<article class="s5 wide">
+<h3>Логика работы с Pillow</h3>
+<pre><code>Image.open()
+      ↓
+получили объект Image
+      ↓
+resize / crop / rotate / convert
+      ↓
+draw / text / filter / enhance
+      ↓
+show() или save()</code></pre>
+</article>
+<article class="s5">
+<h3>Главная идея</h3>
+<p>Почти все операции выполняются над объектом <code>Image</code>. Многие методы возвращают новый объект, поэтому удобно строить цепочку обработки:</p>
+<pre><code>result = (
+    Image.open("photo.jpg")
+    .convert("L")
+    .resize((800, 600))
+)</code></pre>
+</article>
+<article class="s5">
+<h3>Важное различие</h3>
+<p><code>resize()</code>, <code>crop()</code>, <code>rotate()</code> обычно возвращают новое изображение, а <code>thumbnail()</code> изменяет текущий объект на месте.</p>
+</article>
+</div>
+
+</main>
+<footer>Pillow (PIL) Cheatsheet • Обработка изображений в Python</footer>
+</body>
+</html>

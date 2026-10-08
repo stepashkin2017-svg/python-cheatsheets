@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Python ООП — шпаргалка</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;700;800&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+:root{--bg:#EEF3F8;--card:#FFFFFF;--ink:#13203A;--mute:#5A6A85;--line:#D5DEEA;--a1:#0C7C86;--a2:#B9660A;--a3:#5B4BC4;--a4:#B8325A;--a5:#3A7D2C;--code:#0F1A30;--ct:#E3EAF6;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0B1220;--card:#131D31;--ink:#E6ECF7;--mute:#9AABC6;--line:#27344F;--a1:#4FD1C5;--a2:#F2B25C;--a3:#A99BFF;--a4:#FF8FB0;--a5:#8FD97C;--code:#080F1D}}
+:root[data-theme="dark"]{--bg:#0B1220;--card:#131D31;--ink:#E6ECF7;--mute:#9AABC6;--line:#27344F;--a1:#4FD1C5;--a2:#F2B25C;--a3:#A99BFF;--a4:#FF8FB0;--a5:#8FD97C;--code:#080F1D}
+html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 60px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 Onest,system-ui,Arial,sans-serif}
+header{padding:48px 20px 28px;max-width:1180px;margin:0 auto}
+h1{font-size:clamp(30px,5vw,52px);line-height:1.05;margin:0 0 12px;font-weight:800;letter-spacing:-.02em}
+header p{margin:0;color:var(--mute);max-width:64ch}
+nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);border-bottom:1px solid var(--line);display:flex;gap:8px;padding:10px 20px;overflow-x:auto}
+nav a{color:var(--ink);text-decoration:none;font-weight:600;padding:6px 14px;border-radius:99px;border:1px solid var(--line);white-space:nowrap}
+nav a:hover,nav a:focus-visible{background:var(--ink);color:var(--bg);outline:none}
+main{max-width:1180px;margin:0 auto;padding:8px 20px 60px}
+h2{font-size:28px;margin:44px 0 6px}
+.sub{color:var(--mute);margin:0 0 18px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,340px),1fr));gap:16px}
+article{background:var(--card);border:1px solid var(--line);border-left:5px solid var(--c,var(--a1));border-radius:10px;padding:16px 18px;min-width:0}
+.s1{--c:var(--a1)}.s2{--c:var(--a2)}.s3{--c:var(--a3)}.s4{--c:var(--a4)}.s5{--c:var(--a5)}
+h3{margin:0 0 6px;font-size:17px}
+article p{margin:0 0 10px;color:var(--mute);font-size:14.5px}
+article ul{margin:0 0 10px;padding-left:20px;color:var(--mute);font-size:14.5px}
+pre{margin:0;background:var(--code);color:var(--ct);border-radius:8px;padding:12px 14px;overflow-x:auto;font:400 13px/1.55 'JetBrains Mono',ui-monospace,Consolas,monospace}
+pre+pre{margin-top:8px}
+i.k{color:#FFB454;font-style:normal;font-weight:600}i.s{color:#8EE6A0;font-style:normal}i.c{color:#7F90B0;font-style:italic}i.n{color:#7FC4FF;font-style:normal}
+.wide{grid-column:1/-1}
+.hl{border-width:2px;border-left-width:6px}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;padding:7px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{color:var(--mute);font-weight:600}
+td code,p code,li code,.sub code,footer code,header code{font:500 13px 'JetBrains Mono',monospace;background:var(--bg);padding:1px 6px;border-radius:4px}
+.tw{overflow-x:auto}
+footer{color:var(--mute);font-size:13px;text-align:center;padding:0 20px 30px}
+</style>
+</head>
+<body>
+<header>
+<h1>ООП в Python</h1>
+<p>Классы, объекты, методы, свойства и магические методы. Затем отдельный блок про наследование и <code>super()</code>. Комментарий <code>#</code> показывает результат.</p>
+</header>
+<nav><a href="#base">Основы</a><a href="#cls">Классы</a><a href="#meth">Методы</a><a href="#enc">Инкапсуляция</a><a href="#magic">Магические методы</a><a href="#comp">Композиция</a><a href="#inh">Наследование</a><a href="#sup">super()</a></nav>
+<main>
+
+<h2 id="base">Основы</h2>
+<p class="sub">Класс — чертёж, объект (экземпляр) — конкретная вещь по этому чертежу. Объект хранит данные (атрибуты) и умеет действовать (методы).</p>
+<div class="grid">
+<article class="s1"><h3>Три принципа</h3>
+<ul><li><b>Инкапсуляция</b> — данные и методы вместе, внутренности скрыты.</li><li><b>Наследование</b> — новый класс берёт возможности существующего.</li><li><b>Полиморфизм</b> — разные объекты отвечают на один и тот же вызов по-своему.</li></ul></article>
+<article class="s1"><h3>Простейший класс</h3>
+<pre><code>class Cat:
+    pass
+
+c = Cat()          # создали объект
+type(c)            # &lt;class '__main__.Cat'&gt;
+isinstance(c, Cat) # True</code></pre></article>
+</div>
+
+<h2 id="cls">Классы и объекты</h2>
+<div class="grid">
+<article class="s2"><h3>__init__ и self</h3><p><code>__init__</code> вызывается при создании объекта. <code>self</code> — сам объект, всегда первый параметр метода.</p>
+<pre><code>class Cat:
+    def __init__(self, name, age=1):
+        self.name = name     # атрибут объекта
+        self.age = age
+
+tom = Cat("Том", 3)
+tom.name    # 'Том'
+tom.age     # 3</code></pre></article>
+
+<article class="s2"><h3>Методы объекта</h3>
+<pre><code>class Cat:
+    def __init__(self, name):
+        self.name = name
+    def meow(self):
+        return f"{self.name}: мяу!"
+
+Cat("Том").meow()   # 'Том: мяу!'</code></pre></article>
+
+<article class="s2"><h3>Изменение атрибутов</h3>
+<pre><code>tom.age = 4              # изменить
+tom.color = "серый"      # добавить новый
+del tom.color            # удалить
+hasattr(tom, "age")      # True
+getattr(tom, "age", 0)   # 4
+setattr(tom, "age", 5)
+vars(tom)                # {'name': 'Том', 'age': 5}</code></pre></article>
+
+<article class="s2"><h3>Атрибуты класса</h3><p>Общие для всех объектов, лежат в классе. Удобны для счётчиков и констант.</p>
+<pre><code>class Cat:
+    count = 0                 # общий
+    def __init__(self, name):
+        self.name = name
+        Cat.count += 1
+
+Cat("a"); Cat("b")
+Cat.count    # 2</code></pre></article>
+
+<article class="s2"><h3>Ловушка: изменяемый атрибут класса</h3><p>Список в теле класса делят все объекты. Изменяемые данные создавайте в <code>__init__</code>.</p>
+<pre><code>class Bad:
+    items = []            # общий на всех!
+class Good:
+    def __init__(self):
+        self.items = []   # свой у каждого</code></pre></article>
+
+<article class="s2"><h3>__slots__</h3><p>Ограничивает набор атрибутов и экономит память.</p>
+<pre><code>class P:
+    __slots__ = ("x", "y")
+    def __init__(self, x, y):
+        self.x, self.y = x, y
+p = P(1, 2)
+p.z = 3    # AttributeError</code></pre></article>
+</div>
+
+<h2 id="meth">Виды методов</h2>
+<div class="grid">
+<article class="s3"><h3>Метод объекта</h3><p>Получает <code>self</code>, работает с данными конкретного объекта.</p>
+<pre><code>def birthday(self):
+    self.age += 1</code></pre></article>
+
+<article class="s3"><h3>@classmethod</h3><p>Получает класс <code>cls</code>. Часто используется как альтернативный конструктор.</p>
+<pre><code>class Date:
+    def __init__(self, d, m, y):
+        self.d, self.m, self.y = d, m, y
+    @classmethod
+    def from_str(cls, s):
+        d, m, y = map(int, s.split("."))
+        return cls(d, m, y)
+
+Date.from_str("02.10.2026").y   # 2026</code></pre></article>
+
+<article class="s3"><h3>@staticmethod</h3><p>Не получает ни <code>self</code>, ни <code>cls</code>. Обычная функция, логически принадлежащая классу.</p>
+<pre><code>class Calc:
+    @staticmethod
+    def is_even(n):
+        return n % 2 == 0
+
+Calc.is_even(4)   # True</code></pre></article>
+
+<article class="s3 wide"><h3>Сравнение</h3><div class="tw"><table>
+<tr><th>Вид</th><th>Первый параметр</th><th>Доступ</th><th>Вызов</th></tr>
+<tr><td>обычный</td><td><code>self</code></td><td>объект и класс</td><td><code>obj.m()</code></td></tr>
+<tr><td><code>@classmethod</code></td><td><code>cls</code></td><td>класс</td><td><code>Cls.m()</code> или <code>obj.m()</code></td></tr>
+<tr><td><code>@staticmethod</code></td><td>нет</td><td>ничего автоматически</td><td><code>Cls.m()</code> или <code>obj.m()</code></td></tr>
+</table></div></article>
+</div>
+
+<h2 id="enc">Инкапсуляция и свойства</h2>
+<div class="grid">
+<article class="s4"><h3>Уровни доступа (соглашения)</h3><p>В Python нет жёсткого <code>private</code>, только договорённости об именах.</p>
+<pre><code>self.name      # публичный
+self._cache    # «защищённый»: не трогать снаружи
+self.__secret  # «приватный»: имя искажается</code></pre></article>
+
+<article class="s4"><h3>Искажение имени</h3>
+<pre><code>class A:
+    def __init__(self):
+        self.__x = 1
+a = A()
+a.__x            # AttributeError
+a._A__x          # 1 (всё же доступно)</code></pre></article>
+
+<article class="s4"><h3>@property — геттер</h3><p>Метод читается как атрибут, скобки не нужны. Подходит для вычисляемых значений.</p>
+<pre><code>class Circle:
+    def __init__(self, r):
+        self.r = r
+    @property
+    def area(self):
+        return 3.14159 * self.r ** 2
+
+Circle(2).area   # 12.56636</code></pre></article>
+
+<article class="s4"><h3>Сеттер и проверка значений</h3>
+<pre><code>class Temp:
+    def __init__(self, c):
+        self.celsius = c         # вызовет сеттер
+    @property
+    def celsius(self):
+        return self._c
+    @celsius.setter
+    def celsius(self, v):
+        if v &lt; -273.15:
+            raise ValueError("ниже абсолютного нуля")
+        self._c = v
+
+t = Temp(20)
+t.celsius = -300    # ValueError</code></pre></article>
+
+<article class="s4"><h3>Только чтение</h3><p>Свойство без сеттера нельзя перезаписать.</p>
+<pre><code>class User:
+    def __init__(self, id): self._id = id
+    @property
+    def id(self): return self._id
+u = User(7)
+u.id = 8    # AttributeError</code></pre></article>
+</div>
+
+<h2 id="magic">Магические методы</h2>
+<p class="sub">Методы с двойными подчёркиваниями вызываются Python сам, когда вы используете операторы и встроенные функции.</p>
+<div class="grid">
+<article class="s5"><h3>__str__ и __repr__</h3><p><code>__str__</code> — для людей (<code>print</code>), <code>__repr__</code> — для разработчика (в консоли, отладке).</p>
+<pre><code>class P:
+    def __init__(self, x, y): self.x, self.y = x, y
+    def __str__(self):  return f"({self.x}, {self.y})"
+    def __repr__(self): return f"P({self.x}, {self.y})"
+print(P(1, 2))    # (1, 2)
+[P(1, 2)]         # [P(1, 2)]</code></pre></article>
+
+<article class="s5"><h3>Арифметика</h3>
+<pre><code>def __add__(self, o):
+    return P(self.x + o.x, self.y + o.y)
+def __mul__(self, k):
+    return P(self.x * k, self.y * k)
+print(P(1, 2) + P(3, 4))   # (4, 6)
+print(P(1, 2) * 3)         # (3, 6)</code></pre></article>
+
+<article class="s5"><h3>Сравнение</h3>
+<pre><code>def __eq__(self, o):  return (self.x, self.y) == (o.x, o.y)
+def __lt__(self, o):  return self.x &lt; o.x
+P(1, 2) == P(1, 2)   # True
+sorted([P(3, 0), P(1, 0)])   # по __lt__
+# остальные: __ne__ __gt__ __le__ __ge__</code></pre></article>
+
+<article class="s5"><h3>Контейнеры</h3>
+<pre><code>class Deck:
+    def __init__(self): self.cards = [1, 2, 3]
+    def __len__(self):          return len(self.cards)
+    def __getitem__(self, i):   return self.cards[i]
+    def __contains__(self, x):  return x in self.cards
+d = Deck()
+len(d), d[0], 2 in d   # (3, 1, True)
+for c in d: ...        # перебор работает через __getitem__</code></pre></article>
+
+<article class="s5"><h3>__call__ и __bool__</h3>
+<pre><code>class Mul:
+    def __init__(self, k): self.k = k
+    def __call__(self, x): return x * self.k
+double = Mul(2)
+double(5)    # 10 — объект вызывается как функция
+
+# __bool__ определяет истинность объекта в if</code></pre></article>
+
+<article class="s5"><h3>Контекстный менеджер</h3>
+<pre><code>class Timer:
+    def __enter__(self):
+        print("старт"); return self
+    def __exit__(self, *exc):
+        print("конец")
+with Timer():
+    print("работа")
+# старт / работа / конец</code></pre></article>
+</div>
+
+<h2 id="comp">Композиция и dataclass</h2>
+<div class="grid">
+<article class="s1"><h3>Композиция: «имеет»</h3><p>Один объект содержит другой. Часто гибче наследования, когда связь не «является», а «состоит из».</p>
+<pre><code>class Engine:
+    def start(self): return "вррр"
+class Car:
+    def __init__(self):
+        self.engine = Engine()    # имеет двигатель
+    def start(self):
+        return self.engine.start()
+Car().start()   # 'вррр'</code></pre></article>
+
+<article class="s1"><h3>@dataclass</h3><p>Автоматически создаёт <code>__init__</code>, <code>__repr__</code> и <code>__eq__</code> по аннотациям полей.</p>
+<pre><code>from dataclasses import dataclass, field
+
+@dataclass
+class Point:
+    x: int
+    y: int = 0
+    tags: list = field(default_factory=list)
+
+Point(1)             # Point(x=1, y=0, tags=[])
+Point(1) == Point(1) # True</code></pre></article>
+
+<article class="s1"><h3>Параметры dataclass</h3>
+<pre><code>@dataclass(frozen=True, order=True)
+class V:
+    n: int
+# frozen — неизменяемый, order — сравнение &lt; &gt;
+V(1) &lt; V(2)    # True</code></pre></article>
+
+<article class="s1"><h3>Интроспекция</h3>
+<pre><code>isinstance(p, Point)    # объект этого класса?
+type(p).__name__        # 'Point'
+dir(p)                  # все атрибуты и методы
+p.__dict__              # атрибуты объекта
+help(Point)</code></pre></article>
+</div>
+
+<h2 id="inh">Наследование</h2>
+<p class="sub">Класс-потомок получает атрибуты и методы родителя и может добавить своё или переопределить унаследованное. Запись: <code>class Потомок(Родитель)</code>.</p>
+<div class="grid">
+<article class="s4"><h3>Базовое наследование</h3>
+<pre><code>class Animal:
+    def __init__(self, name):
+        self.name = name
+    def speak(self):
+        return "..."
+
+class Dog(Animal):
+    pass
+
+d = Dog("Рекс")
+d.name      # 'Рекс' — унаследовано
+d.speak()   # '...'</code></pre></article>
+
+<article class="s4"><h3>Переопределение методов</h3><p>Метод потомка заменяет метод родителя с тем же именем. Так работает полиморфизм.</p>
+<pre><code>class Dog(Animal):
+    def speak(self): return "Гав"
+class Cat(Animal):
+    def speak(self): return "Мяу"
+
+for a in (Dog("A"), Cat("B"), Animal("C")):
+    print(a.speak())   # Гав / Мяу / ...</code></pre></article>
+
+<article class="s4"><h3>Проверка отношений</h3>
+<pre><code>isinstance(d, Dog)      # True
+isinstance(d, Animal)   # True — потомок «является» родителем
+issubclass(Dog, Animal) # True
+Dog.__bases__           # (&lt;class 'Animal'&gt;,)</code></pre></article>
+
+<article class="s4"><h3>Абстрактный класс</h3><p>Задаёт интерфейс: потомки обязаны реализовать помеченные методы.</p>
+<pre><code>from abc import ABC, abstractmethod
+
+class Shape(ABC):
+    @abstractmethod
+    def area(self): ...
+
+class Sq(Shape):
+    def __init__(self, a): self.a = a
+    def area(self): return self.a ** 2
+
+Shape()      # TypeError
+Sq(3).area() # 9</code></pre></article>
+
+<article class="s4"><h3>Множественное наследование и MRO</h3><p>Класс может иметь нескольких родителей. Порядок поиска метода — <code>MRO</code> (слева направо, родитель после потомков).</p>
+<pre><code>class A: pass
+class B(A): pass
+class C(A): pass
+class D(B, C): pass
+D.__mro__   # D, B, C, A, object</code></pre></article>
+
+<article class="s4"><h3>Миксины</h3><p>Небольшой класс с одной возможностью, подмешиваемый к другим.</p>
+<pre><code>class JsonMixin:
+    def to_json(self):
+        import json
+        return json.dumps(self.__dict__, ensure_ascii=False)
+class User(JsonMixin):
+    def __init__(self, n): self.n = n
+User("Аня").to_json()   # '{"n": "Аня"}'</code></pre></article>
+</div>
+
+<h2 id="sup">super(): вызов родителя</h2>
+<p class="sub"><code>super()</code> возвращает прокси-объект, через который вы обращаетесь к методам следующего класса в цепочке <code>MRO</code> — для одиночного наследования это родитель.</p>
+<div class="grid">
+<article class="s3 hl wide"><h3>Зачем нужен super() и что он даёт</h3>
+<ul>
+<li><b>Не теряем инициализацию родителя.</b> Если в потомке есть свой <code>__init__</code>, родительский автоматически не вызывается.</li>
+<li><b>Не дублируем код.</b> Расширяем метод родителя, а не копируем его целиком.</li>
+<li><b>Не привязываемся к имени.</b> Переименовали или заменили родителя — вызовы <code>super()</code> менять не надо.</li>
+<li><b>Корректно работает с несколькими родителями.</b> Каждый класс в цепочке вызывается один раз по порядку <code>MRO</code>.</li>
+<li><b>Не нужно передавать <code>self</code>.</b> В Python 3 достаточно <code>super()</code> без аргументов.</li>
+</ul></article>
+
+<article class="s3"><h3>Проблема без super()</h3><p>Потомок определил свой <code>__init__</code> и «забыл» родительский — атрибуты родителя не появились.</p>
+<pre><code>class Animal:
+    def __init__(self, name):
+        self.name = name
+
+class Dog(Animal):
+    def __init__(self, breed):
+        self.breed = breed      # name не задан!
+
+Dog("лабрадор").name   # AttributeError</code></pre></article>
+
+<article class="s3"><h3>Решение: super().__init__()</h3>
+<pre><code>class Dog(Animal):
+    def __init__(self, name, breed):
+        super().__init__(name)   # инициализация родителя
+        self.breed = breed
+
+d = Dog("Рекс", "лабрадор")
+d.name, d.breed   # ('Рекс', 'лабрадор')</code></pre></article>
+
+<article class="s3"><h3>super() и Родитель.__init__(self)</h3><p>Явный вызов тоже работает, но жёстко привязан к имени класса и ломается при множественном наследовании (родитель вызовется дважды или не вызовется).</p>
+<pre><code>Animal.__init__(self, name)   # работает, но хрупко
+super().__init__(name)        # предпочтительно</code></pre></article>
+
+<article class="s3"><h3>super() в обычных методах</h3><p>Расширяем поведение родителя: берём его результат и дополняем.</p>
+<pre><code>class Animal:
+    def describe(self):
+        return f"Животное {self.name}"
+class Dog(Animal):
+    def describe(self):
+        base = super().describe()
+        return f"{base}, порода {self.breed}"
+d.describe()   # 'Животное Рекс, порода лабрадор'</code></pre></article>
+
+<article class="s3"><h3>Расширение __str__ и __eq__</h3>
+<pre><code>class Animal:
+    def __str__(self): return f"Animal({self.name})"
+class Dog(Animal):
+    def __str__(self):
+        return super().__str__() + f" / {self.breed}"
+print(d)   # Animal(Рекс) / лабрадор</code></pre></article>
+
+<article class="s3"><h3>super() в @classmethod</h3>
+<pre><code>class Base:
+    @classmethod
+    def create(cls):
+        return cls()
+class Child(Base):
+    @classmethod
+    def create(cls):
+        obj = super().create()   # cls сохранится как Child
+        obj.ready = True
+        return obj
+type(Child.create())   # &lt;class 'Child'&gt;</code></pre></article>
+
+<article class="s3"><h3>Цепочка из трёх уровней</h3>
+<pre><code>class A:
+    def __init__(self): print("A"); 
+class B(A):
+    def __init__(self): super().__init__(); print("B")
+class C(B):
+    def __init__(self): super().__init__(); print("C")
+C()    # A  B  C — от корня к потомку</code></pre></article>
+
+<article class="s3 hl wide"><h3>super() и MRO: «следующий в цепочке», а не «родитель»</h3><p>При множественном наследовании <code>super()</code> идёт по <code>__mro__</code>. Если все классы вызывают <code>super()</code>, каждый метод выполнится ровно один раз, даже у общего предка.</p>
+<pre><code>class A:
+    def hi(self): print("A")
+class B(A):
+    def hi(self): print("B"); super().hi()
+class C(A):
+    def hi(self): print("C"); super().hi()
+class D(B, C):
+    def hi(self): print("D"); super().hi()
+
+D().hi()        # D  B  C  A  (A вызван один раз)
+D.__mro__       # D, B, C, A, object</code></pre>
+<p style="margin-top:10px">Заметьте: <code>super()</code> внутри <code>B</code> вызвал <code>C</code>, хотя <code>C</code> не родитель <code>B</code>. Именно так порядок <code>MRO</code> гарантирует однократный вызов.</p></article>
+
+<article class="s3"><h3>Миксины и **kwargs</h3><p>В кооперативном наследовании каждый класс принимает лишние аргументы и передаёт их дальше.</p>
+<pre><code>class LogMixin:
+    def __init__(self, **kw):
+        print("лог")
+        super().__init__(**kw)
+class Base:
+    def __init__(self, name): self.name = name
+class Svc(LogMixin, Base):
+    pass
+Svc(name="x").name    # лог → 'x'</code></pre></article>
+
+<article class="s3"><h3>Типичные ошибки</h3>
+<ul><li>Забыли <code>super().__init__()</code> — у объекта нет атрибутов родителя.</li><li>Вызвали <code>super().__init__()</code> после того, как обратились к атрибутам, которые он создаёт.</li><li>Передали родителю не те аргументы — <code>TypeError</code>.</li><li>Написали <code>super(self)</code> вместо <code>super()</code>.</li><li>Использовали <code>super()</code> в обычной функции вне класса — <code>RuntimeError</code>.</li></ul></article>
+
+<article class="s3"><h3>Полная форма</h3><p>Старая запись, которая встречается в коде для Python 2. Результат тот же.</p>
+<pre><code>super(Dog, self).__init__(name)   # то же, что super().__init__(name)</code></pre></article>
+</div>
+</main>
+<footer>Совет: для связи «является» используйте наследование, для «имеет» — композицию, а при наследовании вызывайте <code>super()</code> всегда, когда переопределяете <code>__init__</code>.</footer>
+<script>
+document.querySelectorAll('pre code').forEach(function(c){
+var t=c.textContent;
+c.innerHTML=t.replace(/[&<>]/g,function(m){return {'&':'&amp;','<':'&lt;','>':'&gt;'}[m]})
+.replace(/(#.*$)|("[^"\n]*"|'[^'\n]*')|\b(class|def|return|pass|raise|import|from|with|if|else|for|in|and|or|not|self|cls|super|True|False|None)\b|\b(\d+)\b|(@[\w.]+)/gm,function(m,c1,s,k,n,d){
+return '<i class="'+(c1?'c':s?'s':(k||d)?'k':'n')+'">'+m+'</i>'});
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Git, GitHub и GitFlic в VS Code — Cheatsheet</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Onest:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#EEF3F8;--card:#FFF;--text:#172033;--muted:#607087;--line:#D9E2EC;
+  --code:#0F1A30;--code-text:#E8EEF8;--teal:#0C7C86;--orange:#B9660A;
+  --purple:#5B4BC4;--pink:#B8325A;--green:#3A7D2C;--blue:#2873B8;
+  --red:#B42318;--shadow:0 8px 24px rgba(23,32,51,.07)
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Onest,Arial,sans-serif;line-height:1.55}
+.container{max-width:1180px;margin:auto;padding:0 20px}
+header{padding:42px 0 28px;background:linear-gradient(135deg,#e7f4f5,#f8fafc 55%,#eeeafb);border-bottom:1px solid var(--line)}
+h1{margin:0 0 10px;font-size:clamp(30px,5vw,48px);line-height:1.08}
+.subtitle{color:var(--muted);font-size:17px;max-width:850px}
+.badges{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.badge{background:#fff;border:1px solid var(--line);border-radius:999px;padding:6px 11px;font-size:13px;font-weight:600}
+nav{position:sticky;top:0;z-index:10;background:#172033;border-bottom:2px solid #0C7C86;box-shadow:0 4px 14px rgba(23,32,51,.20)}
+.nav-inner{display:flex;gap:9px;overflow-x:auto;padding:10px 20px}
+nav a{white-space:nowrap;text-decoration:none;color:#fff;background:#30415C;border:1px solid #526580;font-size:13px;font-weight:700;padding:8px 12px;border-radius:8px;transition:.15s ease}
+nav a:hover{background:#0C7C86;color:#fff;border-color:#39B7C0;transform:translateY(-1px)}
+main{padding:28px 0 48px}
+.section-title{margin:35px 0 15px;font-size:25px}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+.card{background:var(--card);border:1px solid var(--line);border-left:5px solid var(--teal);border-radius:12px;padding:20px;box-shadow:var(--shadow)}
+.s1{border-left-color:var(--teal)}.s2{border-left-color:var(--orange)}.s3{border-left-color:var(--purple)}
+.s4{border-left-color:var(--pink)}.s5{border-left-color:var(--green)}.s6{border-left-color:var(--blue)}
+.s7{border-left-color:var(--red)}
+.card h3{margin:0 0 8px;font-size:19px}.card p{margin:7px 0;color:#405067}
+code,.inline-code{font-family:"JetBrains Mono",monospace;background:#EEF2F6;border-radius:5px;padding:2px 5px;font-size:.9em}
+pre{margin:12px 0 0;background:var(--code);color:var(--code-text);padding:14px 16px;border-radius:9px;overflow:auto;font:13px/1.55 "JetBrains Mono",monospace}
+.tip{margin-top:12px;padding:10px 12px;background:#F5F8FB;border:1px solid var(--line);border-radius:8px;font-size:13px;color:#506078}
+.warn{margin-top:12px;padding:10px 12px;background:#FFF5F4;border:1px solid #F0C8C4;border-radius:8px;font-size:13px;color:#7A271A}
+table{width:100%;border-collapse:collapse;margin-top:10px;font-size:14px}
+th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{background:#F5F7FA;font-weight:700}
+.flow{display:grid;grid-template-columns:repeat(7,1fr);gap:7px;margin-top:12px}
+.step{background:#F5F8FB;border:1px solid var(--line);border-radius:9px;padding:12px 8px;text-align:center;font-size:12px;font-weight:700}
+.linkbox{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px}
+.linkbox a{color:var(--teal);font-weight:700;text-decoration:none}
+.linkbox a:hover{text-decoration:underline}
+footer{border-top:1px solid var(--line);padding:25px 0 40px;color:var(--muted);font-size:13px;text-align:center}
+@media(max-width:900px){.flow{grid-template-columns:repeat(4,1fr)}}
+@media(max-width:800px){.grid{grid-template-columns:1fr}}
+@media(max-width:520px){.container{padding:0 14px}.card{padding:16px}.flow{grid-template-columns:1fr 1fr}}
+@media(prefers-color-scheme:dark){
+  :root{--bg:#0C1321;--card:#121B2C;--text:#EAF0F8;--muted:#9AA9BD;--line:#26344A;--code:#080F1D;--code-text:#E8EEF8}
+  header{background:linear-gradient(135deg,#0D252A,#101827 55%,#191532)}
+  nav{background:#050A14;border-bottom-color:#23AEB8}
+  nav a{background:#24344E;border-color:#526A8A;color:#fff}
+  nav a:hover{background:#0C7C86;border-color:#55D5DC;color:#fff}
+  code,.inline-code,.tip,.step,th{background:#182235}
+  .card p{color:#AAB8CA}
+  .warn{background:#321A1A;border-color:#68302A;color:#FFB4AB}
+}
+</style>
+</head>
+<body>
+
+<header>
+<div class="container">
+<h1>Git, GitHub и GitFlic<br>в Visual Studio Code</h1>
+<div class="subtitle">
+Практическая cheatsheet: локальный Git, репозитории GitHub и GitFlic,
+ветки, commit, push/pull, SSH, конфликты и основные операции прямо из VS Code.
+</div>
+<div class="badges">
+<span class="badge">Git</span><span class="badge">VS Code</span><span class="badge">GitHub</span>
+<span class="badge">GitFlic</span><span class="badge">branch</span><span class="badge">commit</span>
+<span class="badge">push / pull</span><span class="badge">SSH</span>
+</div>
+</div>
+</header>
+
+<nav>
+<div class="nav-inner">
+<a href="#concepts">Основы</a>
+<a href="#setup">Настройка</a>
+<a href="#init">Репозиторий</a>
+<a href="#commit">Commit</a>
+<a href="#remote">Remote</a>
+<a href="#github">GitHub</a>
+<a href="#gitflic">GitFlic</a>
+<a href="#branch">Ветки</a>
+<a href="#merge">Merge</a>
+<a href="#conflict">Конфликты</a>
+<a href="#ignore">.gitignore</a>
+<a href="#undo">Отмена</a>
+<a href="#workflow">Workflow</a>
+</div>
+</nav>
+
+<main class="container">
+
+<h2 class="section-title" id="concepts">1. Git, GitHub, GitFlic — что есть что?</h2>
+<div class="grid">
+<section class="card s1">
+<h3>Git</h3>
+<p><b>Git</b> — система контроля версий. Она хранит историю изменений проекта локально.</p>
+<pre>git --version
+
+# пример:
+# git version 2.x.x</pre>
+<div class="tip">Git может работать без GitHub или GitFlic: локальный репозиторий сам по себе полноценен.</div>
+</section>
+
+<section class="card s2">
+<h3>GitHub</h3>
+<p><b>GitHub</b> — сервис для размещения Git-репозиториев и совместной работы. В VS Code базовые Git-операции доступны встроенно; для Pull Request и Issues используется расширение GitHub Pull Requests and Issues.</p>
+<pre>git remote add origin https://github.com/user/project.git
+git push -u origin main</pre>
+</section>
+
+<section class="card s3">
+<h3>GitFlic</h3>
+<p><b>GitFlic</b> — платформа для размещения Git-проектов. С локальным Git она работает через обычные remote URL, HTTPS или SSH.</p>
+<pre>git remote add origin https://gitflic.ru/project/user/project.git
+git push -u origin master</pre>
+<div class="tip">Имя основной ветки зависит от настроек репозитория. В документации GitFlic по умолчанию для нового проекта указана <code>master</code>.</div>
+</section>
+
+<section class="card s4">
+<h3>VS Code</h3>
+<p>VS Code использует установленный в системе Git и позволяет выполнять основные операции через панель <b>Source Control</b> и встроенный Terminal.</p>
+<pre>Ctrl + Shift + G
+# открыть Source Control</pre>
+<div class="tip">Графический интерфейс VS Code и команды терминала работают с одним и тем же Git-репозиторием.</div>
+</section>
+</div>
+
+<h2 class="section-title" id="setup">2. Первоначальная настройка Git</h2>
+<div class="grid">
+<section class="card s1">
+<h3>Проверить установку</h3>
+<pre>git --version</pre>
+<p>Команду удобно выполнить в <b>Terminal → New Terminal</b> внутри VS Code.</p>
+</section>
+
+<section class="card s1">
+<h3>Настроить имя</h3>
+<pre>git config --global user.name "Ivan Petrov"</pre>
+</section>
+
+<section class="card s1">
+<h3>Настроить email</h3>
+<pre>git config --global user.email "ivan@example.com"</pre>
+<div class="tip">Имя и email записываются в историю Git как данные автора коммитов. Это не данные для входа в аккаунт GitHub/GitFlic.</div>
+</section>
+
+<section class="card s1">
+<h3>Проверить настройки</h3>
+<pre>git config --global --list</pre>
+</section>
+</div>
+
+<h2 class="section-title" id="init">3. Создание локального репозитория</h2>
+<div class="grid">
+<section class="card s2">
+<h3>Открыть папку в VS Code</h3>
+<p><b>File → Open Folder...</b> → выбрать папку проекта.</p>
+<pre># затем в Terminal:
+git status</pre>
+</section>
+
+<section class="card s2">
+<h3>Инициализировать Git</h3>
+<pre>git init</pre>
+<p>Создаётся скрытая папка <code>.git</code>, в которой Git хранит историю и служебные данные репозитория.</p>
+</section>
+
+<section class="card s2">
+<h3>Через интерфейс VS Code</h3>
+<p>Откройте <b>Source Control</b> → <b>Initialize Repository</b>.</p>
+<pre>Ctrl + Shift + G
+→ Initialize Repository</pre>
+<div class="tip">После инициализации проект является локальным репозиторием. Сам по себе <code>git init</code> ничего на GitHub/GitFlic не загружает.</div>
+</section>
+
+<section class="card s2">
+<h3>Посмотреть состояние</h3>
+<pre>git status</pre>
+<p>Показывает текущую ветку, изменённые, staged и неотслеживаемые файлы.</p>
+</section>
+</div>
+
+<h2 class="section-title" id="commit">4. Изменение → Stage → Commit</h2>
+<section class="card s3">
+<p>Главная схема Git:</p>
+<div class="flow">
+<div class="step">Файл</div><div class="step">Changes</div><div class="step">Stage</div>
+<div class="step">Staged</div><div class="step">Commit</div><div class="step">Local history</div><div class="step">Push</div>
+</div>
+<pre># посмотреть изменения
+git status
+
+# добавить один файл
+git add main.py
+
+# добавить всё
+git add .
+
+# создать коммит
+git commit -m "Добавлена главная программа"
+
+# отправить на сервер
+git push</pre>
+<div class="tip"><b>Важно:</b> сохранение файла, stage, commit и push — разные операции. Commit записывает изменения в локальную историю, а push отправляет локальные коммиты на remote.</div>
+</section>
+
+<div class="grid">
+<section class="card s3">
+<h3>Stage через VS Code</h3>
+<p>В <b>Source Control</b> у изменённого файла нажмите <b>+</b>.</p>
+<pre>Changes
+  main.py       +
+
+Staged Changes
+  main.py</pre>
+</section>
+
+<section class="card s3">
+<h3>Commit через VS Code</h3>
+<p>Введите сообщение коммита в поле Source Control и нажмите <b>Commit</b>.</p>
+<pre>Add calculator
+
+→ Commit</pre>
+</section>
+
+<section class="card s3">
+<h3>Хорошее сообщение</h3>
+<pre>git commit -m "Добавлена проверка ввода"</pre>
+<div class="tip">Сообщение должно кратко объяснять, что изменилось.</div>
+</section>
+
+<section class="card s3">
+<h3>Посмотреть историю</h3>
+<pre>git log --oneline</pre>
+</section>
+</div>
+
+<h2 class="section-title" id="remote">5. Remote — связь с удалённым репозиторием</h2>
+<div class="grid">
+<section class="card s4">
+<h3>Посмотреть remote</h3>
+<pre>git remote -v</pre>
+<p>Обычно основной remote называют <code>origin</code>.</p>
+</section>
+
+<section class="card s4">
+<h3>Добавить remote</h3>
+<pre>git remote add origin https://example.com/user/project.git</pre>
+</section>
+
+<section class="card s4">
+<h3>Изменить URL remote</h3>
+<pre>git remote set-url origin https://example.com/user/project.git</pre>
+</section>
+
+<section class="card s4">
+<h3>Удалить remote</h3>
+<pre>git remote remove origin</pre>
+</section>
+</div>
+
+<h2 class="section-title" id="github">6. Работа с GitHub через VS Code</h2>
+<div class="grid">
+<section class="card s5">
+<h3>Вариант A — Publish to GitHub</h3>
+<p>Для локального репозитория VS Code может создать новый репозиторий GitHub и отправить туда локальные коммиты.</p>
+<pre>Ctrl + Shift + P
+
+Git: Publish to GitHub</pre>
+<div class="tip">При публикации VS Code предлагает войти в GitHub, выбрать имя и public/private для нового репозитория.</div>
+</section>
+
+<section class="card s5">
+<h3>Вариант B — клонировать GitHub</h3>
+<pre>git clone https://github.com/user/project.git
+
+cd project</pre>
+<p>В VS Code также можно выбрать <b>Clone Repository</b>.</p>
+</section>
+
+<section class="card s5">
+<h3>Push в GitHub</h3>
+<pre>git add .
+git commit -m "Изменён интерфейс"
+git push</pre>
+</section>
+
+<section class="card s5">
+<h3>Pull из GitHub</h3>
+<pre>git pull</pre>
+<p><code>pull</code> получает изменения с remote и интегрирует их в текущую локальную ветку.</p>
+</section>
+
+<section class="card s5">
+<h3>Fetch — только получить информацию</h3>
+<pre>git fetch origin</pre>
+<div class="tip"><code>fetch</code> загружает информацию о новых коммитах, не выполняя автоматически слияние с текущей веткой.</div>
+</section>
+
+<section class="card s5">
+<h3>GitHub Pull Request</h3>
+<p>Для создания и просмотра Pull Request прямо в VS Code используется расширение <b>GitHub Pull Requests and Issues</b>.</p>
+<pre>Extensions
+→ GitHub Pull Requests and Issues</pre>
+</section>
+</div>
+
+<h2 class="section-title" id="gitflic">7. Работа с GitFlic через VS Code</h2>
+<div class="grid">
+<section class="card s6">
+<h3>Клонирование GitFlic по HTTPS</h3>
+<pre>git clone https://gitflic.ru/project/user/project.git
+
+cd project</pre>
+<p>После клонирования откройте папку проекта в VS Code.</p>
+</section>
+
+<section class="card s6">
+<h3>Подключение существующего проекта</h3>
+<pre>cd my_project
+
+git init
+
+git remote add origin \
+https://gitflic.ru/project/user/project.git
+
+git add .
+git commit -m "Initial commit"
+git push -u origin master</pre>
+</section>
+
+<section class="card s6">
+<h3>Push в GitFlic</h3>
+<pre>git add .
+git commit -m "Добавлена новая функция"
+git push -u origin master</pre>
+<div class="tip">Если upstream уже настроен, обычно достаточно <code>git push</code>.</div>
+</section>
+
+<section class="card s6">
+<h3>GitFlic через SSH</h3>
+<pre>ssh-keygen -t ed25519 -C "your_email@example.com"
+
+# после добавления public key в GitFlic:
+git remote set-url origin \
+git@gitflic.ru:user/project.git</pre>
+</section>
+
+<section class="card s6">
+<h3>Проверить remote GitFlic</h3>
+<pre>git remote -v</pre>
+<p>Убедитесь, что URL указывает на нужный проект.</p>
+</section>
+
+<section class="card s6">
+<h3>GitFlic + VS Code</h3>
+<p>Для GitFlic можно использовать встроенную Git-поддержку VS Code: клонирование, stage, commit, branch, pull, push и remote выполняются обычными Git-операциями.</p>
+<div class="tip">То есть VS Code не требует отдельного Git-клиента только для работы с GitFlic: важен установленный Git и корректно настроенный remote.</div>
+</section>
+</div>
+
+<h2 class="section-title" id="branch">8. Ветки (branches)</h2>
+<div class="grid">
+<section class="card s1">
+<h3>Посмотреть ветки</h3>
+<pre>git branch</pre>
+</section>
+
+<section class="card s1">
+<h3>Создать ветку</h3>
+<pre>git branch feature-login</pre>
+</section>
+
+<section class="card s1">
+<h3>Создать и сразу перейти</h3>
+<pre>git switch -c feature-login</pre>
+<div class="tip">В VS Code ветку также можно создать через имя текущей ветки в Status Bar.</div>
+</section>
+
+<section class="card s1">
+<h3>Переключиться</h3>
+<pre>git switch main</pre>
+</section>
+
+<section class="card s1">
+<h3>Удалить ветку</h3>
+<pre>git branch -d feature-login</pre>
+</section>
+
+<section class="card s1">
+<h3>Отправить новую ветку</h3>
+<pre>git push -u origin feature-login</pre>
+</section>
+</div>
+
+<h2 class="section-title" id="merge">9. Merge — объединение веток</h2>
+<section class="card s2">
+<pre># перейти в ветку, куда вливаем изменения
+git switch main
+
+# обновить её
+git pull
+
+# объединить feature-login
+git merge feature-login</pre>
+<div class="tip">После успешного merge проверьте проект и при необходимости создайте отдельный коммит.</div>
+</section>
+
+<h2 class="section-title" id="conflict">10. Конфликты слияния</h2>
+<div class="grid">
+<section class="card s7">
+<h3>Когда возникает конфликт?</h3>
+<p>Конфликт появляется, когда Git не может автоматически совместить изменения, например когда две ветки изменили один и тот же участок файла.</p>
+<pre>&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD
+print("Версия A")
+=======
+print("Версия B")
+&gt;&gt;&gt;&gt;&gt;&gt;&gt; feature</pre>
+</section>
+
+<section class="card s7">
+<h3>Решение в VS Code</h3>
+<p>VS Code показывает варианты вроде <b>Accept Current Change</b>, <b>Accept Incoming Change</b> или позволяет вручную объединить код.</p>
+<pre># после исправления файла:
+git add main.py
+git commit -m "Resolve merge conflict"</pre>
+</section>
+
+<section class="card s7">
+<h3>Отмена merge</h3>
+<pre>git merge --abort</pre>
+<div class="warn"><b>Осторожно:</b> перед отменой операции убедитесь, что вы понимаете, какие незакоммиченные изменения у вас есть.</div>
+</section>
+
+<section class="card s7">
+<h3>3-way Merge Editor</h3>
+<p>В VS Code конфликтный файл можно открыть в встроенном 3-way Merge Editor и сравнить текущую, входящую и итоговую версии.</p>
+</section>
+</div>
+
+<h2 class="section-title" id="ignore">11. .gitignore</h2>
+<div class="grid">
+<section class="card s3">
+<h3>Зачем нужен?</h3>
+<p><code>.gitignore</code> указывает файлы и папки, которые Git не должен добавлять в обычный набор изменений.</p>
+<pre># Python
+__pycache__/
+*.pyc
+.venv/
+
+# VS Code
+.vscode/
+
+# секреты
+.env</pre>
+</section>
+
+<section class="card s3">
+<h3>Добавить .gitignore</h3>
+<pre>git add .gitignore
+git commit -m "Добавлен gitignore"</pre>
+</section>
+
+<section class="card s3">
+<h3>Важно</h3>
+<p><code>.gitignore</code> не перестаёт отслеживать файл, который уже был добавлен в Git ранее.</p>
+<pre>git rm --cached .env
+git commit -m "Перестал отслеживать .env"</pre>
+<div class="warn">Никогда не публикуйте пароли, токены, приватные SSH-ключи и другие секреты.</div>
+</section>
+
+</div>
+
+<h2 class="section-title" id="undo">12. Отмена и восстановление изменений</h2>
+<div class="grid">
+<section class="card s4">
+<h3>Убрать файл из Stage</h3>
+<pre>git restore --staged main.py</pre>
+<p>Изменения в файле сохраняются, снимается только staging.</p>
+</section>
+
+<section class="card s4">
+<h3>Отменить незакоммиченные изменения</h3>
+<pre>git restore main.py</pre>
+<div class="warn">Команда удаляет незакоммиченные изменения этого файла. Используйте её осознанно.</div>
+</section>
+
+<section class="card s4">
+<h3>Посмотреть изменения</h3>
+<pre>git diff</pre>
+</section>
+
+<section class="card s4">
+<h3>Посмотреть staged diff</h3>
+<pre>git diff --staged</pre>
+</section>
+
+<section class="card s4">
+<h3>Stash — временно убрать работу</h3>
+<pre>git stash
+
+# вернуть позже
+git stash pop</pre>
+<div class="tip">Удобно, когда нужно временно переключиться на другую ветку, не создавая незавершённый commit.</div>
+</section>
+
+<section class="card s4">
+<h3>Просмотреть коммиты</h3>
+<pre>git log --oneline --graph --decorate --all</pre>
+</section>
+</div>
+
+<h2 class="section-title">13. Полезные команды в одном месте</h2>
+<section class="card s5">
+<table>
+<tr><th>Команда</th><th>Назначение</th></tr>
+<tr><td><code>git init</code></td><td>Создать локальный репозиторий</td></tr>
+<tr><td><code>git clone URL</code></td><td>Склонировать удалённый репозиторий</td></tr>
+<tr><td><code>git status</code></td><td>Показать состояние</td></tr>
+<tr><td><code>git add file.py</code></td><td>Добавить файл в Stage</td></tr>
+<tr><td><code>git add .</code></td><td>Добавить изменения в текущей папке</td></tr>
+<tr><td><code>git commit -m "..."</code></td><td>Создать commit</td></tr>
+<tr><td><code>git push</code></td><td>Отправить commits на remote</td></tr>
+<tr><td><code>git pull</code></td><td>Получить и интегрировать изменения</td></tr>
+<tr><td><code>git fetch</code></td><td>Получить информацию о remote без merge</td></tr>
+<tr><td><code>git branch</code></td><td>Показать ветки</td></tr>
+<tr><td><code>git switch -c name</code></td><td>Создать и открыть ветку</td></tr>
+<tr><td><code>git switch main</code></td><td>Переключить ветку</td></tr>
+<tr><td><code>git merge branch</code></td><td>Объединить ветки</td></tr>
+<tr><td><code>git remote -v</code></td><td>Показать удалённые репозитории</td></tr>
+<tr><td><code>git remote set-url</code></td><td>Изменить URL remote</td></tr>
+<tr><td><code>git diff</code></td><td>Показать незастейдженные изменения</td></tr>
+<tr><td><code>git log --oneline</code></td><td>Краткая история commits</td></tr>
+<tr><td><code>git stash</code></td><td>Временно убрать незакоммиченные изменения</td></tr>
+</table>
+</section>
+
+<h2 class="section-title" id="workflow">14. Типичный рабочий цикл в VS Code</h2>
+<section class="card s1">
+<div class="flow">
+<div class="step">1<br>Pull</div>
+<div class="step">2<br>Изменить код</div>
+<div class="step">3<br>Review diff</div>
+<div class="step">4<br>Stage</div>
+<div class="step">5<br>Commit</div>
+<div class="step">6<br>Push</div>
+<div class="step">7<br>PR / merge</div>
+</div>
+<pre># начало работы
+git pull
+
+# работаем в feature-ветке
+git switch -c feature-calculator
+
+# после изменений
+git status
+git diff
+
+# подготовить
+git add .
+
+# сохранить историю
+git commit -m "Добавлен калькулятор"
+
+# отправить ветку
+git push -u origin feature-calculator</pre>
+</section>
+
+<h2 class="section-title">15. GitHub и GitFlic: главное различие в подключении</h2>
+<section class="card s6">
+<table>
+<tr><th></th><th>GitHub</th><th>GitFlic</th></tr>
+<tr><td>Git</td><td>Используется обычный Git</td><td>Используется обычный Git</td></tr>
+<tr><td>VS Code</td><td>Встроенная Git-поддержка</td><td>Встроенная Git-поддержка</td></tr>
+<tr><td>Remote</td><td><code>github.com/...</code></td><td><code>gitflic.ru/...</code></td></tr>
+<tr><td>HTTPS</td><td>Поддерживается</td><td>Поддерживается</td></tr>
+<tr><td>SSH</td><td>Поддерживается</td><td>Поддерживается</td></tr>
+<tr><td>Ветки / commit / push / pull</td><td>Обычные Git-команды</td><td>Обычные Git-команды</td></tr>
+<tr><td>Pull Request / Issues в VS Code</td><td>Через GitHub Pull Requests and Issues</td><td>Работа с GitFlic выполняется через Git remote и доступные инструменты сервиса</td></tr>
+</table>
+</section>
+
+<h2 class="section-title">16. Быстрый старт: новый проект → GitHub</h2>
+<section class="card s2">
+<pre># 1. Открыть папку в VS Code
+
+# 2. В Terminal:
+git init
+
+# 3. Настроить Git (если ещё не настроен)
+git config --global user.name "Ivan Petrov"
+git config --global user.email "ivan@example.com"
+
+# 4. Добавить файлы
+git add .
+
+# 5. Первый commit
+git commit -m "Initial commit"
+
+# 6. В VS Code:
+# Ctrl + Shift + P
+# Git: Publish to GitHub
+
+# или вручную:
+git remote add origin https://github.com/user/project.git
+git push -u origin main</pre>
+</section>
+
+<h2 class="section-title">17. Быстрый старт: новый проект → GitFlic</h2>
+<section class="card s3">
+<pre># 1. Открыть папку проекта в VS Code
+
+git init
+
+git add .
+
+git commit -m "Initial commit"
+
+# 2. Создать проект на GitFlic
+
+# 3. Подключить remote
+git remote add origin \
+https://gitflic.ru/project/user/project.git
+
+# 4. Отправить основную ветку
+git push -u origin master</pre>
+<div class="tip">Если в вашем GitFlic-проекте основная ветка называется <code>main</code>, используйте <code>main</code> вместо <code>master</code>.</div>
+</section>
+
+<h2 class="section-title">18. Полезные элементы VS Code</h2>
+<section class="card s5">
+<table>
+<tr><th>Элемент</th><th>Что использовать</th></tr>
+<tr><td>Source Control</td><td>Изменения, Stage, Commit, Sync, Branch</td></tr>
+<tr><td>Explorer</td><td>Файлы проекта и Timeline</td></tr>
+<tr><td>Status Bar</td><td>Текущая Git-ветка и состояние синхронизации</td></tr>
+<tr><td>Diff Editor</td><td>Сравнение текущей и предыдущей версии</td></tr>
+<tr><td>Source Control Graph</td><td>История commits и веток</td></tr>
+<tr><td>Terminal</td><td>Все Git-команды вручную</td></tr>
+<tr><td>Command Palette</td><td>Git: Clone, Git: Initialize Repository, Publish to GitHub и др.</td></tr>
+</table>
+</section>
+
+<h2 class="section-title">19. Главное правило</h2>
+<section class="card s7">
+<pre>ИЗМЕНИЛ
+   ↓
+ПРОВЕРИЛ DIFF
+   ↓
+git add
+   ↓
+COMMIT
+   ↓
+PUSH
+   ↓
+REMOTE (GitHub / GitFlic)</pre>
+<div class="tip">
+Не воспринимайте <b>Save → Commit → Push</b> как одну операцию.
+Сохранение изменяет файл, commit сохраняет снимок в локальной истории,
+а push отправляет commits на удалённый сервер.
+</div>
+</section>
+
+</main>
+
+<footer>
+<div class="container">
+Git + GitHub + GitFlic + VS Code · Cheatsheet · Основные операции и практический workflow
+</div>
+</footer>
+
+</body>
+</html>

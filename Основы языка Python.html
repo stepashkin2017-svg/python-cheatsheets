@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Основы языка Python — шпаргалка</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="styles.css">
+
+<style>
+/* --- только для раздела задач --- */
+.task{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-left:5px solid var(--a3);
+  border-radius:var(--radius);
+  padding:16px 18px;
+  margin:0;
+}
+.task .task-num{
+  display:inline-block;
+  font:700 11px var(--font-code);
+  color:var(--a3);
+  background:rgba(91,75,196,.12);
+  padding:3px 8px;border-radius:5px;
+  margin-bottom:10px;
+  letter-spacing:.03em;
+}
+.task h3{margin:0 0 8px;font-size:16px;line-height:1.35;color:var(--text)}
+.task p{margin:0 0 10px;color:var(--muted);font-size:14px}
+
+details{
+  margin-top:8px;
+  border:1px solid var(--line);
+  border-radius:9px;
+  background:var(--bg);
+  overflow:hidden;
+  transition:.15s ease;
+}
+details[open]{
+  border-color:var(--a3);
+  box-shadow:0 4px 14px rgba(91,75,196,.1);
+}
+details > summary{
+  cursor:pointer;
+  list-style:none;
+  padding:9px 12px;
+  font:600 13px var(--font-ui);
+  color:var(--text);
+  display:flex;align-items:center;gap:8px;
+  user-select:none;
+  transition:.15s ease;
+}
+details > summary::-webkit-details-marker{display:none}
+details > summary::before{
+  content:"▸";
+  display:inline-block;
+  font-size:11px;
+  color:var(--a3);
+  transition:.2s ease;
+}
+details[open] > summary::before{
+  transform:rotate(90deg);
+}
+details > summary:hover{color:var(--a3)}
+details[open] > summary{
+  border-bottom:1px solid var(--line);
+  background:var(--card);
+  color:var(--a3);
+}
+details pre{
+  margin:12px 14px !important;
+  background:var(--code-bg);color:var(--code-text);
+  border-radius:8px;padding:12px 14px;overflow-x:auto;
+  font:13px/1.55 var(--font-code);
+}
+details p{
+  margin:12px 14px;
+  color:var(--muted);font-size:14px;
+}
+
+.task-hint{
+  background:linear-gradient(135deg,rgba(12,124,134,.08),rgba(91,75,196,.08));
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:14px 16px;
+  margin:0 0 20px;
+  font-size:14px;color:var(--muted);
+  display:flex;align-items:flex-start;gap:10px;
+}
+.task-hint::before{
+  content:"💡";font-size:18px;line-height:1.2;flex:0 0 auto;
+}
+.task-hint b{color:var(--text);font-weight:700}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <h1>Основы языка Python</h1>
+  <p class="subtitle">
+    Типы данных, переменные, строки и лаконичные конструкции — с короткими примерами
+    и задачами для практики. Комментарий <code>#</code> показывает результат.
+  </p>
+</header>
+
+<nav class="toc">
+  <div class="nav-inner">
+    <a href="#types">Типы данных</a>
+    <a href="#vars">Переменные</a>
+    <a href="#str">Строки</a>
+    <a href="#short">Лаконичный код</a>
+    <a href="#tasks">Задачи</a>
+  </div>
+</nav>
+
+<main>
+
+<h2 id="types">Типы данных</h2>
+<p class="sub">Тип определяет, какие значения хранятся и что с ними можно делать. Узнать тип: <code>type(x)</code>, проверить: <code>isinstance(x, int)</code>.</p>
+<div class="grid">
+<article class="s1 wide"><h3>Основные типы</h3><div class="tw"><table>
+<tr><th>Тип</th><th>Пример</th><th>Что это</th><th>Изменяемый</th></tr>
+<tr><td><code>int</code></td><td><code>42</code>, <code>-7</code></td><td>Целое число, размер не ограничен</td><td>нет</td></tr>
+<tr><td><code>float</code></td><td><code>3.14</code>, <code>2e3</code></td><td>Число с плавающей точкой</td><td>нет</td></tr>
+<tr><td><code>bool</code></td><td><code>True</code>, <code>False</code></td><td>Логическое значение</td><td>нет</td></tr>
+<tr><td><code>str</code></td><td><code>"привет"</code></td><td>Строка (текст)</td><td>нет</td></tr>
+<tr><td><code>list</code></td><td><code>[1, "a", 2.5]</code></td><td>Упорядоченный список</td><td>да</td></tr>
+<tr><td><code>tuple</code></td><td><code>(1, 2)</code></td><td>Упорядоченный кортеж</td><td>нет</td></tr>
+<tr><td><code>dict</code></td><td><code>{"a": 1}</code></td><td>Пары «ключ: значение»</td><td>да</td></tr>
+</table></div></article>
+
+<article class="s1"><h3>Проверка типа</h3><p>Python определяет тип по значению (динамическая типизация).</p>
+<pre><code>type(5)              # &lt;class 'int'&gt;
+type("5")            # &lt;class 'str'&gt;
+isinstance(2.5, float)  # True
+isinstance(True, int)   # True</code></pre></article>
+
+<article class="s1"><h3>Приведение типов</h3><p>Функции-конструкторы превращают значение в другой тип.</p>
+<pre><code>int("15")      # 15
+int(3.9)       # 3 (отбрасывает дробную часть)
+float("2.5")   # 2.5
+str(100)       # '100'
+bool(0)        # False
+list("abc")    # ['a', 'b', 'c']</code></pre></article>
+
+<article class="s1"><h3>Арифметика чисел</h3><p><code>/</code> всегда даёт <code>float</code>, <code>//</code> — целое деление.</p>
+<pre><code>7 / 2      # 3.5
+7 // 2     # 3
+7 % 2      # 1 (остаток)
+2 ** 10    # 1024
+divmod(7, 2)  # (3, 1)
+abs(-4)    # 4
+round(2.675, 1)  # 2.7</code></pre></article>
+
+<article class="s1"><h3>Точность float</h3><p>Дробные числа хранятся приблизительно. Для сравнения используйте <code>round</code> или <code>math.isclose</code>.</p>
+<pre><code>0.1 + 0.2             # 0.30000000000000004
+round(0.1 + 0.2, 2)   # 0.3
+2 ** 100              # int без ограничений</code></pre></article>
+
+<article class="s1"><h3>Изменяемые и неизменяемые</h3><p>Изменяемые (<code>list</code>, <code>dict</code>) правятся «на месте». Неизменяемые (<code>int</code>, <code>str</code>, <code>tuple</code>) создаются заново.</p>
+<pre><code>a = [1, 2]; a.append(3)   # a → [1, 2, 3]
+t = (1, 2)
+t[0] = 9    # TypeError</code></pre></article>
+
+<article class="s1"><h3>Литералы и разделители</h3>
+<pre><code>1_000_000    # 1000000 (подчёркивания для чтения)
+0xFF         # 255 (16-ричное)
+0b101        # 5 (двоичное)
+0o17         # 15 (восьмеричное)
+1.5e-3       # 0.0015</code></pre></article>
+</div>
+
+<h2 id="vars">Переменные</h2>
+<p class="sub">Переменная — это имя, привязанное к объекту в памяти. Оператор <code>=</code> не копирует значение, а связывает имя с объектом.</p>
+<div class="grid">
+<article class="s2"><h3>Создание</h3><p>Объявлять тип заранее не нужно. Имя можно привязать к другому типу.</p>
+<pre><code>age = 25          # int
+name = "Анна"     # str
+age = "двадцать"  # теперь str
+del age           # удалить имя</code></pre></article>
+
+<article class="s2"><h3>Правила имён</h3><p>Допустимы буквы, цифры и <code>_</code>. Нельзя начинать с цифры, использовать пробелы, дефисы и ключевые слова. Регистр важен.</p>
+<pre><code>user_1 = 1     # верно
+_tmp = 2       # верно
+1user = 3      # SyntaxError
+my-var = 4     # SyntaxError
+class = 5      # SyntaxError
+Age != age     # разные имена</code></pre></article>
+
+<article class="s2"><h3>Стиль имён (PEP 8)</h3><p>Договорённости, которые не проверяет интерпретатор, но ждут от кода.</p>
+<pre><code>user_name = "ann"   # snake_case: переменные
+MAX_SIZE = 100      # КОНСТАНТЫ
+_hidden = 1         # «внутреннее» имя
+__x = 2             # защита имени в классе</code></pre></article>
+
+<article class="s2"><h3>Ключевые слова</h3><p>Зарезервированы языком, использовать как имена нельзя. Полный список:</p>
+<pre><code>import keyword
+print(keyword.kwlist)
+# False None True and as assert async await
+# break class continue def del elif else except
+# finally for from global if import in is
+# lambda nonlocal not or pass raise return
+# try while with yield</code></pre></article>
+
+<article class="s2"><h3>Присваивание</h3><p>Несколько имён одним оператором, обмен значений без временной переменной.</p>
+<pre><code>a, b = 1, 2        # два значения сразу
+x = y = 0          # одно значение двум именам
+a, b = b, a        # обмен: a=2, b=1
+first, *rest = [1, 2, 3]   # 1 и [2, 3]</code></pre></article>
+
+<article class="s2"><h3>Составное присваивание</h3><p>Короткая запись «изменить и сохранить».</p>
+<pre><code>n = 10
+n += 5    # 15
+n -= 3    # 12
+n *= 2    # 24
+n //= 5   # 4
+n **= 2   # 16
+s = "a"; s += "b"   # 'ab'</code></pre></article>
+
+<article class="s2"><h3>Имя — это ссылка</h3><p>Два имени могут указывать на один изменяемый объект. Для независимой копии используйте <code>.copy()</code>.</p>
+<pre><code>a = [1, 2]
+b = a
+b.append(3)
+print(a)     # [1, 2, 3] — a тоже изменился
+c = a.copy()   # независимая копия
+id(a) == id(b) # True: один объект</code></pre></article>
+
+<article class="s2"><h3>Ввод и вывод</h3><p><code>input()</code> всегда возвращает строку. <code>print()</code> принимает <code>sep</code> и <code>end</code>.</p>
+<pre><code>name = input("Имя: ")
+print("Привет,", name)
+print(1, 2, 3, sep="-")      # 1-2-3
+print("a", end="")           # без переноса</code></pre></article>
+</div>
+
+<h2 id="str">Работа со строками</h2>
+<p class="sub">Строка (<code>str</code>) — неизменяемая упорядоченная последовательность символов.</p>
+<div class="grid">
+<article class="s3"><h3>Создание и экранирование</h3>
+<pre><code>a = 'одинарные'
+b = "двойные"
+c = """несколько
+строк"""
+d = "Он сказал: \"привет\"\n"   # \n перенос
+e = r"C:\new\file"   # raw: \ как есть
+"Py" "thon"          # 'Python' (склейка)</code></pre></article>
+
+<article class="s3"><h3>Индексы и срезы</h3><p>Индексация с 0, с конца — отрицательные. Срез <code>[старт:стоп:шаг]</code>, стоп не включается.</p>
+<pre><code>s = "Python"
+s[0]       # 'P'
+s[-1]      # 'n'
+s[1:4]     # 'yth'
+s[:2]      # 'Py'
+s[::2]     # 'Pto'
+s[::-1]    # 'nohtyP' (разворот)</code></pre></article>
+
+<article class="s3"><h3>Операции</h3>
+<pre><code>"ab" + "cd"     # 'abcd'
+"ab" * 3        # 'ababab'
+len("Привет")   # 6
+"th" in "Python"   # True
+"a" &lt; "b"        # True (по коду символа)
+ord("a"), chr(98)  # (97, 'b')</code></pre></article>
+
+<article class="s3"><h3>split — разделить строку</h3><p>Без аргумента режет по пробелам, с аргументом — по указанному разделителю.</p>
+<pre><code>"a b  c".split()       # ['a', 'b', 'c']
+"1,2,3".split(",")     # ['1', '2', '3']
+"один два".split(" ")  # ['один', 'два']</code></pre></article>
+
+<article class="s3"><h3>Поиск и замена</h3>
+<pre><code>s = "banana"
+s.find("an")      # 1 (или -1, если нет)
+s.count("a")      # 3
+s.replace("a", "o")   # 'bonono'</code></pre></article>
+
+<article class="s3"><h3>Проверки содержимого</h3>
+<pre><code>"123".isdigit()    # True
+"abc".isalpha()    # True
+"ab1".isalnum()    # True
+"abc".islower()    # True
+"  ".isspace()     # True</code></pre></article>
+</div>
+
+<h2 id="short">Вложенность и лаконичные конструкции</h2>
+<p class="sub">Python позволяет подставлять вызов функции прямо в аргумент другой. Читается изнутри наружу.</p>
+<div class="grid">
+<article class="s4"><h3>Ввод числа в одну строку</h3>
+<pre><code># длинно:
+s = input()
+n = int(s)
+# коротко:
+n = int(input())
+x = float(input("Вес: "))</code></pre></article>
+
+<article class="s4"><h3>Несколько чисел с одной строки</h3>
+<pre><code># ввод: 3 5
+a, b = map(int, input().split())
+print(a + b)    # 8
+# ввод: 4 1 9
+nums = list(map(int, input().split()))   # [4, 1, 9]</code></pre></article>
+
+<article class="s4"><h3>Вложенные вызовы</h3>
+<pre><code>len(str(2 ** 100))      # 31 — цифр в числе
+sum(map(int, "12345"))  # 15 — сумма цифр
+max(len(w) for w in ["a", "abc"])  # 3
+abs(int(input()))       # модуль введённого</code></pre></article>
+
+<article class="s4"><h3>Встроенные функции вместо кода</h3>
+<pre><code>nums = [4, 1, 9]
+sum(nums)        # 14
+min(nums)        # 1
+max(nums)        # 9
+sorted(nums)     # [1, 4, 9]
+len(nums)        # 3
+sum(nums) / len(nums)   # среднее 4.666…</code></pre></article>
+
+<article class="s4"><h3>Компактный вывод</h3>
+<pre><code>nums = [1, 2, 3]
+print(*nums)                # 1 2 3
+print(*nums, sep=", ")      # 1, 2, 3
+print("Сумма:", sum(nums))  # Сумма: 6</code></pre></article>
+
+<article class="s4"><h3>Цепочка сравнений</h3>
+<pre><code>x = 5
+0 &lt; x &lt; 10          # True
+a = b = c = 0       # одно значение трём именам
+name = input() or "аноним"   # если пусто → 'аноним'</code></pre></article>
+
+<article class="s4"><h3>Распаковка</h3>
+<pre><code>x, y = (10, 20)
+h, m = map(int, "12:30".split(":"))   # 12, 30
+first, *mid, last = [1, 2, 3, 4]      # 1, [2, 3], 4
+_, b = "a b".split()                  # _ — не нужно</code></pre></article>
+
+<article class="s4 wide"><h3>Принцип вложенности структур</h3>
+<pre><code>matrix = [[1, 2, 3], [4, 5, 6]]
+matrix[1][2]            # 6
+
+user = {"name": "Аня", "langs": ["ru", "en"], "addr": {"city": "Москва"}}
+user["langs"][0]        # 'ru'
+user["addr"]["city"]    # 'Москва'
+user.get("age", 0)      # 0 — безопасно, если ключа нет</code></pre></article>
+</div>
+
+<h2 id="tasks">Задачи для практики</h2>
+<p class="sub">Попробуйте решить сами, не подглядывая. Нажмите на спойлер «Показать решение», чтобы проверить себя.
+Все задачи можно выполнить прямо в <a href="python-compiler.html" style="color:var(--a1);font-weight:600">Python Playground</a>.</p>
+
+<div class="task-hint">
+  <div>
+    <b>Как работать с задачами.</b> Сначала напишите решение сами — даже если не уверены.
+    Только потом откройте спойлер. Если не совпало — сравните, что именно отличается, и запустите оба кода.
+  </div>
+</div>
+
+<h2 style="margin-top:32px">Ввод и вывод</h2>
+<div class="grid">
+
+<article class="task"><span class="task-num">ЗАДАЧА 1</span>
+<h3>Знакомство</h3>
+<p>Спросите у пользователя имя и город. Затем выведите приветствие в формате:<br>
+<code>Привет, Аня! Как дела в Москве?</code></p>
+<details><summary>Показать решение</summary>
+<pre><code>name = input("Как вас зовут? ")
+city = input("Из какого вы города? ")
+
+print("Привет, " + name + "! Как дела в " + city + "?")</code></pre>
+<p>Вариант с запятыми — тоже работает, но между запятой и именем появится
+лишний пробел:</p>
+<pre><code>print("Привет,", name + "! Как дела в", city + "?")</code></pre>
+</details>
+</article>
+
+<article class="task"><span class="task-num">ЗАДАЧА 2</span>
+<h3>Сумма двух чисел</h3>
+<p>Попросите два числа и выведите их сумму. Например, для ввода <code>3</code> и <code>5</code>
+должно получиться:<br>
+<code>3 + 5 = 8</code></p>
+<details><summary>Показать решение</summary>
+<pre><code>a = int(input("Первое число: "))
+b = int(input("Второе число: "))
+
+print(a, "+", b, "=", a + b)</code></pre>
+<p>Без <code>int()</code> была бы ошибка — <code>input()</code> возвращает строку,
+а склеивать строки через <code>+</code> можно, но тогда получится <code>"35"</code>, а не <code>8</code>.</p>
+</details>
+</article>
+
+<article class="task"><span class="task-num">ЗАДАЧА 3</span>
+<h3>Обращение к пользователю</h3>
+<p>Спросите имя и любимый предмет. Выведите две строки:<br>
+<code>Аня, ты любишь математику?</code><br>
+<code>Отличный выбор!</code></p>
+<details><summary>Показать решение</summary>
+<pre><code>name = input("Как тебя зовут? ")
+subject = input("Любимый предмет? ")
+
+print(name + ", ты любишь", subject + "?")
+print("Отличный выбор!")</code></pre>
+<p>Обратите внимание: запятые в <code>print</code> сами вставляют пробел между
+аргументами. Если нужен знак вопроса вплотную к слову — его лучше приклеить
+к переменной через <code>+</code>.</p>
+</details>
+</article>
+
+</div>
+
+<h2 style="margin-top:32px">Переменные</h2>
+<div class="grid">
+
+<article class="task"><span class="task-num">ЗАДАЧА 4</span>
+<h3>Анкета</h3>
+<p>Создайте три переменные: <code>name</code> со своим именем, <code>age</code> с возрастом, <code>city</code> с городом. Выведите их одной строкой через <code>print</code> в формате: <code>Аня, 12 лет, Москва</code>.</p>
+<details><summary>Показать решение</summary>
+<pre><code>name = "Аня"
+age = 12
+city = "Москва"
+
+print(name + ",", age, "лет,", city)</code></pre>
+<p>Можно и через запятые: <code>print(name, ",", age, "лет,", city)</code> — правда, между именем и запятой появится лишний пробел.</p>
+</details>
+</article>
+
+<article class="task"><span class="task-num">ЗАДАЧА 5</span>
+<h3>Обмен значений</h3>
+<p>Есть <code>a = 5</code> и <code>b = 10</code>. Поменяйте их значения местами <b>двумя способами</b>: классическим (через временную переменную) и «питоновским» (в одну строку).</p>
+<details><summary>Показать решение</summary>
+<pre><code>a = 5
+b = 10
+
+# способ 1: через временную переменную
+temp = a
+a = b
+b = temp
+print(a, b)   # 10 5
+
+# способ 2: обмен в одну строку
+a, b = 5, 10
+a, b = b, a
+print(a, b)   # 10 5</code></pre>
+</details>
+</article>
+
+<article class="task"><span class="task-num">ЗАДАЧА 6</span>
+<h3>Счётчик очков</h3>
+<p>Игрок начал с <code>score = 0</code>. Он получил 10 очков, потом потерял 3, затем заработал ещё 25. Используя составное присваивание (<code>+=</code>, <code>-=</code>), посчитайте итоговый счёт и выведите его.</p>
+<details><summary>Показать решение</summary>
+<pre><code>score = 0
+score += 10   # 10
+score -= 3    # 7
+score += 25   # 32
+
+print("Итог:", score)   # Итог: 32</code></pre>
+</details>
+</article>
+
+</div>
+
+<h2 style="margin-top:32px">Типы данных</h2>
+<div class="grid">
+
+<article class="task"><span class="task-num">ЗАДАЧА 7</span>
+<h3>Что за тип?</h3>
+<p>Определите и выведите тип каждого значения: <code>42</code>, <code>3.14</code>, <code>"привет"</code>, <code>True</code>, <code>[1, 2]</code>, <code>(1, 2)</code>, <code>{"a": 1}</code>.</p>
+<details><summary>Показать решение</summary>
+<pre><code>print(type(42))         # &lt;class 'int'&gt;
+print(type(3.14))       # &lt;class 'float'&gt;
+print(type("привет"))   # &lt;class 'str'&gt;
+print(type(True))       # &lt;class 'bool'&gt;
+print(type([1, 2]))     # &lt;class 'list'&gt;
+print(type((1, 2)))     # &lt;class 'tuple'&gt;
+print(type({"a": 1}))   # &lt;class 'dict'&gt;</code></pre>
+</details>
+</article>
+
+<article class="task"><span class="task-num">ЗАДАЧА 8</span>
+<h3>Калькулятор возраста</h3>
+<p>Пользователь вводит год рождения. Посчитайте и выведите его возраст в 2026 году. Учтите, что <code>input()</code> возвращает строку — нужно преобразовать в <code>int</code>.</p>
+<details><summary>Показать решение</summary>
+<pre><code>year = int(input("Год рождения: "))
+age = 2026 - year
+print("Вам будет", age, "лет")</code></pre>
+<p>Если бы забыли <code>int()</code>, получилось бы <code>TypeError</code> — Python не умеет вычитать строку из числа.</p>
+</details>
+</article>
+
+<article class="task"><span class="task-num">ЗАДАЧА 9</span>
+<h3>Половина и остаток</h3>
+<p>Дано число <code>n = 17</code>. Выведите: сколько раз 5 помещается в него целиком (целое деление) и какой остаток (деление по модулю). Используйте <code>divmod()</code> или <code>//</code> и <code>%</code>.</p>
+<details><summary>Показать решение</summary>
+<pre><code>n = 17
+
+# способ 1: обычными операторами
+print("Целых пятёрок:", n // 5)   # 3
+print("Остаток:", n % 5)          # 2
+
+# способ 2: через divmod
+quotient, remainder = divmod(n, 5)
+print("Целых:", quotient)
+print("Остаток:", remainder)</code></pre>
+</details>
+</article>
+
+<article class="task"><span class="task-num">ЗАДАЧА 10</span>
+<h3>Из строки в число</h3>
+<p>Есть строка <code>price = "149.90"</code>. Преобразуйте её в число, прибавьте 10, округлите до 2 знаков после запятой и выведите результат. Каким типом будет итоговое значение?</p>
+<details><summary>Показать решение</summary>
+<pre><code>price = "149.90"
+price = float(price)         # 149.9
+total = price + 10           # 159.9
+total = round(total, 2)      # 159.9
+
+print(total)                 # 159.9
+print(type(total))           # &lt;class 'float'&gt;</code></pre>
+<p>Итог — <code>float</code>, потому что исходная строка содержала точку. Если бы в строке было <code>"149"</code>, то после <code>int()</code> получился бы <code>int</code>.</p>
+</details>
+</article>
+
+</div>
+
+<h2 style="margin-top:32px">Строки</h2>
+<div class="grid">
+
+<article class="task"><span class="task-num">ЗАДАЧА 11</span>
+<h3>Разворот строки</h3>
+<p>Попросите пользователя ввести слово. Выведите его в обратном порядке. Например, <code>Python</code> → <code>nohtyP</code>.</p>
+<details><summary>Показать решение</summary>
+<pre><code>word = input("Слово: ")
+print(word[::-1])</code></pre>
+<p>Срез с шагом <code>-1</code> идёт от конца к началу.</p>
+</details>
+</article>
+
+<article class="task"><span class="task-num">ЗАДАЧА 12</span>
+<h3>Палиндром</h3>
+<p>Проверьте, читается ли слово одинаково в обе стороны: <code>level</code>, <code>топот</code>, <code>шалаш</code>. Выведите <code>True</code> или <code>False</code>.</p>
+<details><summary>Показать решение</summary>
+<pre><code>word = input("Слово: ")
+print(word == word[::-1])</code></pre>
+<p>Для строки <code>"level"</code> получится <code>True</code>, для <code>"hello"</code> — <code>False</code>.</p>
+</details>
+</article>
+
+<article class="task"><span class="task-num">ЗАДАЧА 13</span>
+<h3>Сколько слов?</h3>
+<p>Дана строка <code>"я учу питон каждый день"</code>. Посчитайте, сколько в ней слов, и выведите каждое слово с новой строки с порядковым номером: <code>1. я</code>, <code>2. учу</code> и т. д.</p>
+<details><summary>Показать решение</summary>
+<pre><code>text = "я учу питон каждый день"
+words = text.split()
+
+print("Всего слов:", len(words))
+
+for i, word in enumerate(words, start=1):
+    print(str(i) + ".", word)</code></pre>
+</details>
+</article>
+
+<article class="task"><span class="task-num">ЗАДАЧА 14</span>
+<h3>Частота буквы</h3>
+<p>Попросите пользователя ввести текст и букву. Посчитайте, сколько раз эта буква встречается в тексте. Например, для текста <code>банан</code> и буквы <code>а</code> должно получиться:<br>
+<code>Буква а встречается 2 раз</code></p>
+<details><summary>Показать решение</summary>
+<pre><code>text = input("Введите текст: ")
+letter = input("Какая буква? ")
+
+count = text.count(letter)
+print("Буква", letter, "встречается", count, "раз")</code></pre>
+<p>Метод <code>count</code> работает для любого символа и даже для целой подстроки:
+<code>text.count("ан")</code> посчитает, сколько раз встречается сочетание «ан».</p>
+</details>
+</article>
+
+<article class="task"><span class="task-num">ЗАДАЧА 15</span>
+<h3>Цена со скидкой</h3>
+<p>Дано: товар стоит <code>price = 2500.0</code> руб., скидка <code>discount = 15</code>%. Посчитайте итоговую цену и выведите её.</p>
+<details><summary>Показать решение</summary>
+<pre><code>price = 2500.0
+discount = 15
+
+final = price * (100 - discount) / 100
+print("Цена со скидкой:", final)</code></pre>
+<p>Результат будет <code>2125.0</code> — это <code>float</code>. Если хочется целого числа,
+примените <code>round()</code> или <code>int()</code>:</p>
+<pre><code>print("Цена со скидкой:", round(final))   # 2125</code></pre>
+</details>
+</article>
+
+<article class="task"><span class="task-num">ЗАДАЧА 16</span>
+<h3>Имя файла</h3>
+<p>Дано: <code>path = "photo_2026_10_08.jpg"</code>. Выведите отдельно имя файла без расширения и само расширение.</p>
+<details><summary>Показать решение</summary>
+<pre><code>path = "photo_2026_10_08.jpg"
+
+name, ext = path.split(".")
+print("Имя:", name)         # photo_2026_10_08
+print("Расширение:", ext)   # jpg</code></pre>
+<p>Метод <code>split</code> вернёт список; распаковка двумя именами сработает,
+только если в строке ровно одна точка. Если точек несколько, лучше
+<code>path.rsplit(".", 1)</code> — режет по последней точке.</p>
+</details>
+</article>
+
+<article class="task"><span class="task-num">ЗАДАЧА 17</span>
+<h3>Приветствие по имени</h3>
+<p>Попросите пользователя ввести имя. Затем выведите: <code>Привет, ИМЯ! В твоём имени N букв.</code>
+где <code>N</code> — количество символов.</p>
+<details><summary>Показать решение</summary>
+<pre><code>name = input("Как тебя зовут? ")
+
+print("Привет, " + name + "! В твоём имени " + str(len(name)) + " букв.")</code></pre>
+<p><code>len(name)</code> даёт число, а <code>str(...)</code> превращает его в строку —
+иначе Python не сможет приклеить число к тексту через <code>+</code>.</p>
+</details>
+</article>
+
+</div>
+
+</main>
+
+<footer class="site">
+  Совет: если вложенный вызов стал трудно читать, разбейте его на два-три шага с понятными именами переменных.
+</footer>
+
+<script src="app.js"></script>
+</body>
+</html>

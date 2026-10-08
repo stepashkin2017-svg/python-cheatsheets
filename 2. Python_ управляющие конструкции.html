@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Python: управляющие конструкции — шпаргалка</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="top">
+  <h1>Python: управляющие конструкции</h1>
+  <p class="subtitle">
+    Условия, циклы <code>while</code> и <code>for</code> — все возможности и короткие примеры.
+    Комментарий <code># →</code> показывает результат.
+  </p>
+</header>
+
+<nav class="toc">
+  <div class="nav-inner">
+    <a href="#if">if / match</a>
+    <a href="#while">while</a>
+    <a href="#for">for</a>
+    <a href="#ctl">break · continue · else · pass</a>
+  </div>
+</nav>
+
+<main>
+
+<h2 id="if">Условный оператор <code>if</code></h2>
+<p class="sub">Выполняет блок, только если условие истинно. Блок задаётся отступом (4 пробела).</p>
+<div class="grid">
+
+<article class="s1"><h3>if / elif / else</h3>
+<p>Проверяется сверху вниз, срабатывает первая истинная ветка. <code>elif</code> и <code>else</code> необязательны.</p>
+<pre><code>age = 17
+if age &lt; 14:
+    print("ребёнок")
+elif age &lt; 18:
+    print("подросток")   # → подросток
+else:
+    print("взрослый")</code></pre>
+</article>
+
+<article class="s1"><h3>Вложенные условия</h3>
+<p>Блок <code>if</code> можно вложить в другой. Часто читается лучше, если объединить через <code>and</code>.</p>
+<pre><code>user, pwd = "ann", "123"
+if user == "ann":
+    if pwd == "123":
+        print("вход")      # → вход
+# то же самое:
+if user == "ann" and pwd == "123":
+    print("вход")</code></pre>
+</article>
+
+<article class="s1"><h3>Операторы сравнения</h3>
+<p>Результат — <code>True</code>/<code>False</code>. Сравнения можно записывать цепочкой.</p>
+<pre><code>x = 5
+x == 5   x != 3   x &gt; 1   x &lt;= 5   # → True
+0 &lt; x &lt; 10        # → True (цепочка)
+1 &lt; x &lt; 3 &lt; 100  # → False</code></pre>
+</article>
+
+<article class="s1"><h3>Логические: and, or, not</h3>
+<p><code>and</code>/<code>or</code> вычисляются лениво и возвращают один из операндов, а не просто <code>True/False</code>.</p>
+<pre><code>not True            # → False
+5 and 0             # → 0
+0 or "по умолчанию" # → 'по умолчанию'
+name = "" or "аноним"   # → 'аноним'</code></pre>
+</article>
+
+<article class="s1"><h3>Принадлежность и тождество</h3>
+<p><code>in</code> — есть ли элемент в коллекции или подстрока в строке. <code>is</code> — тот же объект (для <code>None</code>, <code>True</code>, <code>False</code>).</p>
+<pre><code>"a" in "cat"          # → True
+3 not in [1, 2, 3]    # → False
+x = None
+if x is None:
+    print("пусто")    # → пусто</code></pre>
+</article>
+
+<article class="s1"><h3>Истинность значений</h3>
+<p>Ложными считаются: <code>False</code>, <code>None</code>, <code>0</code>, <code>0.0</code>, <code>""</code>, <code>[]</code>, <code>()</code>, <code>{}</code>. Всё остальное — истина.</p>
+<pre><code>items = []
+if not items:
+    print("список пуст")   # → список пуст
+if "0":                    # непустая строка
+    print("истина")        # → истина</code></pre>
+</article>
+
+<article class="s1"><h3>Тернарный оператор</h3>
+<p>Выражение <code>A if условие else B</code> — условие в одну строку, возвращает значение.</p>
+<pre><code>n = 7
+kind = "чёт" if n % 2 == 0 else "нечёт"
+print(kind)   # → нечёт</code></pre>
+</article>
+
+<article class="s1"><h3>Однострочный if и pass</h3>
+<p>Короткий блок можно писать на одной строке. <code>pass</code> — заглушка, когда блок должен быть, а действий пока нет.</p>
+<pre><code>if n &gt; 0: print("плюс")
+if n &lt; 0:
+    pass   # TODO: обработать позже</code></pre>
+</article>
+
+<article class="s1"><h3>Оператор := (моржовый)</h3>
+<p>Присваивает значение прямо внутри условия (Python 3.8+).</p>
+<pre><code>data = [4, 8, 15]
+if (k := len(data)) &gt; 2:
+    print("много:", k)   # → много: 3</code></pre>
+</article>
+
+<article class="s1 wide"><h3>match / case (Python 3.10+)</h3>
+<p>Сопоставление с образцом: значения, <code>|</code> (или), условие <code>if</code> (guard), кортежи, <code>_</code> — любой вариант.</p>
+<pre><code>def reply(cmd):
+    match cmd:
+        case "start" | "go":          # несколько значений
+            return "запуск"
+        case ("move", x, y):          # кортеж из 3 элементов
+            return "иду в {},{}".format(x, y)
+        case int(n) if n &lt; 0:         # тип + условие
+            return "отрицательное"
+        case _:                       # всё остальное
+            return "неизвестно"
+
+reply("go")             # → 'запуск'
+reply(("move", 2, 5))   # → 'иду в 2,5'</code></pre>
+</article>
+
+</div>
+
+<h2 id="while">Цикл <code>while</code></h2>
+<p class="sub">Повторяет блок, пока условие истинно. Условие проверяется перед каждым проходом — меняйте переменную внутри, иначе цикл бесконечный.</p>
+<div class="grid">
+
+<article class="s2"><h3>Базовый цикл со счётчиком</h3>
+<p>Инициализация → условие → изменение.</p>
+<pre><code>i = 1
+while i &lt;= 3:
+    print(i)
+    i += 1
+# → 1  2  3</code></pre>
+</article>
+
+<article class="s2"><h3>break — выйти из цикла</h3>
+<p>Немедленно завершает ближайший цикл.</p>
+<pre><code>n = 0
+while True:
+    n += 1
+    if n * n &gt; 50:
+        break
+print(n)   # → 8</code></pre>
+</article>
+
+<article class="s2"><h3>continue — к следующей итерации</h3>
+<p>Пропускает остаток тела и снова проверяет условие.</p>
+<pre><code>i = 0
+while i &lt; 6:
+    i += 1
+    if i % 2:        # нечётные пропускаем
+        continue
+    print(i)         # → 2  4  6</code></pre>
+</article>
+
+<article class="s2"><h3>while … else</h3>
+<p>Ветка <code>else</code> выполняется, если цикл закончился сам, а не через <code>break</code>.</p>
+<pre><code>tries = 0
+while tries &lt; 3:
+    tries += 1
+else:
+    print("попытки кончились")  # → выполнится
+# при break — else пропускается</code></pre>
+</article>
+
+<article class="s2"><h3>Бесконечный цикл с выходом</h3>
+<p>Типичный шаблон: ввод до тех пор, пока он не корректен.</p>
+<pre><code>while True:
+    s = input("Число: ")
+    if s.isdigit():
+        break
+    print("Это не число")
+num = int(s)</code></pre>
+</article>
+
+<article class="s2"><h3>while с условием по коллекции</h3>
+<p>Пустая коллекция — ложь, поэтому цикл идёт, пока в ней что-то есть.</p>
+<pre><code>stack = [1, 2, 3]
+while stack:
+    print(stack.pop())   # → 3  2  1</code></pre>
+</article>
+
+<article class="s2"><h3>while и :=</h3>
+<p>Читаем и проверяем значение за один шаг.</p>
+<pre><code>while (line := input("&gt; ")) != "q":
+    print("вы ввели", line)</code></pre>
+</article>
+
+</div>
+
+<h2 id="for">Цикл <code>for</code></h2>
+<p class="sub">Перебирает элементы любого итерируемого объекта: строки, списка, кортежа, множества, словаря, <code>range</code>, файла, генератора.</p>
+<div class="grid">
+
+<article class="s3"><h3>Перебор элементов</h3>
+<p>Переменная цикла получает по одному элементу.</p>
+<pre><code>for ch in "Py":
+    print(ch)          # → P  y
+for x in [10, 20]:
+    print(x)           # → 10  20</code></pre>
+</article>
+
+<article class="s3"><h3>range(): три формы</h3>
+<p>Генерирует числа; конец не включается.</p>
+<pre><code>range(4)          # 0 1 2 3
+range(2, 5)       # 2 3 4
+range(10, 0, -3)  # 10 7 4 1
+for i in range(3):
+    print(i)      # → 0  1  2</code></pre>
+</article>
+
+<article class="s3"><h3>enumerate() — индекс + значение</h3>
+<p>Второй аргумент задаёт начальный номер.</p>
+<pre><code>for i, c in enumerate(["a", "b"], start=1):
+    print(i, c)   # → 1 a  /  2 b</code></pre>
+</article>
+
+<article class="s3"><h3>zip() — несколько последовательностей</h3>
+<p>Идёт параллельно, останавливается на самой короткой.</p>
+<pre><code>names = ["Аня", "Боря"]
+ages = [20, 31]
+for n, a in zip(names, ages):
+    print(n, a)   # → Аня 20  /  Боря 31</code></pre>
+</article>
+
+<article class="s3"><h3>Словарь: keys, values, items</h3>
+<p>По умолчанию цикл идёт по ключам.</p>
+<pre><code>d = {"a": 1, "b": 2}
+for k in d: ...               # ключи
+for v in d.values(): ...      # значения
+for k, v in d.items():
+    print(k, v)               # → a 1  /  b 2</code></pre>
+</article>
+
+<article class="s3"><h3>reversed() и sorted()</h3>
+<p>Обход в обратном или отсортированном порядке, исходный список не меняется.</p>
+<pre><code>for x in reversed([1, 2, 3]):
+    print(x)                  # → 3  2  1
+for w in sorted(["b", "a"]):
+    print(w)                  # → a  b</code></pre>
+</article>
+
+<article class="s3"><h3>break, continue, else в for</h3>
+<p><code>else</code> срабатывает, если <code>break</code> не было — удобно для поиска.</p>
+<pre><code>for n in [3, 5, 8]:
+    if n % 2 == 0:
+        print("чётное:", n)   # → чётное: 8
+        break
+else:
+    print("чётных нет")</code></pre>
+</article>
+
+<article class="s3"><h3>Вложенные циклы и распаковка</h3>
+<p>Внутренний цикл полностью проходит на каждый шаг внешнего.</p>
+<pre><code>for i in range(1, 3):
+    for j in range(1, 3):
+        print(i * j, end=" ")   # → 1 2 2 4
+pairs = [(1, "a"), (2, "b")]
+for num, ch in pairs: ...</code></pre>
+</article>
+
+<article class="s3"><h3>Звёздочка и счётчик «_»</h3>
+<p><code>_</code> — переменная, значение которой не нужно. <code>*</code> собирает остаток при распаковке.</p>
+<pre><code>for _ in range(3):
+    print("hi")                 # 3 раза
+for first, *rest in [(1, 2, 3)]:
+    print(first, rest)          # → 1 [2, 3]</code></pre>
+</article>
+
+<article class="s3 wide"><h3>Генераторы списков (компактный for)</h3>
+<p>Цикл и условие в одном выражении. Есть версии для списков, множеств, словарей и генераторов.</p>
+<pre><code>squares = [x * x for x in range(5)]          # → [0, 1, 4, 9, 16]
+evens   = [x for x in range(10) if x % 2 == 0]  # фильтр
+label   = ["чёт" if x % 2 == 0 else "нечёт" for x in range(3)]
+uniq    = {c for c in "hello"}               # множество
+sq_map  = {x: x * x for x in range(3)}       # → {0: 0, 1: 1, 2: 4}
+total   = sum(x for x in range(4))           # генератор → 6</code></pre>
+</article>
+
+</div>
+
+<h2 id="ctl">Управление циклами: итог</h2>
+<p class="sub">Одинаково работает в <code>while</code> и в <code>for</code>.</p>
+<article class="s5 wide">
+<div class="tw"><table>
+<tr><th>Конструкция</th><th>Что делает</th><th>Когда выполняется</th></tr>
+<tr><td><code>break</code></td><td>Выходит из ближайшего цикла</td><td>Сразу, где написан</td></tr>
+<tr><td><code>continue</code></td><td>Переходит к следующей итерации</td><td>Сразу, где написан</td></tr>
+<tr><td><code>else</code></td><td>Блок после цикла</td><td>Только если цикл не был прерван <code>break</code></td></tr>
+<tr><td><code>pass</code></td><td>Ничего не делает, заполняет пустой блок</td><td>Всегда</td></tr>
+</table></div>
+</article>
+
+</main>
+
+<footer class="site">
+  Совет: для цикла с известным числом шагов или по коллекции берите <code>for</code>,
+  а когда число шагов заранее неизвестно — <code>while</code>.
+</footer>
+
+<script src="app.js"></script>
+</body>
+</html>

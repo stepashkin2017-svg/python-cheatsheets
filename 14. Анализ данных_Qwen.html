@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Анализ данных с помощью Pandas — Cheatsheet</title>
+  <style>
+    :root {
+      --bg: #f6f8fb;
+      --card: #ffffff;
+      --text: #1f2937;
+      --muted: #64748b;
+      --border: #e5e7eb;
+      --primary: #4f46e5;
+      --primary-2: #06b6d4;
+      --code-bg: #0b1220;
+      --code-text: #e5e7eb;
+      --success: #10b981;
+      --warn: #f59e0b;
+      --danger: #ef4444;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.55;
+    }
+
+    .hero {
+      background: linear-gradient(135deg, #312e81 0%, #4f46e5 45%, #0ea5e9 100%);
+      color: #fff;
+      padding: 48px 20px 36px;
+    }
+
+    .hero-inner,
+    main,
+    .toc-inner,
+    footer {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      margin: 0 0 12px;
+      font-size: clamp(28px, 5vw, 44px);
+      line-height: 1.15;
+    }
+
+    .subtitle {
+      max-width: 900px;
+      margin: 0;
+      font-size: 18px;
+      opacity: 0.95;
+    }
+
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 18px;
+    }
+
+    .tag {
+      background: rgba(255, 255, 255, 0.16);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .download-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    .btn {
+      border: none;
+      background: #fff;
+      color: #312e81;
+      padding: 10px 14px;
+      border-radius: 12px;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+    }
+
+    .hint {
+      font-size: 13px;
+      opacity: 0.9;
+    }
+
+    nav.toc {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: rgba(255, 255, 255, 0.88);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border);
+      padding: 10px 16px;
+    }
+
+    .toc-inner {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 2px;
+    }
+
+    .toc a {
+      white-space: nowrap;
+      text-decoration: none;
+      color: #334155;
+      background: #f1f5f9;
+      border: 1px solid #e2e8f0;
+      padding: 7px 10px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .toc a:hover {
+      background: #e0e7ff;
+      color: #3730a3;
+    }
+
+    main {
+      padding: 24px 16px 60px;
+    }
+
+    section.card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 24px;
+      margin: 18px 0;
+      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+    }
+
+    h2 {
+      margin: 0 0 14px;
+      font-size: 26px;
+      color: #111827;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    h3 {
+      margin: 20px 0 8px;
+      font-size: 18px;
+      color: #1f2937;
+    }
+
+    p {
+      margin: 8px 0;
+    }
+
+    .num {
+      display: inline-flex;
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-2));
+      color: #fff;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      font-weight: 800;
+      box-shadow: 0 6px 16px rgba(79, 70, 229, 0.25);
+      flex: 0 0 auto;
+    }
+
+    code.inline {
+      background: #eef2ff;
+      color: #3730a3;
+      padding: 2px 6px;
+      border-radius: 6px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      font-size: 0.95em;
+    }
+
+    pre {
+      background: var(--code-bg);
+      color: var(--code-text);
+      padding: 16px;
+      border-radius: 14px;
+      overflow: auto;
+      border: 1px solid #1f2937;
+      margin: 12px 0;
+    }
+
+    pre code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      font-size: 13.5px;
+      line-height: 1.55;
+      white-space: pre;
+    }
+
+    .callout {
+      border-left: 5px solid var(--primary);
+      background: #eef2ff;
+      padding: 14px 16px;
+      border-radius: 12px;
+      margin: 14px 0;
+    }
+
+    .callout.warn {
+      border-color: var(--warn);
+      background: #fffbeb;
+    }
+
+    .callout.success {
+      border-color: var(--success);
+      background: #ecfdf5;
+    }
+
+    .callout.danger {
+      border-color: var(--danger);
+      background: #fef2f2;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 14px;
+      margin: 12px 0;
+    }
+
+    .mini {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      padding: 14px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 12px 0;
+      font-size: 14px;
+    }
+
+    th, td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      background: #f8fafc;
+      font-weight: 800;
+      color: #111827;
+    }
+
+    tr:nth-child(even) td {
+      background: #fcfcfd;
+    }
+
+    .flow {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      margin: 12px 0;
+    }
+
+    .step {
+      background: linear-gradient(135deg, #eef2ff, #ecfeff);
+      border: 1px solid #c7d2fe;
+      padding: 10px 12px;
+      border-radius: 12px;
+      font-weight: 800;
+      color: #312e81;
+    }
+
+    .arrow {
+      color: #64748b;
+      font-weight: 800;
+    }
+
+    footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: 14px;
+      padding: 10px 16px 40px;
+    }
+
+    a {
+      color: var(--primary);
+    }
+
+    @media print {
+      nav.toc,
+      .download-row {
+        display: none !important;
+      }
+
+      body {
+        background: #fff;
+      }
+
+      section.card {
+        box-shadow: none;
+        break-inside: avoid;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="hero">
+    <div class="hero-inner">
+      <h1>Анализ данных с помощью Pandas — Cheatsheet</h1>
+      <p class="subtitle">
+        Практическая шпаргалка: DataFrame, value_counts, groupby, pivot_table, фильтрация,
+        очистка данных, генерация новых столбцов и фиктивные переменные с простыми примерами.
+      </p>
+
+      <div class="tags">
+        <span class="tag">Pandas</span>
+        <span class="tag">Python</span>
+        <span class="tag">DataFrame</span>
+        <span class="tag">value_counts</span>
+        <span class="tag">groupby</span>
+        <span class="tag">pivot_table</span>
+        <span class="tag">фильтрация</span>
+        <span class="tag">очистка данных</span>
+        <span class="tag">get_dummies</span>
+      </div>
+
+      <div class="download-row">
+        <button class="btn" onclick="downloadHtml()">Скачать HTML</button>
+        <span class="hint">Кнопка сохранит эту страницу как файл pandas_cheatsheet.html</span>
+      </div>
+    </div>
+  </header>
+
+  <nav class="toc">
+    <div class="toc-inner">
+      <a href="#concepts">Основы</a>
+      <a href="#setup">Установка</a>
+      <a href="#data">Данные</a>
+      <a href="#value-counts">value_counts</a>
+      <a href="#groupby">groupby</a>
+      <a href="#pivot">pivot_table</a>
+      <a href="#filter">Фильтрация</a>
+      <a href="#clean">Очистка</a>
+      <a href="#new-cols">Новые столбцы</a>
+      <a href="#dummy">Фиктивные переменные</a>
+      <a href="#commands">Команды</a>
+      <a href="#workflow">Workflow</a>
+      <a href="#rule">Правило</a>
+    </div>
+  </nav>
+
+  <main>
+    <section class="card" id="concepts">
+      <h2><span class="num">1</span> Pandas, Series и DataFrame</h2>
+      <p>
+        <strong>Pandas</strong> — библиотека Python для работы с табличными данными.
+        Основные объекты:
+      </p>
+
+      <div class="grid">
+        <div class="mini">
+          <h3>Series</h3>
+          <p>Одномерный массив: один столбец данных с индексом.</p>
+        </div>
+        <div class="mini">
+          <h3>DataFrame</h3>
+          <p>Двумерная таблица: строки, столбцы, типы данных, индекс.</p>
+        </div>
+      </div>
+
+      <h3>Пример создания DataFrame</h3>
+      <pre><code>import pandas as pd
+
+df = pd.DataFrame({
+    "city": ["Moscow", "SPb", "Moscow", "Kazan", "SPb"],
+    "month": ["Jan", "Feb", "Jan", "Jan", "Feb"],
+    "sales": [120, 90, 150, 80, 110],
+    "status": ["active", "closed", "active", "active", "closed"],
+    "age": [25, 30, None, 22, 35]
+})
+
+print(df)
+</code></pre>
+
+      <div class="callout">
+        Этот пример будет использоваться дальше во всех разделах.
+      </div>
+    </section>
+
+    <section class="card" id="setup">
+      <h2><span class="num">2</span> Установка и проверка Pandas</h2>
+
+      <h3>Установка</h3>
+      <pre><code>pip install pandas
+</code></pre>
+
+      <h3>Проверка версии</h3>
+      <pre><code>python -c "import pandas; print(pandas.__version__)"
+</code></pre>
+
+      <h3>Первый простой пример</h3>
+      <pre><code>import pandas as pd
+
+s = pd.Series([10, 20, 30])
+print(s.mean())
+</code></pre>
+    </section>
+
+    <section class="card" id="data">
+      <h2><span class="num">3</span> Загрузка данных и первичный осмотр</h2>
+
+      <h3>Загрузка CSV</h3>
+      <pre><code>df = pd.read_csv("sales.csv")
+</code></pre>
+
+      <h3>Загрузка Excel</h3>
+      <pre><code>df = pd.read_excel("sales.xlsx", sheet_name="Sheet1")
+</code></pre>
+
+      <h3>Базовый осмотр таблицы</h3>
+      <pre><code>df.head()
+df.info()
+df.describe()
+df.shape
+df.columns
+</code></pre>
+
+      <div class="callout success">
+        Перед анализом всегда смотрите <code class="inline">head()</code>,
+        <code class="inline">info()</code> и <code class="inline">describe()</code>.
+        Это помогает быстро понять структуру данных и найти проблемы.
+      </div>
+    </section>
+
+    <section class="card" id="value-counts">
+      <h2><span class="num">4</span> value_counts — подсчёт значений</h2>
+      <p>
+        Метод <code class="inline">value_counts()</code> показывает, сколько раз каждое значение
+        встречается в столбце.
+      </p>
+
+      <h3>Простой подсчёт</h3>
+      <pre><code>df["city"].value_counts()
+</code></pre>
+
+      <h3>Доли в процентах</h3>
+      <pre><code>df["status"].value_counts(normalize=True).mul(100).round(1)
+</code></pre>
+
+      <h3>Топ-2 значения</h3>
+      <pre><code>df["city"].value_counts().head(2)
+</code></pre>
+
+      <div class="callout">
+        Подходит для быстрых вопросов: «какой город встречается чаще?»,
+        «сколько активных и закрытых записей?».
+      </div>
+    </section>
+
+    <section class="card" id="groupby">
+      <h2><span class="num">5</span> groupby — группировка данных</h2>
+      <p>
+        <code class="inline">groupby</code> группирует строки по одному или нескольким столбцам
+        и позволяет применить агрегацию: сумму, среднее, количество и другие функции.
+      </p>
+
+      <h3>Сумма продаж по городам</h3>
+      <pre><code>df.groupby("city")["sales"].sum()
+</code></pre>
+
+      <h3>Средние продажи по городам</h3>
+      <pre><code>df.groupby("city")["sales"].mean().round(1)
+</code></pre>
+
+      <h3>Группировка по нескольким столбцам</h3>
+      <pre><code>df.groupby(["city", "month"])["sales"].sum()
+</code></pre>
+
+      <h3>Несколько агрегаций сразу</h3>
+      <pre><code>df.groupby("city").agg(
+    total_sales=("sales", "sum"),
+    avg_sales=("sales", "mean"),
+    records=("sales", "count")
+).reset_index()
+</code></pre>
+
+      <div class="callout success">
+        Логика простая: <strong>по чему группируем → что считаем → получаем результат</strong>.
+      </div>
+    </section>
+
+    <section class="card" id="pivot">
+      <h2><span class="num">6</span> pivot_table — сводная таблица</h2>
+      <p>
+        <code class="inline">pivot_table</code> строит таблицу вида «строки × столбцы»
+        и агрегирует значения, как сводная таблица в Excel.
+      </p>
+
+      <h3>Продажи по городам и месяцам</h3>
+      <pre><code>pd.pivot_table(
+    df,
+    values="sales",
+    index="city",
+    columns="month",
+    aggfunc="sum",
+    fill_value=0
+)
+</code></pre>
+
+      <h3>Средние продажи по статусу</h3>
+      <pre><code>pd.pivot_table(
+    df,
+    values="sales",
+    index="city",
+    columns="status",
+    aggfunc="mean"
+)
+</code></pre>
+
+      <h3>Несколько функций агрегации</h3>
+      <pre><code>pd.pivot_table(
+    df,
+    values="sales",
+    index="city",
+    columns="month",
+    aggfunc=["sum", "mean"],
+    fill_value=0
+)
+</code></pre>
+    </section>
+
+    <section class="card" id="filter">
+      <h2><span class="num">7</span> Фильтрация данных</h2>
+      <p>
+        Фильтрация оставляет только те строки, которые удовлетворяют условию.
+      </p>
+
+      <h3>Простой фильтр</h3>
+      <pre><code>df[df["sales"] &gt; 100]
+</code></pre>
+
+      <h3>Несколько условий</h3>
+      <pre><code>df[(df["city"] == "Moscow") &amp; (df["sales"] &gt;= 120)]
+</code></pre>
+
+      <h3>Фильтр + выбор столбцов через loc</h3>
+      <pre><code>df.loc[df["status"] == "active", ["city", "sales"]]
+</code></pre>
+
+      <h3>Более читаемый синтаксис через query</h3>
+      <pre><code>df.query("sales &gt; 100 and city == 'Moscow'")
+</code></pre>
+
+      <h3>Фильтр по списку значений</h3>
+      <pre><code>df[df["city"].isin(["Moscow", "SPb"])]
+</code></pre>
+
+      <div class="callout warn">
+        В булевых масках используйте <code class="inline">&amp;</code>,
+        <code class="inline">|</code> и <code class="inline">~</code>,
+        а не слова <code class="inline">and</code>, <code class="inline">or</code>,
+        <code class="inline">not</code>.
+      </div>
+    </section>
+
+    <section class="card" id="clean">
+      <h2><span class="num">8</span> Очистка данных: isnull, fillna, apply</h2>
+      <p>
+        Реальные данные часто содержат пропуски, лишний пробелы, разный регистр
+        и несогласованные значения.
+      </p>
+
+      <h3>Сколько пропусков в каждом столбце</h3>
+      <pre><code>df.isnull().sum()
+</code></pre>
+
+      <h3>Найти строки с пропуском в столбце age</h3>
+      <pre><code>df[df["age"].isnull()]
+</code></pre>
+
+      <h3>Заполнить пропуски медианой</h3>
+      <pre><code>df["age"] = df["age"].fillna(df["age"].median())
+</code></pre>
+
+      <h3>Заполнить несколько столбцов разными значениями</h3>
+      <pre><code>df = df.fillna({
+    "age": 0,
+    "status": "unknown"
+})
+</code></pre>
+
+      <h3>Удалить строки с пропусками в важных столбцах</h3>
+      <pre><code>df_clean = df.dropna(subset=["sales", "city"])
+</code></pre>
+
+      <h3>apply: очистить текст в столбце</h3>
+      <pre><code>df["city"] = df["city"].apply(lambda x: x.strip().title())
+</code></pre>
+
+      <h3>apply: создать категорию на основе значения</h3>
+      <pre><code>df["sales_label"] = df["sales"].apply(
+    lambda x: "high" if x &gt;= 120 else "normal"
+)
+</code></pre>
+
+      <div class="callout danger">
+        Не злоупотребляйте параметром <code class="inline">inplace=True</code>.
+        Современный стиль — явно присваивать результат обратно:
+        <code class="inline">df = df.fillna(...)</code>.
+      </div>
+    </section>
+
+    <section class="card" id="new-cols">
+      <h2><span class="num">9</span> Генерация новых столбцов</h2>
+      <p>
+        Новые столбцы создают из существующих: бонусы, проценты, флаги, категории,
+        отношения, признаки для моделей.
+      </p>
+
+      <h3>Простая арифметика</h3>
+      <pre><code>df["bonus"] = df["sales"] * 0.1
+</code></pre>
+
+      <h3>Округление нового столбца</h3>
+      <pre><code>df["bonus"] = df["bonus"].round(2)
+</code></pre>
+
+      <h3>assign: добавить несколько столбцов цепочкой</h3>
+      <pre><code>df = df.assign(
+    profit=lambda d: d["sales"] - 20,
+    sales_per_age=lambda d: d["sales"] / d["age"]
+)
+</code></pre>
+
+      <h3>Булев признак</h3>
+      <pre><code>df["is_big_sale"] = df["sales"].gt(100)
+</code></pre>
+
+      <h3>Новый столбец через np.where</h3>
+      <pre><code>import numpy as np
+
+df["priority"] = np.where(df["sales"] &gt;= 120, "high", "low")
+</code></pre>
+
+      <h3>Интервальный признак через pd.cut</h3>
+      <pre><code>df["sales_bin"] = pd.cut(
+    df["sales"],
+    bins=[0, 100, 150],
+    labels=["low", "high"]
+)
+</code></pre>
+    </section>
+
+    <section class="card" id="dummy">
+      <h2><span class="num">10</span> Фиктивные переменные (dummy variables)</h2>
+      <p>
+        Фиктивные переменные превращают категориальные признаки в числовые столбцы
+        со значениями <code class="inline">0/1</code> или <code class="inline">True/False</code>.
+        Это часто нужно для машинного обучения.
+      </p>
+
+      <h3>Кодирование одного столбца</h3>
+      <pre><code>status_dummies = pd.get_dummies(df["status"], prefix="status")
+print(status_dummies)
+</code></pre>
+
+      <h3>Присоединить фиктивные столбцы к исходной таблице</h3>
+      <pre><code>df_encoded = pd.concat(
+    [df, pd.get_dummies(df["city"], prefix="city")],
+    axis=1
+)
+</code></pre>
+
+      <h3>Кодирование нескольких столбцов сразу</h3>
+      <pre><code>df_model = pd.get_dummies(
+    df,
+    columns=["city", "status"],
+    drop_first=True
+)
+</code></pre>
+
+      <h3>Если нужны именно числа 0 и 1</h3>
+      <pre><code>df_model = pd.get_dummies(
+    df,
+    columns=["city", "status"],
+    drop_first=True
+).astype(int)
+</code></pre>
+
+      <div class="callout">
+        Параметр <code class="inline">drop_first=True</code> убирает одну категорию,
+        чтобы уменьшить риск мультиколлинеарности в линейных моделях.
+      </div>
+    </section>
+
+    <section class="card" id="commands">
+      <h2><span class="num">11</span> Полезные команды в одном месте</h2>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Команда</th>
+            <th>Назначение</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code class="inline">pd.read_csv()</code></td>
+            <td>Загрузить CSV-файл</td>
+          </tr>
+          <tr>
+            <td><code class="inline">df.head()</code></td>
+            <td>Показать первые строки</td>
+          </tr>
+          <tr>
+            <td><code class="inline">df.info()</code></td>
+            <td>Показать типы данных и пропуски</td>
+          </tr>
+          <tr>
+            <td><code class="inline">df.describe()</code></td>
+            <td>Описательная статистика</td>
+          </tr>
+          <tr>
+            <td><code class="inline">df["col"].value_counts()</code></td>
+            <td>Подсчитать значения</td>
+          </tr>
+          <tr>
+            <td><code class="inline">df.groupby("col")</code></td>
+            <td>Сгруппировать данные</td>
+          </tr>
+          <tr>
+            <td><code class="inline">pd.pivot_table()</code></td>
+            <td>Построить сводную таблицу</td>
+          </tr>
+          <tr>
+            <td><code class="inline">df[df["sales"] &gt; 100]</code></td>
+            <td>Отфильтровать строки</td>
+          </tr>
+          <tr>
+            <td><code class="inline">df.isnull().sum()</code></td>
+            <td>Посчитать пропуски</td>
+          </tr>
+          <tr>
+            <td><code class="inline">df.fillna()</code></td>
+            <td>Заполнить пропуски</td>
+          </tr>
+          <tr>
+            <td><code class="inline">df.apply()</code></td>
+            <td>Применить функцию к данным</td>
+          </tr>
+          <tr>
+            <td><code class="inline">df.assign()</code></td>
+            <td>Добавить новые столбцы</td>
+          </tr>
+          <tr>
+            <td><code class="inline">pd.get_dummies()</code></td>
+            <td>Создать фиктивные переменные</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="card" id="workflow">
+      <h2><span class="num">12</span> Типичный рабочий цикл анализа</h2>
+
+      <div class="flow">
+        <span class="step">1. Загрузить</span>
+        <span class="arrow">→</span>
+        <span class="step">2. Посмотреть</span>
+        <span class="arrow">→</span>
+        <span class="step">3. Очистить</span>
+        <span class="arrow">→</span>
+        <span class="step">4. Отфильтровать</span>
+        <span class="arrow">→</span>
+        <span class="step">5. Сгруппировать</span>
+        <span class="arrow">→</span>
+        <span class="step">6. Сделать вывод</span>
+      </div>
+
+      <pre><code>import pandas as pd
+
+# 1. Загрузка данных
+df = pd.read_csv("sales.csv")
+
+# 2. Первичный осмотр
+print(df.head())
+print(df.info())
+
+# 3. Очистка
+df["city"] = df["city"].str.strip().str.title()
+df["age"] = df["age"].fillna(df["age"].median())
+
+# 4. Фильтрация
+active_df = df[df["status"] == "active"]
+
+# 5. Группировка и агрегация
+summary = (
+    active_df
+    .groupby("city")
+    .agg(
+        total_sales=("sales", "sum"),
+        avg_sales=("sales", "mean"),
+        count=("sales", "count")
+    )
+    .sort_values("total_sales", ascending=False)
+)
+
+# 6. Результат
+print(summary)
+</code></pre>
+    </section>
+
+    <section class="card" id="rule">
+      <h2><span class="num">13</span> Главное правило Pandas</h2>
+
+      <div class="flow">
+        <span class="step">ЗАГРУЗИЛ</span>
+        <span class="arrow">↓</span>
+        <span class="step">ПОСМОТРЕЛ ДАННЫЕ</span>
+        <span class="arrow">↓</span>
+        <span class="step">ОЧИСТИЛ</span>
+        <span class="arrow">↓</span>
+        <span class="step">ОТФИЛЬТРОВАЛ</span>
+        <span class="arrow">↓</span>
+        <span class="step">СГРУППИРОВАЛ</span>
+        <span class="arrow">↓</span>
+        <span class="step">СДЕЛАЛ ВЫВОД</span>
+      </div>
+
+      <div class="callout success">
+        Не начинайте сразу со сложных моделей. Сначала убедитесь, что данные загружены корректно,
+        типы столбцов правильные, пропуски обработаны, а фильтры и группировки дают понятный результат.
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    Pandas · Анализ данных · Cheatsheet · value_counts · groupby · pivot_table · фильтрация · очистка · фиктивные переменные
+  </footer>
+
+  <script>
+    function downloadHtml() {
+      const doctype = '<!DOCTYPE html>\n';
+      const html = doctype + document.documentElement.outerHTML;
+      const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'pandas_cheatsheet.html';
+
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+
+      URL.revokeObjectURL(url);
+    }
+  </script>
+</body>
+</html>
